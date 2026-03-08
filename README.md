@@ -1,4 +1,4 @@
-# 🐕 Pawsome Dogs Club Website
+# 🐕 Keystone Canine Training Club Website
 
 A modern React + TypeScript website for a dog club with event listings, training classes, and member signup functionality. Includes a Node.js/Express backend with MySQL database integration.
 

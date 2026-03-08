@@ -9,7 +9,7 @@ export default function Navigation() {
     <nav className={styles.navbar}>
       <div className={styles.container}>
         <Link to="/" className={styles.logo}>
-          🐕 Pawsome Dogs Club
+          🐕 Keystone Canine Training Club
         </Link>
 
         <button

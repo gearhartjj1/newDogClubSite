@@ -5,7 +5,7 @@ export default function Home() {
   return (
     <div className={styles.container}>
       <section className={styles.hero}>
-        <h1>Welcome to Pawsome Dogs Club</h1>
+        <h1>Welcome to Keystone Canine Training Club</h1>
         <p>Your community for dog lovers and enthusiasts</p>
       </section>
 
@@ -13,7 +13,7 @@ export default function Home() {
         <div className={styles.card}>
           <h2>🐕 About Us</h2>
           <p>
-            The Pawsome Dogs Club is dedicated to bringing together dog owners and enthusiasts
+            The Keystone Canine Training Club is dedicated to bringing together dog owners and enthusiasts
             for training, socializing, and celebrating our furry friends.
           </p>
         </div>

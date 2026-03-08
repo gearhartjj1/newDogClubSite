@@ -62,7 +62,7 @@ app.use((req, res) => {
 app.listen(PORT, () => {
   console.log(`
 ╔═══════════════════════════════════════════════════╗
-║     🐕 Pawsome Dogs Club API Server              ║
+║     🐕 Keystone Canine Training Club API Server  ║
 ║     Running on http://localhost:${PORT}            ║
 ║     Environment: ${process.env.NODE_ENV || 'development'}             ║
 ╚═══════════════════════════════════════════════════╝

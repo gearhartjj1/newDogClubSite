@@ -1,4 +1,4 @@
-# Pawsome Dogs Club - Project Structure
+# Keystone Canine Training Club - Project Structure
 
 ## Overview
 A modern React + TypeScript website for a dog club featuring event listings, training classes, and class signup functionality.
