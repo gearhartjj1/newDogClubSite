@@ -1,4 +1,5 @@
 import express, { Request, Response } from 'express';
+import pool from '../config/database';
 
 const router = express.Router();
 
@@ -7,10 +8,18 @@ const router = express.Router();
 //Build basic pages for UI
 //Plan out more phases
 
+//TODO: Get query configured to get full data on classes includeing number enrolled
+
 // Get all classes
 router.get('/', async (req: Request, res: Response) => {
   try {
-    const query = 'SELECT * FROM classes';
+    //const query = 'SELECT * FROM KCTCSession';
+    //const query = 'SELECT * FROM Enrollment';
+    //const query = 'SELECT  S.class,S.Start,S.Time,S.Instructors,S.CurDog,E.DogName FROM Enrollment E, KCTCSession S where E.SID = S.ID';
+    //const query = 'SELECT Count(*) FROM Enrollment E, KCTCSession S where E.SID = S.ID';
+    const query = 'SELECT c.class AS class_name, COUNT(e.id) AS enrolled_dogs FROM KCTCSession c INNER JOIN Enrollment e ON c.id = e.SID GROUP BY c.id, c.class ORDER BY c.class';
+    const stuffFromEnrollment = await pool.query(query);
+    console.log('Enrollment data fetched:', stuffFromEnrollment);
     // TODO: Execute query using database connection
     
     res.json({
@@ -18,6 +27,7 @@ router.get('/', async (req: Request, res: Response) => {
       status: 'ready'
     });
   } catch (error) {
+    console.log("the error: ", error);
     res.status(500).json({ error: 'Failed to fetch classes' });
   }
 });

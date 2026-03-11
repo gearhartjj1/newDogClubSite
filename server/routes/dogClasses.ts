@@ -6,10 +6,10 @@ const router = express.Router();
 // Get all dog classes
 router.get('/', async (req: Request, res: Response) => {
   try {
-    const query = 'SELECT * FROM KCTCSession';
+    const query = 'SELECT * FROM KCTCSession WHERE Session = "2024-V"';
     // TODO: Execute query using database connection
     const dogClasses = await pool.query(query);
-    console.log('Dog classes fetched:', dogClasses);
+    //console.log('Dog classes fetched:', dogClasses);
     res.json(dogClasses);
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch dog classes' });
