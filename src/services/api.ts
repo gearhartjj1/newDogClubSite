@@ -17,6 +17,7 @@ export interface DogClass {
   Session: string,
   Start: string, //TODO: should be a Date but the data looks sketchy
   Time: string //TODO: should be a Time but the data looks sketchy
+  DogsInClass: number;
   }
 
 // Dog Classes API

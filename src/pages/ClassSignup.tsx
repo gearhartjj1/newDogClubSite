@@ -1,11 +1,37 @@
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import styles from './ClassSignup.module.css';
+import { dogClassAPI, type DogClass } from '../services/api';
+
+/*
+  Design requirements of new signup form;
+  - Members should be able to select their dog from a dropdown
+  - Form should know that the user is already signed in, UI should indicate they are logged in as a member
+  ---- No need to select checkbox to indicate they are a member
+  - Non-members can enter dogs information manually
+  - There should be a dropdown to select the class they want
+  ---- If the user gets to the page from the class list the dropdown should auto select the item
+  ---- If the user goes directly to the signup from a dedicate button the dropdown should be empty
+*/
+
+/*
+  TODO:
+  - Update class dropdown to pull classes from database
+  - Update form submission to send data to backend and save to database
+*/
 
 export default function ClassSignup() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const classId = searchParams.get('classId');
+  const [dogClasses, setDogClasses] = useState<DogClass[]>([]);
+    useEffect(() => {
+      const fetchDogClasses = async () => {
+        const queryDogClasses = await dogClassAPI.getAll();
+        setDogClasses(queryDogClasses);
+      };
+      fetchDogClasses();
+    }, []);
 
   const [formData, setFormData] = useState({
     firstName: '',
@@ -22,14 +48,7 @@ export default function ClassSignup() {
 
   const [submitted, setSubmitted] = useState(false);
 
-  const classes = [
-    { id: '1', name: 'Puppy Kindergarten' },
-    { id: '2', name: 'Basic Obedience' },
-    { id: '3', name: 'Intermediate Training' },
-    { id: '4', name: 'Agility Fundamentals' },
-    { id: '5', name: 'Reactive Dogs Workshop' },
-    { id: '6', name: 'Trick Training' },
-  ];
+  const classes = dogClasses.map((cls) => ({ id: cls.ID, name: cls.Class }));
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;

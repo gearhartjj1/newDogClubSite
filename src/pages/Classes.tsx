@@ -3,6 +3,10 @@ import styles from './Classes.module.css';
 import { useEffect, useState } from 'react';
 import { dogClassAPI, type DogClass } from '../services/api';
 
+//TODO: check the data from the database to make sure the number of dogs enrolled is correct
+//There are a lot of classes that have more than the max for the class
+//But that could just be because the data is test data
+//Or maybe there isn't something to enforce the max number of dogs
 export default function Classes() {
   const [dogClasses, setDogClasses] = useState<DogClass[]>([]);
     useEffect(() => {
@@ -46,12 +50,12 @@ export default function Classes() {
                 <div
                   className={styles.progressBar}
                   style={{
-                    width: `${(1 / dogClass.MaxDog) * 100}%`,
+                    width: `${(dogClass.DogsInClass / dogClass.MaxDog) * 100}%`,
                   }}
                 ></div>
               </div>
               <span className={styles.enrollmentText}>
-                1/{dogClass.MaxDog} enrolled
+                {dogClass.DogsInClass}/{dogClass.MaxDog} enrolled
               </span>
             </div>
 

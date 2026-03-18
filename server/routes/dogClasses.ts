@@ -6,7 +6,8 @@ const router = express.Router();
 // Get all dog classes
 router.get('/', async (req: Request, res: Response) => {
   try {
-    const query = 'SELECT * FROM KCTCSession WHERE Session = "2024-V"';
+    const query = 'SELECT c.*, COUNT(e.id) AS DogsInClass FROM KCTCSession c INNER JOIN Enrollment e ON c.id = e.SID GROUP BY c.id, c.class ORDER BY c.class';
+    //const query = 'SELECT * FROM KCTCSession WHERE Session = "2024-V"';
     // TODO: Execute query using database connection
     const dogClasses = await pool.query(query);
     //console.log('Dog classes fetched:', dogClasses);
@@ -40,7 +41,14 @@ router.post('/', async (req: Request, res: Response) => {
     if (!title || !date || !time || !location) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
-
+    const newQuery = `
+    insert into Enrollment values (
+      [CID], [PID], [SID], 
+      [Memb], [PAIDYN], [Pay_Method], 
+      [DOGNAME], [DOGAGE], [DOGBREED], 
+      [DogAgeUnits], 
+      [DateSubmitted]
+    )`;
     const query = 'INSERT INTO events (title, event_date, event_time, location, description) VALUES (?, ?, ?, ?, ?)';
     // TODO: Execute query using database connection
     

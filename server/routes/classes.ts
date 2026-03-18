@@ -17,7 +17,7 @@ router.get('/', async (req: Request, res: Response) => {
     //const query = 'SELECT * FROM Enrollment';
     //const query = 'SELECT  S.class,S.Start,S.Time,S.Instructors,S.CurDog,E.DogName FROM Enrollment E, KCTCSession S where E.SID = S.ID';
     //const query = 'SELECT Count(*) FROM Enrollment E, KCTCSession S where E.SID = S.ID';
-    const query = 'SELECT c.class AS class_name, COUNT(e.id) AS enrolled_dogs FROM KCTCSession c INNER JOIN Enrollment e ON c.id = e.SID GROUP BY c.id, c.class ORDER BY c.class';
+    const query = 'SELECT c.*, COUNT(e.id) AS enrolled_dogs FROM KCTCSession c INNER JOIN Enrollment e ON c.id = e.SID GROUP BY c.id, c.class ORDER BY c.class';
     const stuffFromEnrollment = await pool.query(query);
     console.log('Enrollment data fetched:', stuffFromEnrollment);
     // TODO: Execute query using database connection
