@@ -18,6 +18,11 @@ import { dogClassAPI, type DogClass } from '../services/api';
   TODO:
   - Update class dropdown to pull classes from database
   - Update form submission to send data to backend and save to database
+  - Create backlog, focus on each section that needs built and then expand fro thers
+*/
+
+/*
+  - Get form submission working and send to api
 */
 
 export default function ClassSignup() {
@@ -60,7 +65,7 @@ export default function ClassSignup() {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!formData.agreeTerms) {
@@ -70,7 +75,8 @@ export default function ClassSignup() {
 
     console.log('Form submitted:', formData);
     setSubmitted(true);
-
+    //TODO: send call to api
+    await dogClassAPI.create(formData);
     // Simulate form submission
     setTimeout(() => {
       navigate('/');
