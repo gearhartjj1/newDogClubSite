@@ -38,6 +38,17 @@ export default function ClassSignup() {
       fetchDogClasses();
     }, []);
 
+  // Placeholder dog data - will be replaced with user profile data
+  const placeholderDogs = [
+    { id: 1, name: 'Max', breed: 'Golden Retriever', age: '3 years' },
+    { id: 2, name: 'Bella', breed: 'Labrador', age: '2 years' },
+    { id: 3, name: 'Charlie', breed: 'German Shepherd', age: '4 years' },
+    { id: 4, name: 'Lucy', breed: 'Beagle', age: '1 year' },
+  ];
+
+  const [useUsersDogs, setUseUsersDogs] = useState(false);
+  const [selectedDogId, setSelectedDogId] = useState<number | ''>('');
+
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -63,6 +74,21 @@ export default function ClassSignup() {
       ...prev,
       [name]: type === 'checkbox' ? checked : value,
     }));
+  };
+
+  const handleDogSelection = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const dogId = parseInt(e.target.value);
+    const selectedDog = placeholderDogs.find((dog) => dog.id === dogId);
+    
+    if (selectedDog) {
+      setSelectedDogId(dogId);
+      setFormData((prev) => ({
+        ...prev,
+        dogName: selectedDog.name,
+        dogBreed: selectedDog.breed,
+        dogAge: selectedDog.age,
+      }));
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -162,42 +188,77 @@ export default function ClassSignup() {
         <div className={styles.section}>
           <h2>Your Dog's Information</h2>
 
-          <div className={styles.formGroup}>
-            <label htmlFor="dogName">Dog's Name *</label>
+          <div className={styles.checkboxGroup}>
             <input
-              type="text"
-              id="dogName"
-              name="dogName"
-              value={formData.dogName}
-              onChange={handleChange}
-              required
+              type="checkbox"
+              id="useUsersDogs"
+              name="useUsersDogs"
+              checked={useUsersDogs}
+              onChange={(e) => {
+                setUseUsersDogs(e.target.checked);
+                setSelectedDogId('');
+              }}
             />
+            <label htmlFor="useUsersDogs">Use one of my dogs</label>
           </div>
 
-          <div className={styles.formGroup}>
-            <label htmlFor="dogBreed">Breed *</label>
-            <input
-              type="text"
-              id="dogBreed"
-              name="dogBreed"
-              value={formData.dogBreed}
-              onChange={handleChange}
-              required
-            />
-          </div>
+          {useUsersDogs ? (
+            <div className={styles.formGroup}>
+              <label htmlFor="selectedDog">Select Your Dog *</label>
+              <select
+                id="selectedDog"
+                value={selectedDogId}
+                onChange={handleDogSelection}
+                required
+              >
+                <option value="">- Choose a dog -</option>
+                {placeholderDogs.map((dog) => (
+                  <option key={dog.id} value={dog.id}>
+                    {dog.name} - {dog.breed}
+                  </option>
+                ))}
+              </select>
+            </div>
+          ) : (
+            <>
+              <div className={styles.formGroup}>
+                <label htmlFor="dogName">Dog's Name *</label>
+                <input
+                  type="text"
+                  id="dogName"
+                  name="dogName"
+                  value={formData.dogName}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
 
-          <div className={styles.formGroup}>
-            <label htmlFor="dogAge">Age *</label>
-            <input
-              type="text"
-              id="dogAge"
-              name="dogAge"
-              placeholder="e.g., 2 years, 6 months"
-              value={formData.dogAge}
-              onChange={handleChange}
-              required
-            />
-          </div>
+              <div className={styles.formGroup}>
+                <label htmlFor="dogBreed">Breed *</label>
+                <input
+                  type="text"
+                  id="dogBreed"
+                  name="dogBreed"
+                  value={formData.dogBreed}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
+              <div className={styles.formGroup}>
+                <label htmlFor="dogAge">Age *</label>
+                <input
+                  type="text"
+                  id="dogAge"
+                  name="dogAge"
+                  placeholder="e.g., 2 years, 6 months"
+                  value={formData.dogAge}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+            </>
+          )}
 
           <div className={styles.formGroup}>
             <label htmlFor="dogExperience">Training Experience Level *</label>
