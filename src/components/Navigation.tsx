@@ -2,7 +2,11 @@ import { Link } from 'react-router-dom';
 import { useState } from 'react';
 import styles from './Navigation.module.css';
 
-export default function Navigation() {
+interface NavigationProps {
+  currentUser?: string | null;
+}
+
+export default function Navigation({ currentUser }: NavigationProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
@@ -41,6 +45,19 @@ export default function Navigation() {
               Sign Up
             </Link>
           </li>
+          {currentUser ? (
+            <li>
+              <Link to="/profile" onClick={() => setMobileMenuOpen(false)}>
+                👤 {currentUser}
+              </Link>
+            </li>
+          ) : (
+            <li>
+              <Link to="/login" className={styles.cta} onClick={() => setMobileMenuOpen(false)}>
+                Sign In
+              </Link>
+            </li>
+          )}
         </ul>
       </div>
     </nav>
