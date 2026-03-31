@@ -24,46 +24,62 @@ export default function Classes() {
         <p>Professional dog training programs for all levels</p>
       </header>
 
-      <div className={styles.classesGrid}>
-        {dogClasses.map((dogClass) => (
-          <div key={dogClass.ID} className={styles.classCard}>
-            <div className={styles.classHeader}>
-              <h2>{dogClass.Class}</h2>
-            </div>
-
-            <div className={styles.classInfo}>
-              <p>
-                <strong>Instructor:</strong> {dogClass.Instructors}
-              </p>
-              <p>
-                <strong>Schedule:</strong> {dogClass.Start} at {dogClass.Time } in {dogClass.Room}
-              </p>
-              <p>
-                <strong>Price:</strong> ${dogClass.Rate}/month
-              </p>
-            </div>
-
-            <p className={styles.description}>{"TBD"}</p>
-
-            <div className={styles.enrollment}>
-              <div className={styles.progress}>
-                <div
-                  className={styles.progressBar}
-                  style={{
-                    width: `${(dogClass.DogsInClass / dogClass.MaxDog) * 100}%`,
-                  }}
-                ></div>
-              </div>
-              <span className={styles.enrollmentText}>
-                {dogClass.DogsInClass}/{dogClass.MaxDog} enrolled
-              </span>
-            </div>
-
-            <Link to={`/signup?classId=${dogClass.ID}`} className={styles.signupButton}>
-              Sign Up
-            </Link>
-          </div>
-        ))}
+      <div className={styles.tableWrapper}>
+        <table className={styles.classesTable}>
+          <thead>
+            <tr>
+              <th>Class Name</th>
+              <th>Instructor</th>
+              <th>Schedule</th>
+              <th>Location</th>
+              <th>Price</th>
+              <th>Enrollment</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {dogClasses.map((dogClass) => (
+              <tr key={dogClass.ID}>
+                <td className={styles.className}>{dogClass.Class}</td>
+                <td>{dogClass.Instructors}</td>
+                <td>
+                  {dogClass.Start} at {dogClass.Time}
+                </td>
+                <td>{dogClass.Room}</td>
+                <td>${dogClass.Rate}/mo</td>
+                <td>
+                  <div className={styles.enrollmentCell}>
+                    <span className={styles.enrollmentCount}>
+                      {dogClass.DogsInClass > dogClass.MaxDog ? dogClass.MaxDog : dogClass.DogsInClass}/{dogClass.MaxDog}
+                    </span>
+                    <div className={styles.progressSmall}>
+                      <div
+                        className={styles.progressBarSmall}
+                        style={{
+                          width: `${(dogClass.DogsInClass > dogClass.MaxDog ? dogClass.MaxDog : dogClass.DogsInClass) / dogClass.MaxDog * 100}%`,
+                        }}
+                      ></div>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  {dogClass.DogsInClass < dogClass.MaxDog ? (
+                    <Link
+                      to={`/signup?classId=${dogClass.ID}`}
+                      className={styles.signupButtonSmall}
+                    >
+                      Sign Up
+                    </Link>
+                  ) : (
+                    <button className={styles.waitlistButtonSmall}>
+                      Join Waitlist
+                    </button>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );

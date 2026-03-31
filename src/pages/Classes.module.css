@@ -23,124 +23,127 @@
   margin: 0;
 }
 
-.classesGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 25px;
+.tableWrapper {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  overflow-x: auto;
   padding: 20px 0;
 }
 
-.classCard {
-  background: white;
-  border-radius: 8px;
-  padding: 25px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s, box-shadow 0.3s;
+.classesTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.classesTable thead {
+  background-color: #f9f9f9;
+  border-bottom: 2px solid #667eea;
+}
+
+.classesTable th {
+  padding: 15px 12px;
+  text-align: left;
+  font-weight: 600;
+  color: #333;
+  white-space: nowrap;
+}
+
+.classesTable tbody tr {
+  border-bottom: 1px solid #f0f0f0;
+  transition: background-color 0.2s;
+}
+
+.classesTable tbody tr:hover {
+  background-color: #f9f9f9;
+}
+
+.classesTable td {
+  padding: 12px;
+  color: #666;
+}
+
+.className {
+  font-weight: 600;
+  color: #333;
+}
+
+.enrollmentCell {
   display: flex;
   flex-direction: column;
+  gap: 5px;
+  min-width: 80px;
 }
 
-.classCard:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
-}
-
-.classHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 10px;
-  margin-bottom: 15px;
-}
-
-.classHeader h2 {
-  margin: 0;
-  font-size: 1.3rem;
-  color: #333;
-  flex: 1;
-}
-
-.badge {
-  padding: 5px 12px;
-  border-radius: 20px;
-  font-size: 0.8rem;
+.enrollmentCount {
+  font-size: 0.9rem;
   font-weight: 600;
-  white-space: nowrap;
-  color: white;
-}
-
-.badge.beginner {
-  background: #4caf50;
-}
-
-.badge.intermediate {
-  background: #ff9800;
-}
-
-.badge.advanced {
-  background: #f44336;
-}
-
-.classInfo {
-  margin-bottom: 15px;
-  padding-bottom: 15px;
-  border-bottom: 1px solid #f0f0f0;
-}
-
-.classInfo p {
-  margin: 8px 0;
-  color: #666;
-  font-size: 0.95rem;
-}
-
-.classInfo strong {
   color: #333;
 }
 
-.description {
-  color: #555;
-  line-height: 1.6;
-  margin-bottom: 15px;
-  flex-grow: 1;
-  font-size: 0.95rem;
-}
-
-.enrollment {
-  margin-bottom: 20px;
-}
-
-.progress {
-  height: 8px;
+.progressSmall {
+  height: 6px;
   background: #f0f0f0;
-  border-radius: 4px;
+  border-radius: 3px;
   overflow: hidden;
-  margin-bottom: 8px;
 }
 
-.progressBar {
+.progressBarSmall {
   height: 100%;
   background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-  border-radius: 4px;
+  border-radius: 3px;
   transition: width 0.3s;
 }
 
-.enrollmentText {
-  font-size: 0.85rem;
-  color: #666;
-}
-
-.signupButton {
-  display: block;
-  text-align: center;
+.signupButtonSmall {
+  display: inline-block;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
-  padding: 12px 20px;
+  padding: 8px 16px;
   border-radius: 5px;
   text-decoration: none;
   font-weight: 600;
-  transition: transform 0.3s;
+  font-size: 0.9rem;
+  transition: transform 0.2s;
+  white-space: nowrap;
 }
 
-.signupButton:hover {
+.signupButtonSmall:hover {
   transform: scale(1.05);
+}
+
+.waitlistButtonSmall {
+  display: inline-block;
+  background-color: #ccc;
+  color: #666;
+  padding: 8px 16px;
+  border-radius: 5px;
+  border: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+
+.waitlistButtonSmall:hover {
+  background-color: #999;
+  color: white;
+}
+
+@media (max-width: 768px) {
+  .classesTable {
+    font-size: 0.85rem;
+  }
+
+  .classesTable th,
+  .classesTable td {
+    padding: 10px 8px;
+  }
+
+  .signupButtonSmall {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+  }
 }
