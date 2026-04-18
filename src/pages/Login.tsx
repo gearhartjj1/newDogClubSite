@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import styles from './Login.module.css';
+import { signinAPI } from '../services/api';
 
 interface LoginProps {
   onLogin: (username: string) => void;
@@ -11,8 +12,9 @@ export default function Login({ onLogin }: LoginProps) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
@@ -22,10 +24,24 @@ export default function Login({ onLogin }: LoginProps) {
       return;
     }
 
-    // Placeholder authentication - accept any username/password combo
-    // In a real app, this would validate against a backend
-    onLogin(username);
-    navigate('/profile');
+    setIsLoading(true);
+
+    try {
+      // Call the sign-in API
+      const response = await signinAPI.signin(username, password);
+      
+      if (response.success) {
+        // Log the user in
+        onLogin(response.user.username);
+        navigate('/profile');
+      }
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Sign in failed';
+      setError(errorMessage);
+      console.error('Sign in error:', err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -63,16 +79,13 @@ export default function Login({ onLogin }: LoginProps) {
             />
           </div>
 
-          <button type="submit" className={styles.submitButton}>
-            Sign In
+          <button type="submit" className={styles.submitButton} disabled={isLoading}>
+            {isLoading ? 'Signing In...' : 'Sign In'}
           </button>
         </form>
 
         <div className={styles.footer}>
           <p>Don't have an account? <a href="#signup">Sign up here</a></p>
-          <p style={{ fontSize: '0.85rem', color: '#666', marginTop: '10px' }}>
-            Demo: You can use any username and password
-          </p>
         </div>
       </div>
     </div>

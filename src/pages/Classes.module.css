@@ -7,7 +7,7 @@
 .header {
   text-align: center;
   padding: 40px 0;
-  border-bottom: 2px solid #667eea;
+  border-bottom: 2px solid #d4af37;
   margin-bottom: 40px;
 }
 
@@ -39,7 +39,7 @@
 
 .classesTable thead {
   background-color: #f9f9f9;
-  border-bottom: 2px solid #667eea;
+  border-bottom: 2px solid #d4af37;
 }
 
 .classesTable th {
@@ -91,14 +91,14 @@
 
 .progressBarSmall {
   height: 100%;
-  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(90deg, #d4af37 0%, #3a3a3a 100%);
   border-radius: 3px;
   transition: width 0.3s;
 }
 
 .signupButtonSmall {
   display: inline-block;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #d4af37 0%, #3a3a3a 100%);
   color: white;
   padding: 8px 16px;
   border-radius: 5px;

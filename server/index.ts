@@ -9,6 +9,7 @@ dotenv.config();
 import dogClassesRouter from './routes/dogClasses';
 import classesRouter from './routes/classes';
 import signupsRouter from './routes/signups';
+import signinRouter from './routes/signin';
 
 const app = express();
 const PORT = process.env.SERVER_PORT || 3001;
@@ -40,6 +41,7 @@ app.get('/api/health', (req, res) => {
 app.use('/api/dog-classes', dogClassesRouter);
 app.use('/api/classes', classesRouter);
 app.use('/api/signups', signupsRouter);
+app.use('/api/signin', signinRouter);
 
 // Error handling middleware
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
