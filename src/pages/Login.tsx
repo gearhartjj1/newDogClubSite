@@ -29,10 +29,10 @@ export default function Login({ onLogin }: LoginProps) {
     try {
       // Call the sign-in API
       const response = await signinAPI.signin(username, password);
-      
+      console.log('Sign in response: ', response);
       if (response.success) {
         // Log the user in
-        onLogin(response.user.username);
+        onLogin(response.user.email);
         navigate('/profile');
       }
     } catch (err) {

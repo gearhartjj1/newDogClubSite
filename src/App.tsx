@@ -13,6 +13,7 @@ function App() {
   const [currentUser, setCurrentUser] = useState<string | null>(null);
 
   const handleLogin = (username: string) => {
+    console.log("handle login called with username: ", username);
     setCurrentUser(username);
   };
 

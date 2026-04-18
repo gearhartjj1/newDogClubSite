@@ -34,10 +34,11 @@ router.post('/', async (req: Request, res: Response) => {
 
     // Query the database for the user
     // Note: The Teacher table is where user login data is stored
-    const query = 'SELECT * FROM Teacher WHERE UserName = ? LIMIT 1';
-    
+    const query = 'SELECT * FROM Teacher WHERE LastName = ? LIMIT 1';
+    console.log("Jake the query: ", query, username);
     try {
       const [rows]: any = await pool.query(query, [username]);
+      console.log('Sign in query result: ', rows);
 
       if (!rows || rows.length === 0) {
         return res.status(401).json({
@@ -57,6 +58,7 @@ router.post('/', async (req: Request, res: Response) => {
       }
 
       // Successful login
+      console.log("sign in is good, sending response for user: ", user);
       res.status(200).json({
         success: true,
         message: 'Sign in successful',
@@ -68,6 +70,7 @@ router.post('/', async (req: Request, res: Response) => {
       } as SignInResponse);
 
     } catch (dbError: any) {
+        console.error('Database error during sign in: ', dbError);
       // If table doesn't exist, provide helpful error message
       if (dbError.message && dbError.message.includes('ER_NO_SUCH_TABLE')) {
         console.error('Teacher table not found. Check database schema.');
