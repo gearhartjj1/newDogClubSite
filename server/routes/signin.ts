@@ -62,11 +62,7 @@ router.post('/', async (req: Request, res: Response) => {
       res.status(200).json({
         success: true,
         message: 'Sign in successful',
-        user: {
-          id: user.ID,
-          username: user.UserName,
-          email: user.Email || undefined
-        }
+        user: user
       } as SignInResponse);
 
     } catch (dbError: any) {

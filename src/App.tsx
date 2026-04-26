@@ -10,11 +10,11 @@ import Profile from './pages/Profile';
 import './App.css';
 
 function App() {
-  const [currentUser, setCurrentUser] = useState<string | null>(null);
+  const [currentUser, setCurrentUser] = useState<any>(null);
 
-  const handleLogin = (username: string) => {
-    console.log("handle login called with username: ", username);
-    setCurrentUser(username);
+  const handleLogin = (user: any) => {
+    console.log("handle login called with user: ", user);
+    setCurrentUser(user);
   };
 
   const handleLogout = () => {
@@ -23,7 +23,7 @@ function App() {
 
   return (
     <Router>
-      <Navigation currentUser={currentUser} />
+      <Navigation currentUser={currentUser?.Email} />
       <main className="main-content">
         <Routes>
           <Route path="/" element={<Home />} />
@@ -35,7 +35,7 @@ function App() {
             path="/profile"
             element={
               currentUser ? (
-                <Profile username={currentUser} onLogout={handleLogout} />
+                <Profile user={currentUser} onLogout={handleLogout} />
               ) : (
                 <Login onLogin={handleLogin} />
               )

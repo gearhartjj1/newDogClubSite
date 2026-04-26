@@ -32,7 +32,7 @@ export default function Login({ onLogin }: LoginProps) {
       console.log('Sign in response: ', response);
       if (response.success) {
         // Log the user in
-        onLogin(response.user.email);
+        onLogin(response.user);
         navigate('/profile');
       }
     } catch (err) {

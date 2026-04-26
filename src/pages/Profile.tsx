@@ -3,7 +3,7 @@ import { useState } from 'react';
 import styles from './Profile.module.css';
 
 interface ProfileProps {
-  username: string;
+  user: any;
   onLogout: () => void;
 }
 
@@ -22,7 +22,8 @@ interface PastClass {
   completedDate: string;
 }
 
-export default function Profile({ username, onLogout }: ProfileProps) {
+export default function Profile({ user, onLogout }: ProfileProps) {
+  console.log("Profile component received user: ", user);
   const navigate = useNavigate();
   const [showAddDog, setShowAddDog] = useState(false);
   const [newDogForm, setNewDogForm] = useState({
@@ -81,7 +82,7 @@ export default function Profile({ username, onLogout }: ProfileProps) {
       <header className={styles.header}>
         <div className={styles.headerContent}>
           <h1>👤 My Profile</h1>
-          <p>Welcome, {username}!</p>
+          <p>Welcome, {user.FirstName}!</p>
         </div>
         <button onClick={handleLogout} className={styles.logoutButton}>
           Sign Out
