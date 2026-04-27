@@ -2,6 +2,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import styles from './ClassSignup.module.css';
 import { dogClassAPI, type DogClass } from '../services/api';
+import { useUserData } from '../context/UserDataContext';
 
 /*
   Design requirements of new signup form;
@@ -28,6 +29,7 @@ import { dogClassAPI, type DogClass } from '../services/api';
 export default function ClassSignup() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const { userData } = useUserData();
   const classId = searchParams.get('classId');
   const [dogClasses, setDogClasses] = useState<DogClass[]>([]);
     useEffect(() => {
@@ -38,22 +40,22 @@ export default function ClassSignup() {
       fetchDogClasses();
     }, []);
 
-  // Placeholder dog data - will be replaced with user profile data
-  const placeholderDogs = [
-    { id: 1, name: 'Max', breed: 'Golden Retriever', age: '3 years' },
-    { id: 2, name: 'Bella', breed: 'Labrador', age: '2 years' },
-    { id: 3, name: 'Charlie', breed: 'German Shepherd', age: '4 years' },
-    { id: 4, name: 'Lucy', breed: 'Beagle', age: '1 year' },
+  // Use user's dogs if logged in, otherwise use placeholder data
+  const availableDogs = userData?.dogs || [
+    { id: 1, name: 'Max', breed: 'Golden Retriever', age: '3 years', experience: 'experienced' },
+    { id: 2, name: 'Bella', breed: 'Labrador', age: '2 years', experience: 'some' },
+    { id: 3, name: 'Charlie', breed: 'German Shepherd', age: '4 years', experience: 'beginner' },
+    { id: 4, name: 'Lucy', breed: 'Beagle', age: '1 year', experience: 'beginner' },
   ];
 
-  const [useUsersDogs, setUseUsersDogs] = useState(false);
+  const [useUsersDogs, setUseUsersDogs] = useState(!!userData);
   const [selectedDogId, setSelectedDogId] = useState<number | ''>('');
 
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    phone: '',
+    firstName: userData?.userInfo?.name?.split(' ')[0] || '',
+    lastName: userData?.userInfo?.name?.split(' ')[1] || '',
+    email: userData?.email || userData?.userInfo?.email || '',
+    phone: userData?.userInfo?.phone || '',
     dogName: '',
     dogBreed: '',
     dogAge: '',
@@ -78,7 +80,7 @@ export default function ClassSignup() {
 
   const handleDogSelection = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const dogId = parseInt(e.target.value);
-    const selectedDog = placeholderDogs.find((dog) => dog.id === dogId);
+    const selectedDog = availableDogs.find((dog) => dog.id === dogId);
     
     if (selectedDog) {
       setSelectedDogId(dogId);
@@ -212,7 +214,7 @@ export default function ClassSignup() {
                 required
               >
                 <option value="">- Choose a dog -</option>
-                {placeholderDogs.map((dog) => (
+                {availableDogs.map((dog) => (
                   <option key={dog.id} value={dog.id}>
                     {dog.name} - {dog.breed}
                   </option>

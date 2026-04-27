@@ -1,30 +1,19 @@
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import styles from './Profile.module.css';
+import { useUserData, type Dog, type PastClass, type UserInfo } from '../context/UserDataContext';
 
-interface ProfileProps {
-  user: any;
-  onLogout: () => void;
-}
-
-interface Dog {
-  id: number;
-  name: string;
-  breed: string;
-  age: string;
-  experience: string;
-}
-
-interface PastClass {
-  id: number;
-  className: string;
-  instructor: string;
-  completedDate: string;
-}
-
-export default function Profile({ user, onLogout }: ProfileProps) {
-  console.log("Profile component received user: ", user);
+export default function Profile() {
   const navigate = useNavigate();
+  const { userData, setUserData } = useUserData();
+  console.log("Profile page user data: ", userData);
+
+  // Redirect to login if not authenticated
+  if (!userData) {
+    navigate('/login');
+    return null;
+  }
+
   const [showAddDog, setShowAddDog] = useState(false);
   const [newDogForm, setNewDogForm] = useState({
     name: '',
@@ -33,20 +22,20 @@ export default function Profile({ user, onLogout }: ProfileProps) {
     experience: 'beginner',
   });
 
-  // Placeholder user data
-  const [userInfo] = useState({
-    name: 'John Doe',
-    email: 'john.doe@example.com',
-    phone: '555-123-4567',
-    memberSince: 'January 2024',
-  });
+  // Use user data from context, with fallback values
+  const userInfo: UserInfo =  {
+    name: userData.username || 'User',
+    email: userData.email || '',
+    phone: userData.userInfo?.phone || '',
+    memberSince: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long' }),
+  };
 
-  const [dogs, setDogs] = useState<Dog[]>([
+  const [dogs, setDogs] = useState<Dog[]>(userData.dogs || [
     { id: 1, name: 'Max', breed: 'Golden Retriever', age: '3 years', experience: 'experienced' },
     { id: 2, name: 'Bella', breed: 'Labrador', age: '2 years', experience: 'some' },
   ]);
 
-  const [pastClasses] = useState<PastClass[]>([
+  const [pastClasses] = useState<PastClass[]>(userData.pastClasses || [
     { id: 1, className: 'Basic Obedience', instructor: 'Sarah Smith', completedDate: 'December 2023' },
     { id: 2, className: 'Advanced Training', instructor: 'Sarah Smith', completedDate: 'August 2023' },
   ]);
@@ -73,7 +62,7 @@ export default function Profile({ user, onLogout }: ProfileProps) {
   };
 
   const handleLogout = () => {
-    onLogout();
+    setUserData(null);
     navigate('/login');
   };
 
@@ -82,7 +71,7 @@ export default function Profile({ user, onLogout }: ProfileProps) {
       <header className={styles.header}>
         <div className={styles.headerContent}>
           <h1>👤 My Profile</h1>
-          <p>Welcome, {user.FirstName}!</p>
+          <p>Welcome, {userData.userInfo?.name}!</p>
         </div>
         <button onClick={handleLogout} className={styles.logoutButton}>
           Sign Out

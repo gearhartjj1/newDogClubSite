@@ -1,13 +1,11 @@
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
 import styles from './Navigation.module.css';
+import { useUserData } from '../context/UserDataContext';
 
-interface NavigationProps {
-  currentUser?: string | null;
-}
-
-export default function Navigation({ currentUser }: NavigationProps) {
+export default function Navigation() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { userData } = useUserData();
 
   return (
     <nav className={styles.navbar}>
@@ -45,10 +43,10 @@ export default function Navigation({ currentUser }: NavigationProps) {
               Sign Up
             </Link>
           </li>
-          {currentUser ? (
+          {userData ? (
             <li>
               <Link to="/profile" onClick={() => setMobileMenuOpen(false)}>
-                👤 {currentUser}
+                👤 {userData.username}
               </Link>
             </li>
           ) : (

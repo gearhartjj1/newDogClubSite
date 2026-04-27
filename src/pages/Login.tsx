@@ -2,13 +2,11 @@ import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import styles from './Login.module.css';
 import { signinAPI } from '../services/api';
+import { useUserData, type UserData } from '../context/UserDataContext';
 
-interface LoginProps {
-  onLogin: (username: string) => void;
-}
-
-export default function Login({ onLogin }: LoginProps) {
+export default function Login() {
   const navigate = useNavigate();
+  const { setUserData } = useUserData();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -31,8 +29,20 @@ export default function Login({ onLogin }: LoginProps) {
       const response = await signinAPI.signin(username, password);
       console.log('Sign in response: ', response);
       if (response.success) {
-        // Log the user in
-        onLogin(response.user);
+        // Set the user data in context
+        // convert user data from database to match our UserDataContext structure
+        const userData: UserData = {
+          id: response.user.Family,
+          username: response.user.LastName,
+          email: response.user.Email,
+          userInfo: {
+            name: response.user.FirstName + ' ' + response.user.LastName,
+            email: response.user.Email,
+            phone: response.user.Phone,
+            memberSince: "TBD"
+          }
+        }
+        setUserData(userData);
         navigate('/profile');
       }
     } catch (err) {

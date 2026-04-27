@@ -66,6 +66,8 @@ router.post('/', async (req: Request, res: Response) => {
     //I need to verify there are open spots in the class before enrolling
     //Update class page to not allow enrolling if the max limit of dogs is reached
 
+    //TODO: I should have the user id value from the login, need to pass in the pId and pass that into this
+
     const maxIdResult = await pool.query('SELECT MAX(ID) AS maxId FROM Enrollment');
     //TODO: this works well, but I should probably add some error handling here in case of failures
     const newIdValue = (maxIdResult[0] as any)[0].maxId + 1;
