@@ -46,6 +46,13 @@ export const dogClassAPI = {
     if (!response.ok) throw new Error('Failed to create dog class');
     return response.json();
   },
+
+  getByUserId: async (userId: number) => {
+    const response = await fetch(`${API_URL}/dog-classes/user/${userId}`);
+    if (!response.ok) throw new Error('Failed to fetch user dog classes');
+    const data = await response.json();
+    return data[0] as DogClass[];
+  },
 };
 
 // Classes API

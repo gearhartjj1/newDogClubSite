@@ -1,7 +1,8 @@
 import { useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styles from './Profile.module.css';
 import { useUserData, type Dog, type PastClass, type UserInfo } from '../context/UserDataContext';
+import { dogClassAPI } from '../services/api';
 
 export default function Profile() {
   const navigate = useNavigate();
@@ -35,10 +36,29 @@ export default function Profile() {
     { id: 2, name: 'Bella', breed: 'Labrador', age: '2 years', experience: 'some' },
   ]);
 
-  const [pastClasses] = useState<PastClass[]>(userData.pastClasses || [
-    { id: 1, className: 'Basic Obedience', instructor: 'Sarah Smith', completedDate: 'December 2023' },
-    { id: 2, className: 'Advanced Training', instructor: 'Sarah Smith', completedDate: 'August 2023' },
-  ]);
+  const [pastClasses, setPastClasses] = useState<PastClass[]>([]);
+
+  // Fetch user's enrolled classes on component load
+  useEffect(() => {
+    const fetchUserClasses = async () => {
+      try {
+        if (userData?.id) {
+          const response = await dogClassAPI.getByUserId(userData.id);
+          setPastClasses(response.map(cls => ({
+            id: cls.ID,
+            className: cls.Class,
+            instructor: cls.Instructors || 'N/A',
+            completedDate: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long' }),
+          })));
+          console.log('User classes fetched:', response);
+        }
+      } catch (error) {
+        console.error('Error fetching user classes:', error);
+      }
+    };
+
+    fetchUserClasses();
+  }, [userData?.id]);
 
   const handleAddDog = (e: React.FormEvent) => {
     e.preventDefault();

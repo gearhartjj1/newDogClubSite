@@ -7,7 +7,6 @@ const router = express.Router();
 router.get('/', async (req: Request, res: Response) => {
   try {
     const query = 'SELECT c.*, COUNT(e.id) AS DogsInClass FROM KCTCSession c INNER JOIN Enrollment e ON c.id = e.SID WHERE c.Session = "2024-V" GROUP BY c.id, c.class ORDER BY c.class';
-    //const query = 'SELECT * FROM KCTCSession WHERE Session = "2024-V"';
     const dogClasses = await pool.query(query);
     console.log('Dog classes fetched:', dogClasses);
     res.json(dogClasses);
@@ -17,19 +16,18 @@ router.get('/', async (req: Request, res: Response) => {
   }
 });
 
-// Get single event
-router.get('/:id', async (req: Request, res: Response) => {
+// Get all dog classes joined by a specific user
+router.get('/user/:userId', async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
-    const query = 'SELECT * FROM events WHERE event_id = ?';
-    // TODO: Execute query using database connection
-    
-    res.json({
-      message: `Event ${id} endpoint - connect to database`,
-      status: 'ready'
-    });
+    const { userId } = req.params;
+    //const query = 'SELECT * FROM KCTCSession WHERE PID = ?';
+    const query = 'SELECT c.*, FROM KCTCSession c INNER JOIN Enrollment e ON c.id = e.SID WHERE e.PID = ? GROUP BY c.id, c.class ORDER BY c.class';
+    const dogClasses = await pool.query(query, [userId]);
+    console.log(`Dog classes fetched for user ${userId}:`, dogClasses);
+    res.json(dogClasses);
   } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch event' });
+    console.log('Error fetching dog classes for user: ', error);
+    res.status(500).json({ error: 'Failed to fetch dog classes for user' });
   }
 });
 
