@@ -51,6 +51,7 @@ export default function ClassSignup() {
   const [useUsersDogs, setUseUsersDogs] = useState(!!userData);
   const [selectedDogId, setSelectedDogId] = useState<number | ''>('');
 
+  //I think maybe this should be useMemo?
   const [formData, setFormData] = useState({
     firstName: userData?.userInfo?.name?.split(' ')[0] || '',
     lastName: userData?.userInfo?.name?.split(' ')[1] || '',
@@ -62,6 +63,7 @@ export default function ClassSignup() {
     dogExperience: 'beginner',
     classId: classId || '',
     agreeTerms: false,
+    userId: userData?.id || null,
   });
 
   const [submitted, setSubmitted] = useState(false);

@@ -6,7 +6,7 @@ const router = express.Router();
 // Get all dog classes
 router.get('/', async (req: Request, res: Response) => {
   try {
-    const query = 'SELECT c.*, COUNT(e.id) AS DogsInClass FROM KCTCSession c INNER JOIN Enrollment e ON c.id = e.SID WHERE c.Session = "2024-V" GROUP BY c.id, c.class ORDER BY c.class';
+    const query = 'SELECT c.*, COUNT(e.ID) AS DogsInClass FROM KCTCSession c INNER JOIN Enrollment e ON c.ID = e.SID WHERE c.Session = "2024-V" GROUP BY c.ID, c.class ORDER BY c.class';
     const dogClasses = await pool.query(query);
     console.log('Dog classes fetched:', dogClasses);
     res.json(dogClasses);
@@ -20,8 +20,7 @@ router.get('/', async (req: Request, res: Response) => {
 router.get('/user/:userId', async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
-    //const query = 'SELECT * FROM KCTCSession WHERE PID = ?';
-    const query = 'SELECT c.*, FROM KCTCSession c INNER JOIN Enrollment e ON c.id = e.SID WHERE e.PID = ? GROUP BY c.id, c.class ORDER BY c.class';
+    const query = 'SELECT c.* FROM KCTCSession c INNER JOIN Enrollment e ON c.ID = e.SID WHERE e.PID = ? GROUP BY c.ID, c.class ORDER BY c.class';
     const dogClasses = await pool.query(query, [userId]);
     console.log(`Dog classes fetched for user ${userId}:`, dogClasses);
     res.json(dogClasses);
@@ -70,7 +69,8 @@ router.post('/', async (req: Request, res: Response) => {
     //TODO: this works well, but I should probably add some error handling here in case of failures
     const newIdValue = (maxIdResult[0] as any)[0].maxId + 1;
     console.log("the new id is: ", (maxIdResult[0] as any)[0].maxId);
-    const newQuery = `insert into Enrollment values (${newIdValue}, 1, ${req.body.classId}, 'Y', 'Y', 1, '${req.body.dogName}', '${req.body.dogAge}', '${req.body.dogBreed}', 'Y', 'None', 'internet', ${Date.now()})`;
+    console.log("the user id: ", req.body.userId);
+    const newQuery = `insert into Enrollment values (${newIdValue}, ${req.body.userId}, ${req.body.classId}, 'Y', 'Y', 1, '${req.body.dogName}', '${req.body.dogAge}', '${req.body.dogBreed}', 'Y', 'None', 'internet', ${Date.now()})`;
     const response = await pool.query(newQuery);
     console.log('Database response: ', response);
     
