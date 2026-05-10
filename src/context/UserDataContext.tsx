@@ -5,7 +5,6 @@ export interface Dog {
   name: string;
   breed: string;
   age: string;
-  experience: string;
 }
 
 export interface PastClass {

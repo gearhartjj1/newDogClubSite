@@ -33,10 +33,10 @@ export default function ClassSignup() {
   const classId = searchParams.get('classId');
   const [dogClasses, setDogClasses] = useState<DogClass[]>([]);
   const [availableDogs, setAvailableDogs] = useState<Dog[]>([
-    { id: 1, name: 'Max', breed: 'Golden Retriever', age: '3 years', experience: 'experienced' },
-    { id: 2, name: 'Bella', breed: 'Labrador', age: '2 years', experience: 'some' },
-    { id: 3, name: 'Charlie', breed: 'German Shepherd', age: '4 years', experience: 'beginner' },
-    { id: 4, name: 'Lucy', breed: 'Beagle', age: '1 year', experience: 'beginner' },
+    { id: 1, name: 'Max', breed: 'Golden Retriever', age: '3 years' },
+    { id: 2, name: 'Bella', breed: 'Labrador', age: '2 years' },
+    { id: 3, name: 'Charlie', breed: 'German Shepherd', age: '4 years' },
+    { id: 4, name: 'Lucy', breed: 'Beagle', age: '1 year' },
   ]);
 
   useEffect(() => {
@@ -59,7 +59,6 @@ export default function ClassSignup() {
               name: dog.name,
               breed: dog.breed,
               age: dog.age,
-              experience: 'beginner',
             }));
             setAvailableDogs(formattedDogs);
             console.log('Member dogs loaded:', formattedDogs);
@@ -85,7 +84,6 @@ export default function ClassSignup() {
     dogName: '',
     dogBreed: '',
     dogAge: '',
-    dogExperience: 'beginner',
     classId: classId || '',
     agreeTerms: false,
     userId: userData?.id || null,
@@ -289,19 +287,6 @@ export default function ClassSignup() {
             </>
           )}
 
-          <div className={styles.formGroup}>
-            <label htmlFor="dogExperience">Training Experience Level *</label>
-            <select
-              id="dogExperience"
-              name="dogExperience"
-              value={formData.dogExperience}
-              onChange={handleChange}
-            >
-              <option value="beginner">Beginner - Little to no training</option>
-              <option value="some">Some Experience - Basic commands known</option>
-              <option value="experienced">Experienced - Well trained dog</option>
-            </select>
-          </div>
         </div>
 
         <div className={styles.section}>

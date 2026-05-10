@@ -20,7 +20,6 @@ export default function Profile() {
     name: '',
     breed: '',
     age: '',
-    experience: 'beginner',
   });
 
   // Use user data from context, with fallback values
@@ -47,7 +46,6 @@ export default function Profile() {
               name: dog.name,
               breed: dog.breed,
               age: dog.age,
-              experience: 'beginner' // TODO: add experience level to database
             }));
             setDogs(formattedDogs);
             console.log('User dogs fetched:', formattedDogs);
@@ -109,11 +107,10 @@ export default function Profile() {
           name: response.data.name,
           breed: response.data.breed,
           age: response.data.age,
-          experience: 'beginner',
         };
 
         setDogs([...dogs, newDog]);
-        setNewDogForm({ name: '', breed: '', age: '', experience: 'beginner' });
+        setNewDogForm({ name: '', breed: '', age: '' });
         setShowAddDog(false);
         console.log('Dog added successfully:', newDog);
       } else {
@@ -238,20 +235,6 @@ export default function Profile() {
                     required
                   />
                 </div>
-                <div className={styles.formGroup}>
-                  <label htmlFor="experience">Experience Level</label>
-                  <select
-                    id="experience"
-                    value={newDogForm.experience}
-                    onChange={(e) =>
-                      setNewDogForm({ ...newDogForm, experience: e.target.value })
-                    }
-                  >
-                    <option value="beginner">Beginner</option>
-                    <option value="some">Some Experience</option>
-                    <option value="experienced">Experienced</option>
-                  </select>
-                </div>
               </div>
               <div className={styles.formActions}>
                 <button type="submit" className={styles.submitButton}>
@@ -278,7 +261,6 @@ export default function Profile() {
                     <h3>🐕 {dog.name}</h3>
                     <p><strong>Breed:</strong> {dog.breed}</p>
                     <p><strong>Age:</strong> {dog.age}</p>
-                    <p><strong>Experience:</strong> {dog.experience}</p>
                   </div>
                   <button
                     onClick={() => handleRemoveDog(dog.id)}
