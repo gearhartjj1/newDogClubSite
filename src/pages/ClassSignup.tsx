@@ -1,8 +1,8 @@
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import styles from './ClassSignup.module.css';
-import { dogClassAPI, type DogClass } from '../services/api';
-import { useUserData } from '../context/UserDataContext';
+import { dogClassAPI, memberDogsAPI, type DogClass } from '../services/api';
+import { useUserData, type Dog } from '../context/UserDataContext';
 
 /*
   Design requirements of new signup form;
@@ -32,21 +32,46 @@ export default function ClassSignup() {
   const { userData } = useUserData();
   const classId = searchParams.get('classId');
   const [dogClasses, setDogClasses] = useState<DogClass[]>([]);
-    useEffect(() => {
-      const fetchDogClasses = async () => {
-        const queryDogClasses = await dogClassAPI.getAll();
-        setDogClasses(queryDogClasses);
-      };
-      fetchDogClasses();
-    }, []);
-
-  // Use user's dogs if logged in, otherwise use placeholder data
-  const availableDogs = userData?.dogs || [
+  const [availableDogs, setAvailableDogs] = useState<Dog[]>([
     { id: 1, name: 'Max', breed: 'Golden Retriever', age: '3 years', experience: 'experienced' },
     { id: 2, name: 'Bella', breed: 'Labrador', age: '2 years', experience: 'some' },
     { id: 3, name: 'Charlie', breed: 'German Shepherd', age: '4 years', experience: 'beginner' },
     { id: 4, name: 'Lucy', breed: 'Beagle', age: '1 year', experience: 'beginner' },
-  ];
+  ]);
+
+  useEffect(() => {
+    const fetchDogClasses = async () => {
+      const queryDogClasses = await dogClassAPI.getAll();
+      setDogClasses(queryDogClasses);
+    };
+    fetchDogClasses();
+  }, []);
+
+  // Fetch user's dogs from database when logged in
+  useEffect(() => {
+    const fetchUserDogs = async () => {
+      try {
+        if (userData?.id) {
+          const response = await memberDogsAPI.getByFamilyId(userData.id);
+          if (response.success && response.data && response.data.length > 0) {
+            const formattedDogs: Dog[] = response.data.map((dog: any) => ({
+              id: dog.id,
+              name: dog.name,
+              breed: dog.breed,
+              age: dog.age,
+              experience: 'beginner',
+            }));
+            setAvailableDogs(formattedDogs);
+            console.log('Member dogs loaded:', formattedDogs);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching member dogs:', error);
+      }
+    };
+
+    fetchUserDogs();
+  }, [userData?.id]);
 
   const [useUsersDogs, setUseUsersDogs] = useState(!!userData);
   const [selectedDogId, setSelectedDogId] = useState<number | ''>('');

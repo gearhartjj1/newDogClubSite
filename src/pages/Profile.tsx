@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import styles from './Profile.module.css';
 import { useUserData, type Dog, type PastClass, type UserInfo } from '../context/UserDataContext';
-import { dogClassAPI } from '../services/api';
+import { dogClassAPI, memberDogsAPI } from '../services/api';
 
 export default function Profile() {
   const navigate = useNavigate();
@@ -31,12 +31,35 @@ export default function Profile() {
     memberSince: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long' }),
   };
 
-  const [dogs, setDogs] = useState<Dog[]>(userData.dogs || [
-    { id: 1, name: 'Max', breed: 'Golden Retriever', age: '3 years', experience: 'experienced' },
-    { id: 2, name: 'Bella', breed: 'Labrador', age: '2 years', experience: 'some' },
-  ]);
-
+  const [dogs, setDogs] = useState<Dog[]>([]);
   const [pastClasses, setPastClasses] = useState<PastClass[]>([]);
+
+  // Fetch user's dogs from database on component load
+  useEffect(() => {
+    const fetchUserDogs = async () => {
+      try {
+        if (userData?.id) {
+          const response = await memberDogsAPI.getByFamilyId(userData.id);
+          if (response.success && response.data) {
+            // Map database dogs to Dog interface
+            const formattedDogs: Dog[] = response.data.map((dog: any) => ({
+              id: dog.id,
+              name: dog.name,
+              breed: dog.breed,
+              age: dog.age,
+              experience: 'beginner' // TODO: add experience level to database
+            }));
+            setDogs(formattedDogs);
+            console.log('User dogs fetched:', formattedDogs);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching user dogs:', error);
+      }
+    };
+
+    fetchUserDogs();
+  }, [userData?.id]);;
 
   // Fetch user's enrolled classes on component load
   useEffect(() => {
@@ -60,25 +83,62 @@ export default function Profile() {
     fetchUserClasses();
   }, [userData?.id]);
 
-  const handleAddDog = (e: React.FormEvent) => {
+  const handleAddDog = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newDogForm.name || !newDogForm.breed || !newDogForm.age) {
       alert('Please fill in all fields');
       return;
     }
 
-    const newDog: Dog = {
-      id: Math.max(...dogs.map(d => d.id), 0) + 1,
-      ...newDogForm,
-    };
+    try {
+      if (!userData?.id) {
+        alert('User ID not found');
+        return;
+      }
 
-    setDogs([...dogs, newDog]);
-    setNewDogForm({ name: '', breed: '', age: '', experience: 'beginner' });
-    setShowAddDog(false);
+      const response = await memberDogsAPI.add(
+        userData.id,
+        newDogForm.name,
+        newDogForm.breed,
+        newDogForm.age
+      );
+
+      if (response.success) {
+        const newDog: Dog = {
+          id: response.data.id,
+          name: response.data.name,
+          breed: response.data.breed,
+          age: response.data.age,
+          experience: 'beginner',
+        };
+
+        setDogs([...dogs, newDog]);
+        setNewDogForm({ name: '', breed: '', age: '', experience: 'beginner' });
+        setShowAddDog(false);
+        console.log('Dog added successfully:', newDog);
+      } else {
+        alert('Failed to add dog: ' + response.error);
+      }
+    } catch (error) {
+      console.error('Error adding dog:', error);
+      alert('Failed to add dog');
+    }
   };
 
-  const handleRemoveDog = (id: number) => {
-    setDogs(dogs.filter(dog => dog.id !== id));
+  const handleRemoveDog = async (id: number) => {
+    try {
+      const response = await memberDogsAPI.remove(id);
+
+      if (response.success) {
+        setDogs(dogs.filter(dog => dog.id !== id));
+        console.log('Dog removed successfully');
+      } else {
+        alert('Failed to remove dog: ' + response.error);
+      }
+    } catch (error) {
+      console.error('Error removing dog:', error);
+      alert('Failed to remove dog');
+    }
   };
 
   const handleLogout = () => {

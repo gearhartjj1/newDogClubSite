@@ -1,0 +1,40 @@
+Current goal for June window
+- Full member login and class sign up working
+- Have class sign up available via new site for July window
+  - Both sites will be available for use to do the sign up
+  - New site will be available and optional to use
+
+Specifics that need done to get to this goal
+- Member login
+- Member profile page
+- Class sign up list
+- Hosting site somewhere
+- Setting up logic to toggle to the production database
+- General code clean up
+
+Member login TODO
+- Sign in functionality --- done
+- Ability to change password
+- Review how current sign in works from a security standpoint
+   - I have concerns, the current method just uses the member database table and sees if the credentials match
+   - This seems basic and not very secure
+
+Member profile page
+- Basic member details
+- Past classes --- done
+- Ability to add your dogs
+    - I need to figure out how to add database tables
+    - Can this be done without causing issues in the existing database?
+        - Build sql statement to make table
+        - Build database server function to handle communicating with database
+        - Connect to UI to allow users to log their dogs and use during signup
+
+Signing up for classes
+- UI to show current available classes --- done
+- Logic to show remaining openings --- done
+- Ability to be added to waitlist
+- Logic before allowing sign up to make sure the class is still open
+    - If the class closed while you signed up, then show option to be added to waitlist
+- Payment logic
+    - Review how it works currently
+    - Get paypal integratoion working

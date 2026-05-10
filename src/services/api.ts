@@ -121,4 +121,32 @@ export const signinAPI = {
   },
 };
 
-export default { dogClassAPI, classesAPI, signupsAPI };
+// Member Dogs API
+export const memberDogsAPI = {
+  getByFamilyId: async (familyId: number) => {
+    const response = await fetch(`${API_URL}/member-dogs/${familyId}`);
+    if (!response.ok) throw new Error('Failed to fetch member dogs');
+    return response.json();
+  },
+
+  add: async (familyId: number, dogName: string, dogBreed: string, dogAge: string) => {
+    const response = await fetch(`${API_URL}/member-dogs`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ familyId, dogName, dogBreed, dogAge }),
+    });
+    if (!response.ok) throw new Error('Failed to add dog');
+    return response.json();
+  },
+
+  remove: async (dogId: number) => {
+    const response = await fetch(`${API_URL}/member-dogs/${dogId}`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+    });
+    if (!response.ok) throw new Error('Failed to remove dog');
+    return response.json();
+  },
+};
+
+export default { dogClassAPI, classesAPI, signupsAPI, memberDogsAPI };
