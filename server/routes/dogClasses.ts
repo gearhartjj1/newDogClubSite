@@ -70,7 +70,7 @@ router.post('/', async (req: Request, res: Response) => {
     const newIdValue = (maxIdResult[0] as any)[0].maxId + 1;
     console.log("the new id is: ", (maxIdResult[0] as any)[0].maxId);
     console.log("the user id: ", req.body.userId);
-    const newQuery = `insert into Enrollment values (${newIdValue}, ${req.body.userId}, ${req.body.classId}, 'Y', 'Y', 1, '${req.body.dogName}', '${req.body.dogAge}', '${req.body.dogBreed}', 'Y', 'None', 'internet', ${Date.now()})`;
+    const newQuery = `insert into Enrollment values (${newIdValue}, ${req.body.userId}, ${req.body.classId}, 'Y', 'Y', ${req.body.paymentMethod}, '${req.body.dogName}', '${req.body.dogAge}', '${req.body.dogBreed}', 'Y', 'None', 'internet', ${Date.now()})`;
     const response = await pool.query(newQuery);
     console.log('Database response: ', response);
     

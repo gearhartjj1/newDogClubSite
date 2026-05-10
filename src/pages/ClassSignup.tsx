@@ -85,6 +85,7 @@ export default function ClassSignup() {
     dogBreed: '',
     dogAge: '',
     classId: classId || '',
+    paymentMethod: '',
     agreeTerms: false,
     userId: userData?.id || null,
   });
@@ -126,10 +127,22 @@ export default function ClassSignup() {
       return;
     }
 
-    console.log('Form submitted:', formData);
+    // Map payment method text to numeric value
+    const paymentMethodMap: { [key: string]: number } = {
+      'PayPal': 1,
+      'Cash': 2,
+      'Check': 3,
+    };
+
+    const submissionData = {
+      ...formData,
+      paymentMethod: paymentMethodMap[formData.paymentMethod] || 1,
+    };
+
+    console.log('Form submitted:', submissionData);
     setSubmitted(true);
     //TODO: send call to api
-    await dogClassAPI.create(formData);
+    await dogClassAPI.create(submissionData);
     // Simulate form submission
     setTimeout(() => {
       navigate('/');
@@ -307,6 +320,26 @@ export default function ClassSignup() {
                   {cls.name}
                 </option>
               ))}
+            </select>
+          </div>
+        </div>
+
+        <div className={styles.section}>
+          <h2>Payment Method</h2>
+
+          <div className={styles.formGroup}>
+            <label htmlFor="paymentMethod">Select Payment Method *</label>
+            <select
+              id="paymentMethod"
+              name="paymentMethod"
+              value={formData.paymentMethod}
+              onChange={handleChange}
+              required
+            >
+              <option value="">- Choose a payment method -</option>
+              <option value="PayPal">PayPal</option>
+              <option value="Cash">Cash</option>
+              <option value="Check">Check</option>
             </select>
           </div>
         </div>
