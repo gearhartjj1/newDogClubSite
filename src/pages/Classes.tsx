@@ -71,9 +71,12 @@ export default function Classes() {
                       Sign Up
                     </Link>
                   ) : (
-                    <button className={styles.waitlistButtonSmall}>
+                    <Link
+                      to={`/signup?classId=${dogClass.ID}&waitlist=true`}
+                      className={styles.waitlistButtonSmall}
+                    >
                       Join Waitlist
-                    </button>
+                    </Link>
                   )}
                 </td>
               </tr>

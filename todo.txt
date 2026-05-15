@@ -20,9 +20,9 @@ Member login TODO
    - This seems basic and not very secure
 
 Member profile page
-- Basic member details
+- Basic member details --- done
 - Past classes --- done
-- Ability to add your dogs
+- Ability to add your dogs --- done
     - I need to figure out how to add database tables
     - Can this be done without causing issues in the existing database?
         - Build sql statement to make table
@@ -38,3 +38,15 @@ Signing up for classes
 - Payment logic
     - Review how it works currently
     - Get paypal integratoion working
+
+
+
+Code	Payment Method	Notes
+1	PayPal	Online payment processed immediately
+2	Check	Payment due by specified date
+3	Cash	Payment due at first class or by due date
+4	Instructor Perk	Redeem instructor perks card (members only)
+5	Bonus Bones	Redeem bonus bones certificate (members only)
+6	Gift Certificate	Redeem gift certificate
+7	Waitlisted	No payment yet - waiting for class opening
+9	Deleted	Cancelled/deleted enrollment (not shown to users)

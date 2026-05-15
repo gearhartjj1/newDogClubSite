@@ -31,6 +31,7 @@ export default function ClassSignup() {
   const navigate = useNavigate();
   const { userData } = useUserData();
   const classId = searchParams.get('classId');
+  const isWaitlist = searchParams.get('waitlist') === 'true';
   const [dogClasses, setDogClasses] = useState<DogClass[]>([]);
   const [availableDogs, setAvailableDogs] = useState<Dog[]>([
     { id: 1, name: 'Max', breed: 'Golden Retriever', age: '3 years' },
@@ -85,7 +86,7 @@ export default function ClassSignup() {
     dogBreed: '',
     dogAge: '',
     classId: classId || '',
-    paymentMethod: '',
+    paymentMethod: isWaitlist ? 'Waitlist' : '',
     agreeTerms: false,
     userId: userData?.id || null,
   });
@@ -132,6 +133,7 @@ export default function ClassSignup() {
       'PayPal': 1,
       'Cash': 2,
       'Check': 3,
+      'Waitlist': 7,
     };
 
     const submissionData = {
@@ -168,9 +170,24 @@ export default function ClassSignup() {
   return (
     <div className={styles.container}>
       <header className={styles.header}>
-        <h1>📝 Sign Up for a Class</h1>
-        <p>Join our training program and start your dog's journey to success</p>
+        <h1>📝 {isWaitlist ? 'Join Waitlist' : 'Sign Up for a Class'}</h1>
+        <p>{isWaitlist ? 'Join the waitlist for this class' : 'Join our training program and start your dog\'s journey to success'}</p>
       </header>
+
+      {isWaitlist && (
+        <div style={{
+          backgroundColor: '#fff3cd',
+          border: '1px solid #ffc107',
+          color: '#856404',
+          padding: '12px 20px',
+          borderRadius: '4px',
+          marginBottom: '20px',
+          textAlign: 'center',
+          fontWeight: '500'
+        }}>
+          ⚠️ This class is full. You are signing up for the waitlist.
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className={styles.form}>
         <div className={styles.section}>
@@ -334,12 +351,14 @@ export default function ClassSignup() {
               name="paymentMethod"
               value={formData.paymentMethod}
               onChange={handleChange}
+              disabled={isWaitlist}
               required
             >
-              <option value="">- Choose a payment method -</option>
-              <option value="PayPal">PayPal</option>
-              <option value="Cash">Cash</option>
-              <option value="Check">Check</option>
+              {!isWaitlist && <option value="">- Choose a payment method -</option>}
+              {!isWaitlist && <option value="PayPal">PayPal</option>}
+              {!isWaitlist && <option value="Cash">Cash</option>}
+              {!isWaitlist && <option value="Check">Check</option>}
+              {isWaitlist && <option value="Waitlist">Waitlist</option>}
             </select>
           </div>
         </div>
