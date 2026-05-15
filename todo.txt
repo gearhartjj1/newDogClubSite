@@ -40,6 +40,11 @@ Signing up for classes
     - Get paypal integratoion working
 
 
+Security
+- It is bad
+- Plain text passwords?
+
+
 
 Code	Payment Method	Notes
 1	PayPal	Online payment processed immediately
