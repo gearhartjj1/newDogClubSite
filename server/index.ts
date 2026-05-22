@@ -1,6 +1,8 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 // Load environment variables
 dotenv.config();
@@ -12,12 +14,15 @@ import signupsRouter from './routes/signups';
 import signinRouter from './routes/signin';
 import memberDogsRouter from './routes/memberDogs';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const app = express();
-const PORT = process.env.SERVER_PORT || 3001;
+const PORT = process.env.PORT || process.env.SERVER_PORT || 3001;
 
 // Middleware
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
+  origin: process.env.CORS_ORIGIN || (process.env.NODE_ENV === 'production' ? process.env.RAILWAY_PUBLIC_DOMAIN && `https://${process.env.RAILWAY_PUBLIC_DOMAIN}` : 'http://localhost:5173'),
   credentials: true
 }));
 app.use(express.json());
@@ -54,13 +59,24 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
   });
 });
 
-// 404 handler
-app.use((req, res) => {
-  res.status(404).json({
-    error: 'Endpoint not found',
-    path: req.path
+// Serve static frontend files in production
+if (process.env.NODE_ENV === 'production') {
+  const clientPath = path.join(__dirname, '../dist');
+  app.use(express.static(clientPath));
+
+  // SPA fallback - serve index.html for non-API routes
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(clientPath, 'index.html'));
   });
-});
+} else {
+  // 404 handler for development
+  app.use((req, res) => {
+    res.status(404).json({
+      error: 'Endpoint not found',
+      path: req.path
+    });
+  });
+}
 
 // Start server
 app.listen(PORT, () => {
