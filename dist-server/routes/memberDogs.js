@@ -1,5 +1,5 @@
 import express from 'express';
-import pool from '../config/database';
+import pool from '../config/database.js';
 const router = express.Router();
 // Get all dogs for a specific family
 router.get('/:familyId', async (req, res) => {

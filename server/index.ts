@@ -8,11 +8,11 @@ import { fileURLToPath } from 'url';
 dotenv.config();
 
 // Import routes
-import dogClassesRouter from './routes/dogClasses';
-import classesRouter from './routes/classes';
-import signupsRouter from './routes/signups';
-import signinRouter from './routes/signin';
-import memberDogsRouter from './routes/memberDogs';
+import dogClassesRouter from './routes/dogClasses.js';
+import classesRouter from './routes/classes.js';
+import signupsRouter from './routes/signups.js';
+import signinRouter from './routes/signin.js';
+import memberDogsRouter from './routes/memberDogs.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

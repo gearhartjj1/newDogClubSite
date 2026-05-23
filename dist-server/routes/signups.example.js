@@ -1,5 +1,5 @@
 import express from 'express';
-import pool from '../config/database';
+import pool from '../config/database.js';
 const router = express.Router();
 // Create a new class signup
 router.post('/', async (req, res) => {

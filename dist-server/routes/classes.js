@@ -1,5 +1,5 @@
 import express from 'express';
-import pool from '../config/database';
+import pool from '../config/database.js';
 const router = express.Router();
 //TODO: get existing database to connect
 //Update sql queries based on how the current database is structured
