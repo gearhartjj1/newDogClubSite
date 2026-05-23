@@ -26,13 +26,13 @@ body {
 }
 
 a {
-  color: #d4af37;
+  color: #0d9488;
   text-decoration: none;
   transition: color 0.3s;
 }
 
 a:hover {
-  color: #3a3a3a;
+  color: #134e4a;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -46,14 +46,14 @@ button {
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #d4af37;
+  background-color: #0d9488;
   color: white;
   cursor: pointer;
   transition: background-color 0.25s, transform 0.25s;
 }
 
 button:hover {
-  background-color: #3a3a3a;
+  background-color: #134e4a;
   transform: scale(1.05);
 }
 
