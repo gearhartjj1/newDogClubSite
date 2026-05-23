@@ -1,6 +1,6 @@
 // API service for frontend to communicate with backend
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+const API_URL = import.meta.env.VITE_API_URL || '/api';
 
 export interface DogClass {
   Class: string,
