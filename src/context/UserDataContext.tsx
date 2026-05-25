@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
+import { signinAPI } from '../services/api';
 
 export interface Dog {
   id: number;
@@ -35,43 +36,47 @@ interface UserDataContextType {
   setUserData: (userData: UserData | null) => void;
   getUserData: () => UserData | null;
   logout: () => void;
+  isLoading: boolean;
 }
 
 const UserDataContext = createContext<UserDataContextType | undefined>(undefined);
-
-const STORAGE_KEY = 'dogclub_user_session';
-
-function loadStoredUser(): UserData | null {
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-      return JSON.parse(stored) as UserData;
-    }
-  } catch (e) {
-    console.error('Failed to load stored session:', e);
-    localStorage.removeItem(STORAGE_KEY);
-  }
-  return null;
-}
 
 interface UserDataProviderProps {
   children: ReactNode;
 }
 
 export function UserDataProvider({ children }: UserDataProviderProps) {
-  const [userData, setUserDataState] = useState<UserData | null>(loadStoredUser);
+  const [userData, setUserDataState] = useState<UserData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Sync to localStorage whenever userData changes
+  // On mount, check for an existing session via /api/me
   useEffect(() => {
-    if (userData) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(userData));
-    } else {
-      localStorage.removeItem(STORAGE_KEY);
-    }
-  }, [userData]);
+    signinAPI.me()
+      .then((user) => {
+        if (user) {
+          const restored: UserData = {
+            id: user.id,
+            username: user.username,
+            email: user.email,
+            userInfo: {
+              name: user.firstName + ' ' + user.username,
+              email: user.email,
+              phone: user.phone,
+              memberSince: 'TBD',
+            },
+          };
+          setUserDataState(restored);
+        }
+      })
+      .catch(() => {
+        // No active session - user is not logged in
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }, []);
 
   const setUserData = (newUserData: UserData | null) => {
-    console.log("user data updated: ", newUserData);
     setUserDataState(newUserData);
   };
 
@@ -79,7 +84,12 @@ export function UserDataProvider({ children }: UserDataProviderProps) {
     return userData;
   };
 
-  const logout = () => {
+  const logout = async () => {
+    try {
+      await signinAPI.logout();
+    } catch (e) {
+      console.error('Logout request failed:', e);
+    }
     setUserDataState(null);
   };
 
@@ -88,6 +98,7 @@ export function UserDataProvider({ children }: UserDataProviderProps) {
     setUserData,
     getUserData,
     logout,
+    isLoading,
   };
 
   return (

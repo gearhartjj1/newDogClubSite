@@ -1,8 +1,9 @@
 import express from 'express';
 import cors from 'cors';
+import session from 'express-session';
+import expressMySqlSession from 'express-mysql-session';
 import dotenv from 'dotenv';
 import path from 'path';
-import fs from 'fs';
 import { fileURLToPath } from 'url';
 
 // Load environment variables
@@ -14,12 +15,16 @@ import classesRouter from './routes/classes.js';
 import signupsRouter from './routes/signups.js';
 import signinRouter from './routes/signin.js';
 import memberDogsRouter from './routes/memberDogs.js';
+import pool from './config/database.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || process.env.SERVER_PORT || 3001;
+
+// Trust proxy (required for secure cookies behind Railway's proxy)
+app.set('trust proxy', 1);
 
 // Middleware
 app.use(cors({
@@ -29,6 +34,27 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Session store setup (MySQL-backed)
+const MySQLStore = expressMySqlSession(session as any);
+const sessionStore = new MySQLStore({
+  clearExpired: true,
+  checkExpirationInterval: 900000, // 15 minutes
+  expiration: 86400000, // 24 hours
+}, pool as any);
+
+app.use(session({
+  store: sessionStore,
+  secret: process.env.SESSION_SECRET || 'dev-secret-change-in-production',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    httpOnly: true, // Prevents JavaScript access (XSS protection)
+    secure: process.env.NODE_ENV === 'production', // HTTPS only in production
+    sameSite: 'lax',
+    maxAge: 24 * 60 * 60 * 1000, // 24 hours
+  },
+}));
+
 // Request logging middleware
 app.use((req, res, next) => {
   console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
@@ -37,23 +63,10 @@ app.use((req, res, next) => {
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
-  const distExists = fs.existsSync(clientPath);
-  const indexHtmlExists = fs.existsSync(path.join(clientPath, 'index.html'));
-  const cwd = process.cwd();
-  const cwdContents = fs.readdirSync(cwd);
   res.json({
     status: 'Server is running',
     timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV || 'development',
-    debug: {
-      __dirname,
-      clientPath,
-      cwd,
-      cwdContents,
-      distExists,
-      indexHtmlExists,
-      distContents: distExists ? fs.readdirSync(clientPath) : null
-    }
+    environment: process.env.NODE_ENV || 'development'
   });
 });
 
@@ -64,22 +77,6 @@ app.use('/api/signups', signupsRouter);
 app.use('/api/signin', signinRouter);
 app.use('/api/member-dogs', memberDogsRouter);
 
-// Serve static frontend files in production
-const clientPath = path.join(__dirname, '../dist');
-
-// Startup diagnostics
-const distExists = fs.existsSync(clientPath);
-const indexExists = fs.existsSync(path.join(clientPath, 'index.html'));
-console.log(`[STARTUP] __dirname: ${__dirname}`);
-console.log(`[STARTUP] clientPath: ${clientPath}`);
-console.log(`[STARTUP] dist/ exists: ${distExists}`);
-console.log(`[STARTUP] dist/index.html exists: ${indexExists}`);
-if (distExists) {
-  console.log(`[STARTUP] dist/ contents: ${fs.readdirSync(clientPath).join(', ')}`);
-}
-
-app.use(express.static(clientPath));
-
 // Error handling middleware
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
   console.error('Error:', err);
@@ -89,10 +86,24 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
   });
 });
 
-// SPA fallback - serve index.html for non-API routes
-app.get('*', (req, res) => {
-  res.sendFile(path.join(clientPath, 'index.html'));
-});
+// Serve static frontend files in production
+if (process.env.NODE_ENV === 'production') {
+  const clientPath = path.join(__dirname, '../dist');
+  app.use(express.static(clientPath));
+
+  // SPA fallback - serve index.html for non-API routes
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(clientPath, 'index.html'));
+  });
+} else {
+  // 404 handler for development
+  app.use((req, res) => {
+    res.status(404).json({
+      error: 'Endpoint not found',
+      path: req.path
+    });
+  });
+}
 
 // Start server
 app.listen(PORT, () => {
