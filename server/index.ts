@@ -50,6 +50,10 @@ app.use('/api/signups', signupsRouter);
 app.use('/api/signin', signinRouter);
 app.use('/api/member-dogs', memberDogsRouter);
 
+// Serve static frontend files in production
+const clientPath = path.join(__dirname, '../dist');
+app.use(express.static(clientPath));
+
 // Error handling middleware
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
   console.error('Error:', err);
@@ -59,24 +63,10 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
   });
 });
 
-// Serve static frontend files in production
-if (process.env.NODE_ENV === 'production') {
-  const clientPath = path.join(__dirname, '../dist');
-  app.use(express.static(clientPath));
-
-  // SPA fallback - serve index.html for non-API routes
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(clientPath, 'index.html'));
-  });
-} else {
-  // 404 handler for development
-  app.use((req, res) => {
-    res.status(404).json({
-      error: 'Endpoint not found',
-      path: req.path
-    });
-  });
-}
+// SPA fallback - serve index.html for non-API routes
+app.get('*', (req, res) => {
+  res.sendFile(path.join(clientPath, 'index.html'));
+});
 
 // Start server
 app.listen(PORT, () => {
