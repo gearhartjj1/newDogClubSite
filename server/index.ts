@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import path from 'path';
+import fs from 'fs';
 import { fileURLToPath } from 'url';
 
 // Load environment variables
@@ -54,7 +55,6 @@ app.use('/api/member-dogs', memberDogsRouter);
 const clientPath = path.join(__dirname, '../dist');
 
 // Startup diagnostics
-import fs from 'fs';
 const distExists = fs.existsSync(clientPath);
 const indexExists = fs.existsSync(path.join(clientPath, 'index.html'));
 console.log(`[STARTUP] __dirname: ${__dirname}`);
