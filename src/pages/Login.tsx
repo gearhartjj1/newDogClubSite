@@ -25,20 +25,18 @@ export default function Login() {
     setIsLoading(true);
 
     try {
-      // Call the sign-in API
+      // Call the sign-in API (session cookie is set automatically by the server)
       const response = await signinAPI.signin(username, password);
-      console.log('Sign in response: ', response);
       if (response.success) {
-        // Set the user data in context
-        // convert user data from database to match our UserDataContext structure
+        // Set the user data in context from the session response
         const userData: UserData = {
-          id: response.user.Family,
-          username: response.user.LastName,
-          email: response.user.Email,
+          id: response.user.id,
+          username: response.user.username,
+          email: response.user.email,
           userInfo: {
-            name: response.user.FirstName + ' ' + response.user.LastName,
-            email: response.user.Email,
-            phone: response.user.Phone,
+            name: response.user.firstName + ' ' + response.user.username,
+            email: response.user.email,
+            phone: response.user.phone,
             memberSince: "TBD"
           }
         }

@@ -7,13 +7,6 @@ import { dogClassAPI, memberDogsAPI } from '../services/api';
 export default function Profile() {
   const navigate = useNavigate();
   const { userData, setUserData } = useUserData();
-  console.log("Profile page user data: ", userData);
-
-  // Redirect to login if not authenticated
-  if (!userData) {
-    navigate('/login');
-    return null;
-  }
 
   const [showAddDog, setShowAddDog] = useState(false);
   const [newDogForm, setNewDogForm] = useState({
@@ -22,16 +15,16 @@ export default function Profile() {
     age: '',
   });
 
-  // Use user data from context, with fallback values
-  const userInfo: UserInfo =  {
-    name: userData.username || 'User',
-    email: userData.email || '',
-    phone: userData.userInfo?.phone || '',
-    memberSince: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long' }),
-  };
-
   const [dogs, setDogs] = useState<Dog[]>([]);
   const [pastClasses, setPastClasses] = useState<PastClass[]>([]);
+
+  // there is a bu here where on refresh the userData is not loaded causing this to go to the login page
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!userData) {
+      navigate('/login');
+    }
+  }, [userData, navigate]);
 
   // Fetch user's dogs from database on component load
   useEffect(() => {
@@ -40,7 +33,6 @@ export default function Profile() {
         if (userData?.id) {
           const response = await memberDogsAPI.getByFamilyId(userData.id);
           if (response.success && response.data) {
-            // Map database dogs to Dog interface
             const formattedDogs: Dog[] = response.data.map((dog: any) => ({
               id: dog.id,
               name: dog.name,
@@ -57,7 +49,7 @@ export default function Profile() {
     };
 
     fetchUserDogs();
-  }, [userData?.id]);;
+  }, [userData?.id]);
 
   // Fetch user's enrolled classes on component load
   useEffect(() => {
@@ -80,6 +72,19 @@ export default function Profile() {
 
     fetchUserClasses();
   }, [userData?.id]);
+
+  // Don't render profile content if not authenticated
+  if (!userData) {
+    return null;
+  }
+
+  // Use user data from context, with fallback values
+  const userInfo: UserInfo = {
+    name: userData.username || 'User',
+    email: userData.email || '',
+    phone: userData.userInfo?.phone || '',
+    memberSince: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long' }),
+  };
 
   const handleAddDog = async (e: React.FormEvent) => {
     e.preventDefault();

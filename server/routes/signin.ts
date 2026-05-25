@@ -3,6 +3,19 @@ import pool from '../config/database.js';
 
 const router = express.Router();
 
+// Extend express-session types to include our user data
+declare module 'express-session' {
+  interface SessionData {
+    user: {
+      id: number;
+      username: string;
+      firstName: string;
+      email: string;
+      phone: string;
+    };
+  }
+}
+
 interface SignInRequest {
   username: string;
   password: string;
@@ -14,7 +27,9 @@ interface SignInResponse {
   user?: {
     id: number;
     username: string;
-    email?: string;
+    firstName: string;
+    email: string;
+    phone: string;
   };
   error?: string;
 }
@@ -33,12 +48,9 @@ router.post('/', async (req: Request, res: Response) => {
     }
 
     // Query the database for the user
-    // Note: The Teacher table is where user login data is stored
     const query = 'SELECT * FROM Teacher WHERE LastName = ? LIMIT 1';
-    console.log("Jake the query: ", query, username);
     try {
       const [rows]: any = await pool.query(query, [username]);
-      console.log('Sign in query result: ', rows);
 
       if (!rows || rows.length === 0) {
         return res.status(401).json({
@@ -57,17 +69,27 @@ router.post('/', async (req: Request, res: Response) => {
         } as SignInResponse);
       }
 
-      // Successful login
-      console.log("sign in is good, sending response for user: ", user);
+      // Build session user data (only what the client needs)
+      const sessionUser = {
+        id: user.Family,
+        username: user.LastName,
+        firstName: user.FirstName,
+        email: user.Email || '',
+        phone: user.Phone || '',
+      };
+
+      // Store user in session
+      req.session.user = sessionUser;
+
+      // Successful login - return user data from session
       res.status(200).json({
         success: true,
         message: 'Sign in successful',
-        user: user
+        user: sessionUser,
       } as SignInResponse);
 
     } catch (dbError: any) {
-        console.error('Database error during sign in: ', dbError);
-      // If table doesn't exist, provide helpful error message
+      console.error('Database error during sign in: ', dbError);
       if (dbError.message && dbError.message.includes('ER_NO_SUCH_TABLE')) {
         console.error('Teacher table not found. Check database schema.');
         return res.status(500).json({
@@ -85,6 +107,32 @@ router.post('/', async (req: Request, res: Response) => {
       error: 'Failed to process sign in request'
     } as SignInResponse);
   }
+});
+
+// Get current session user
+router.get('/me', (req: Request, res: Response) => {
+  if (req.session.user) {
+    return res.status(200).json({
+      success: true,
+      user: req.session.user,
+    });
+  }
+  return res.status(401).json({
+    success: false,
+    error: 'Not authenticated',
+  });
+});
+
+// Logout - destroy session
+router.post('/logout', (req: Request, res: Response) => {
+  req.session.destroy((err) => {
+    if (err) {
+      console.error('Session destroy error:', err);
+      return res.status(500).json({ success: false, error: 'Logout failed' });
+    }
+    res.clearCookie('connect.sid');
+    return res.status(200).json({ success: true, message: 'Logged out successfully' });
+  });
 });
 
 export default router;
