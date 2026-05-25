@@ -55,6 +55,24 @@ app.use(session({
   },
 }));
 
+// HTTPS enforcement middleware for production
+if (process.env.NODE_ENV === 'production') {
+  // Add HSTS header to all responses
+  app.use((req, res, next) => {
+    res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+    next();
+  });
+
+  // Redirect HTTP to HTTPS on authentication routes
+  app.use('/api/signin', (req, res, next) => {
+    if (!req.secure) {
+      const httpsUrl = `https://${req.headers.host}${req.originalUrl}`;
+      return res.redirect(301, httpsUrl);
+    }
+    next();
+  });
+}
+
 // Request logging middleware
 app.use((req, res, next) => {
   console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
