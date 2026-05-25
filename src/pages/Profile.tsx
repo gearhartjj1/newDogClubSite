@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import styles from './Profile.module.css';
 import { useUserData, type Dog, type PastClass, type UserInfo } from '../context/UserDataContext';
-import { dogClassAPI, memberDogsAPI } from '../services/api';
+import { dogClassAPI, memberDogsAPI, signinAPI } from '../services/api';
 
 export default function Profile() {
   const navigate = useNavigate();
@@ -143,9 +143,14 @@ export default function Profile() {
     }
   };
 
-  const handleLogout = () => {
-    setUserData(null);
-    navigate('/login');
+  const handleLogout = async () => {
+    const response = await signinAPI.logout();
+    if (response.success) {
+      setUserData(null);
+      navigate('/login');
+    } else {
+      alert('Failed to logout: ' + response.error);
+    }
   };
 
   return (
