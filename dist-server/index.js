@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import path from 'path';
+import fs from 'fs';
 import { fileURLToPath } from 'url';
 // Load environment variables
 dotenv.config();
@@ -29,10 +30,23 @@ app.use((req, res, next) => {
 });
 // Health check endpoint
 app.get('/api/health', (req, res) => {
+    const distExists = fs.existsSync(clientPath);
+    const indexHtmlExists = fs.existsSync(path.join(clientPath, 'index.html'));
+    const cwd = process.cwd();
+    const cwdContents = fs.readdirSync(cwd);
     res.json({
         status: 'Server is running',
         timestamp: new Date().toISOString(),
-        environment: process.env.NODE_ENV || 'development'
+        environment: process.env.NODE_ENV || 'development',
+        debug: {
+            __dirname,
+            clientPath,
+            cwd,
+            cwdContents,
+            distExists,
+            indexHtmlExists,
+            distContents: distExists ? fs.readdirSync(clientPath) : null
+        }
     });
 });
 // API Routes
@@ -41,6 +55,19 @@ app.use('/api/classes', classesRouter);
 app.use('/api/signups', signupsRouter);
 app.use('/api/signin', signinRouter);
 app.use('/api/member-dogs', memberDogsRouter);
+// Serve static frontend files in production
+const clientPath = path.join(__dirname, '../dist');
+// Startup diagnostics
+const distExists = fs.existsSync(clientPath);
+const indexExists = fs.existsSync(path.join(clientPath, 'index.html'));
+console.log(`[STARTUP] __dirname: ${__dirname}`);
+console.log(`[STARTUP] clientPath: ${clientPath}`);
+console.log(`[STARTUP] dist/ exists: ${distExists}`);
+console.log(`[STARTUP] dist/index.html exists: ${indexExists}`);
+if (distExists) {
+    console.log(`[STARTUP] dist/ contents: ${fs.readdirSync(clientPath).join(', ')}`);
+}
+app.use(express.static(clientPath));
 // Error handling middleware
 app.use((err, req, res, next) => {
     console.error('Error:', err);
@@ -49,24 +76,10 @@ app.use((err, req, res, next) => {
         message: process.env.NODE_ENV === 'development' ? err.message : undefined
     });
 });
-// Serve static frontend files in production
-if (process.env.NODE_ENV === 'production') {
-    const clientPath = path.join(__dirname, '../dist');
-    app.use(express.static(clientPath));
-    // SPA fallback - serve index.html for non-API routes
-    app.get('*', (req, res) => {
-        res.sendFile(path.join(clientPath, 'index.html'));
-    });
-}
-else {
-    // 404 handler for development
-    app.use((req, res) => {
-        res.status(404).json({
-            error: 'Endpoint not found',
-            path: req.path
-        });
-    });
-}
+// SPA fallback - serve index.html for non-API routes
+app.get('*', (req, res) => {
+    res.sendFile(path.join(clientPath, 'index.html'));
+});
 // Start server
 app.listen(PORT, () => {
     console.log(`
