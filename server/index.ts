@@ -52,6 +52,19 @@ app.use('/api/member-dogs', memberDogsRouter);
 
 // Serve static frontend files in production
 const clientPath = path.join(__dirname, '../dist');
+
+// Startup diagnostics
+import fs from 'fs';
+const distExists = fs.existsSync(clientPath);
+const indexExists = fs.existsSync(path.join(clientPath, 'index.html'));
+console.log(`[STARTUP] __dirname: ${__dirname}`);
+console.log(`[STARTUP] clientPath: ${clientPath}`);
+console.log(`[STARTUP] dist/ exists: ${distExists}`);
+console.log(`[STARTUP] dist/index.html exists: ${indexExists}`);
+if (distExists) {
+  console.log(`[STARTUP] dist/ contents: ${fs.readdirSync(clientPath).join(', ')}`);
+}
+
 app.use(express.static(clientPath));
 
 // Error handling middleware
