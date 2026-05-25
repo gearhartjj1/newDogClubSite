@@ -37,10 +37,23 @@ app.use((req, res, next) => {
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
+  const distExists = fs.existsSync(clientPath);
+  const indexHtmlExists = fs.existsSync(path.join(clientPath, 'index.html'));
+  const cwd = process.cwd();
+  const cwdContents = fs.readdirSync(cwd);
   res.json({
     status: 'Server is running',
     timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV || 'development'
+    environment: process.env.NODE_ENV || 'development',
+    debug: {
+      __dirname,
+      clientPath,
+      cwd,
+      cwdContents,
+      distExists,
+      indexHtmlExists,
+      distContents: distExists ? fs.readdirSync(clientPath) : null
+    }
   });
 });
 
