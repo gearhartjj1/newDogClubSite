@@ -42,7 +42,6 @@ export const dogClassAPI = {
   },
 
   create: async (dogClassData: any) => {
-    console.log("in api: ", dogClassData);
     const response = await fetch(`${API_URL}/dog-classes`, {
       ...fetchOptions,
       method: 'POST',
@@ -113,9 +112,17 @@ export const signupsAPI = {
   },
 };
 
+// Verify the connection is secure before sending credentials
+function assertSecureConnection(): void {
+  if (window.location.protocol !== 'https:' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+    throw new Error('Secure connection (HTTPS) is required for authentication. Please access this site over HTTPS.');
+  }
+}
+
 // Sign In API
 export const signinAPI = {
   signin: async (username: string, password: string) => {
+    assertSecureConnection();
     const response = await fetch(`${API_URL}/signin`, {
       ...fetchOptions,
       method: 'POST',

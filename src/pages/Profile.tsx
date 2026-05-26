@@ -40,7 +40,6 @@ export default function Profile() {
               age: dog.age,
             }));
             setDogs(formattedDogs);
-            console.log('User dogs fetched:', formattedDogs);
           }
         }
       } catch (error) {
@@ -63,7 +62,6 @@ export default function Profile() {
             instructor: cls.Instructors || 'N/A',
             completedDate: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long' }),
           })));
-          console.log('User classes fetched:', response);
         }
       } catch (error) {
         console.error('Error fetching user classes:', error);
@@ -117,7 +115,6 @@ export default function Profile() {
         setDogs([...dogs, newDog]);
         setNewDogForm({ name: '', breed: '', age: '' });
         setShowAddDog(false);
-        console.log('Dog added successfully:', newDog);
       } else {
         alert('Failed to add dog: ' + response.error);
       }
@@ -133,7 +130,6 @@ export default function Profile() {
 
       if (response.success) {
         setDogs(dogs.filter(dog => dog.id !== id));
-        console.log('Dog removed successfully');
       } else {
         alert('Failed to remove dog: ' + response.error);
       }

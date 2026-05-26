@@ -34,6 +34,17 @@ interface SignInResponse {
   error?: string;
 }
 
+// Reject non-secure login requests in production
+router.use((req: Request, res: Response, next) => {
+  if (process.env.NODE_ENV === 'production' && !req.secure) {
+    return res.status(403).json({
+      success: false,
+      error: 'HTTPS is required for authentication. Please use a secure connection.'
+    });
+  }
+  next();
+});
+
 // Sign in user
 router.post('/', async (req: Request, res: Response) => {
   try {

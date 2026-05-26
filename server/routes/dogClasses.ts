@@ -8,10 +8,9 @@ router.get('/', async (req: Request, res: Response) => {
   try {
     const query = 'SELECT c.*, COUNT(e.ID) AS DogsInClass FROM KCTCSession c INNER JOIN Enrollment e ON c.ID = e.SID WHERE c.Session = "2024-V" GROUP BY c.ID, c.class ORDER BY c.class';
     const dogClasses = await pool.query(query);
-    console.log('Dog classes fetched:', dogClasses);
     res.json(dogClasses);
   } catch (error) {
-    console.log('Error fetching dog classes: ', error);
+    console.error('Error fetching dog classes: ', error);
     res.status(500).json({ error: 'Failed to fetch dog classes' });
   }
 });
@@ -22,10 +21,9 @@ router.get('/user/:userId', async (req: Request, res: Response) => {
     const { userId } = req.params;
     const query = 'SELECT c.* FROM KCTCSession c INNER JOIN Enrollment e ON c.ID = e.SID WHERE e.PID = ? GROUP BY c.ID, c.class ORDER BY c.class';
     const dogClasses = await pool.query(query, [userId]);
-    console.log(`Dog classes fetched for user ${userId}:`, dogClasses);
     res.json(dogClasses);
   } catch (error) {
-    console.log('Error fetching dog classes for user: ', error);
+    console.error('Error fetching dog classes for user: ', error);
     res.status(500).json({ error: 'Failed to fetch dog classes for user' });
   }
 });
@@ -50,7 +48,6 @@ router.get('/user/:userId', async (req: Request, res: Response) => {
 
 // Create event (admin)
 router.post('/', async (req: Request, res: Response) => {
-  console.log('dog class post: ', req.body);
   try {
     //TODO: I have the basic query to add rnrollment data
     //-I need to update the form to be more similar to the form in the old site
@@ -68,18 +65,15 @@ router.post('/', async (req: Request, res: Response) => {
     const maxIdResult = await pool.query('SELECT MAX(ID) AS maxId FROM Enrollment');
     //TODO: this works well, but I should probably add some error handling here in case of failures
     const newIdValue = (maxIdResult[0] as any)[0].maxId + 1;
-    console.log("the new id is: ", (maxIdResult[0] as any)[0].maxId);
-    console.log("the user id: ", req.body.userId);
     const newQuery = 'INSERT INTO Enrollment VALUES (?, ?, ?, \'Y\', \'Y\', ?, ?, ?, ?, \'Y\', \'None\', \'internet\', ?)';
     const response = await pool.query(newQuery, [newIdValue, req.body.userId, req.body.classId, req.body.paymentMethod, req.body.dogName, req.body.dogAge, req.body.dogBreed, Date.now()]);
-    console.log('Database response: ', response);
     
     res.status(201).json({
       message: 'Event created - connect to database',
       status: 'ready'
     });
   } catch (error) {
-    console.log('Error creating event: ', error);
+    console.error('Error creating event: ', error);
     res.status(500).json({ error: 'Failed to create event' });
   }
 });
