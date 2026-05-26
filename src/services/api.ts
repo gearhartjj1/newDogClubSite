@@ -42,7 +42,6 @@ export const dogClassAPI = {
   },
 
   create: async (dogClassData: any) => {
-    console.log("in api: ", dogClassData);
     const response = await fetch(`${API_URL}/dog-classes`, {
       ...fetchOptions,
       method: 'POST',

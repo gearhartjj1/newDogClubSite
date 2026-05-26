@@ -140,7 +140,6 @@ export default function ClassSignup() {
       paymentMethod: paymentMethodMap[formData.paymentMethod] || 1,
     };
 
-    console.log('Form submitted:', submissionData);
     setSubmitted(true);
     //TODO: send call to api
     await dogClassAPI.create(submissionData);
