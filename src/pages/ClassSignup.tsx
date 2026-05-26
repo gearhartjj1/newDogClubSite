@@ -62,7 +62,6 @@ export default function ClassSignup() {
               age: dog.age,
             }));
             setAvailableDogs(formattedDogs);
-            console.log('Member dogs loaded:', formattedDogs);
           }
         }
       } catch (error) {

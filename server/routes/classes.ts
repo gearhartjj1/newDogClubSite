@@ -19,7 +19,6 @@ router.get('/', async (req: Request, res: Response) => {
     //const query = 'SELECT Count(*) FROM Enrollment E, KCTCSession S where E.SID = S.ID';
     const query = 'SELECT c.*, COUNT(e.id) AS enrolled_dogs FROM KCTCSession c INNER JOIN Enrollment e ON c.id = e.SID GROUP BY c.id, c.class ORDER BY c.class';
     const stuffFromEnrollment = await pool.query(query);
-    console.log('Enrollment data fetched:', stuffFromEnrollment);
     // TODO: Execute query using database connection
     
     res.json({
@@ -27,7 +26,7 @@ router.get('/', async (req: Request, res: Response) => {
       status: 'ready'
     });
   } catch (error) {
-    console.log("the error: ", error);
+    console.error("the error: ", error);
     res.status(500).json({ error: 'Failed to fetch classes' });
   }
 });
