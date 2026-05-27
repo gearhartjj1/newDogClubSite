@@ -8,7 +8,6 @@ import ClassSignup from './pages/ClassSignup';
 import Login from './pages/Login';
 import Profile from './pages/Profile';
 import BuildingUsage from './pages/BuildingUsage';
-import Calendar from './pages/Calendar';
 import ClassPrices from './pages/ClassPrices';
 import ContactUs from './pages/ContactUs';
 import Directions from './pages/Directions';
@@ -38,7 +37,6 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/building-usage" element={<BuildingUsage />} />
-            <Route path="/calendar" element={<Calendar />} />
             <Route path="/class-prices" element={<ClassPrices />} />
             <Route path="/contact" element={<ContactUs />} />
             <Route path="/directions" element={<Directions />} />

@@ -1,10 +1,17 @@
 import { Link } from 'react-router-dom';
 import styles from './Sidebar.module.css';
 
-const sidebarLinks = [
+interface SidebarLink {
+  to: string;
+  icon: string;
+  label: string;
+  external?: boolean;
+}
+
+const sidebarLinks: SidebarLink[] = [
   { to: '/', icon: '🏠', label: 'Home' },
   { to: '/building-usage', icon: '🏢', label: 'Building Usage' },
-  { to: '/calendar', icon: '📅', label: 'Calendar' },
+  { to: '/KCTC Calendar.pdf', icon: '📅', label: 'Calendar', external: true },
   { to: '/classes', icon: '🎓', label: 'Classes' },
   { to: '/class-prices', icon: '💰', label: 'Class Prices' },
   { to: '/contact', icon: '📧', label: 'Contact Us' },
@@ -23,12 +30,19 @@ export default function Sidebar() {
     <aside className={styles.sidebar}>
       <h3 className={styles.heading}>Quick Access</h3>
       <nav className={styles.nav}>
-        {sidebarLinks.map((link) => (
-          <Link key={link.to} to={link.to} className={styles.button}>
-            <span className={styles.icon}>{link.icon}</span>
-            <span className={styles.label}>{link.label}</span>
-          </Link>
-        ))}
+        {sidebarLinks.map((link) =>
+          link.external ? (
+            <a key={link.to} href={link.to} target="_blank" rel="noopener noreferrer" className={styles.button}>
+              <span className={styles.icon}>{link.icon}</span>
+              <span className={styles.label}>{link.label}</span>
+            </a>
+          ) : (
+            <Link key={link.to} to={link.to} className={styles.button}>
+              <span className={styles.icon}>{link.icon}</span>
+              <span className={styles.label}>{link.label}</span>
+            </Link>
+          )
+        )}
       </nav>
     </aside>
   );
