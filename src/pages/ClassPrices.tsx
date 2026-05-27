@@ -9,40 +9,72 @@ export default function ClassPrices() {
         <p>Affordable training for every dog and handler</p>
       </section>
 
-      <section className={styles.content}>
+      <section className={styles.contentStacked}>
         <div className={styles.card}>
-          <h2>Member Pricing</h2>
-          <p>Members enjoy discounted rates on all classes and programs.</p>
-          <ul>
-            <li><strong>Puppy Basics (6 weeks):</strong> $85</li>
-            <li><strong>Beginner Obedience (8 weeks):</strong> $100</li>
-            <li><strong>Intermediate/Advanced (8 weeks):</strong> $100</li>
-            <li><strong>Rally (8 weeks):</strong> $100</li>
-            <li><strong>Agility (8 weeks):</strong> $110</li>
-            <li><strong>Private Lessons (per session):</strong> $50</li>
-          </ul>
+          <h2>Pricing</h2>
+          <table className={styles.table}>
+            <thead>
+              <tr>
+                <th>Class</th>
+                <th>Member Cost</th>
+                <th>Non-Members Cost</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>All Six and Seven-Week Classes</td>
+                <td>$30</td>
+                <td>$100</td>
+              </tr>
+              <tr>
+                <td>All Five-Week Classes</td>
+                <td>$25</td>
+                <td>$80</td>
+              </tr>
+              <tr>
+                <td>All Four-Week Classes</td>
+                <td>$20</td>
+                <td>$60</td>
+              </tr>
+              <tr>
+                <td>Drop-In Utility and Drop-In Open Obedience</td>
+                <td>$10 per dog per day</td>
+                <td>$10 per dog per day</td>
+              </tr>
+              <tr>
+                <td>Drop-In Fee for Classes Other Than Utility, Open Obedience and Conformation</td>
+                <td>$5 per dog</td>
+                <td>$15 per dog</td>
+              </tr>
+              <tr>
+                <td>Introduction to Conformation</td>
+                <td>$60</td>
+                <td>$60</td>
+              </tr>
+              <tr>
+                <td>Conformation (Drop-In Class)</td>
+                <td>$8 per dog</td>
+                <td>$8 per dog</td>
+              </tr>
+              <tr>
+                <td>Run Thrus (Per Dog)</td>
+                <td>$5 for each run (one or two); $12 for three runs</td>
+                <td>$5 for each run (one or two); $12 for three runs</td>
+              </tr>
+              <tr>
+                <td>Walk-Ins (Not Registered)</td>
+                <td>Add $5 to class quoted price</td>
+                <td>Add $10 to class quoted price</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
 
         <div className={styles.card}>
-          <h2>Non-Member Pricing</h2>
-          <p>Non-members are welcome to enroll in most classes at standard rates.</p>
+          <h2>Notes</h2>
           <ul>
-            <li><strong>Puppy Basics (6 weeks):</strong> $110</li>
-            <li><strong>Beginner Obedience (8 weeks):</strong> $130</li>
-            <li><strong>Intermediate/Advanced (8 weeks):</strong> $130</li>
-            <li><strong>Rally (8 weeks):</strong> $130</li>
-            <li><strong>Agility (8 weeks):</strong> $140</li>
-            <li><strong>Private Lessons (per session):</strong> $65</li>
-          </ul>
-        </div>
-
-        <div className={styles.card}>
-          <h2>Additional Information</h2>
-          <ul>
-            <li>Multi-dog discount: 10% off second dog in same session</li>
-            <li>Gift certificates available for all class levels</li>
-            <li>Payment due at registration</li>
-            <li>Refund policy: Full refund if cancelled 7+ days before start</li>
+            <li>Please check website CLASS SCHEDULE for the number of weeks for each class.</li>
+            <li>Instructors and Assistants are entitled to one free class of any type (with one dog) for each class taught during the current session.</li>
           </ul>
         </div>
       </section>

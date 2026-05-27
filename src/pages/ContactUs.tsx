@@ -9,36 +9,32 @@ export default function ContactUs() {
         <p>We'd love to hear from you</p>
       </section>
 
-      <section className={styles.content}>
-        <div className={styles.card}>
-          <h2>Get in Touch</h2>
+      <section className={styles.contentStacked}>
+        <div className={styles.card} style={{ textAlign: 'center', lineHeight: '2.2' }}>
+          <h1>Get in Touch</h1>
           <p>
-            Have questions about classes, membership, or events? We're here to help!
-            Reach out using any of the methods below and a club representative will
-            get back to you as soon as possible.
+            Keystone Canine Training Club is conveniently located South of Pittsburgh
+            in Baldwin Borough, Pennsylvania.
           </p>
-        </div>
+          <br/>
+          <h2>The Club can be reached by:</h2>
+          <h3>Telephone</h3>
+          <p>(412) 833-2211 — Voice Mail answers 24 hours a day.</p>
 
-        <div className={styles.card}>
-          <h2>Contact Information</h2>
-          <ul>
-            <li><strong>Email:</strong> info@keystonecanine.org</li>
-            <li><strong>Phone:</strong> (555) 123-4567</li>
-            <li><strong>Mailing Address:</strong><br />
-              Keystone Canine Training Club<br />
-              123 Training Lane<br />
-              Harrisburg, PA 17101
-            </li>
-          </ul>
-        </div>
+          <h3>E-Mail</h3>
+          <p><a href="mailto:info@keystonecanine.com">info@keystonecanine.com</a></p>
 
-        <div className={styles.card}>
-          <h2>Response Times</h2>
+          <h3>Mailing Address</h3>
           <p>
-            We strive to respond to all inquiries within 48 hours. For urgent matters,
-            please call during business hours. For class enrollment questions, please
-            check our Classes page first as many common questions are answered there.
+            Keystone Canine Training Club<br />
+            PO Box 921<br />
+            Bethel Park, Pennsylvania 15102-0921
           </p>
+
+          <h3>Building Location</h3>
+          <p>5167 Brownsville Rd., Baldwin Borough, 15236</p>
+          <br/>
+          <p><strong>⚠️ DO NOT SEND SNAIL MAIL TO THIS LOCATION! SEND IT TO OUR PO BOX.</strong></p>
         </div>
       </section>
 
