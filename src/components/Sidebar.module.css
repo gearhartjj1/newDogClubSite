@@ -1,19 +1,13 @@
 .sidebar {
-  position: sticky;
-  top: 20px;
   width: 220px;
   min-width: 220px;
-  height: calc(100vh - 40px);
   display: flex;
   flex-direction: column;
   padding: 20px 15px;
   background: white;
-  border: 1px solid #e0e0e0;
-  border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  align-self: flex-start;
-  margin-top: 20px;
-  margin-right: 20px;
+  border-right: 1px solid #e0e0e0;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.05);
+  overflow-y: auto;
 }
 
 .heading {
@@ -91,11 +85,12 @@
 
 @media (max-width: 900px) {
   .sidebar {
-    position: static;
     width: 100%;
     min-width: unset;
-    margin: 20px 0 0 0;
-    order: -1;
+    overflow-y: visible;
+    border-right: none;
+    border-bottom: 1px solid #e0e0e0;
+    box-shadow: none;
   }
 
   .nav {
