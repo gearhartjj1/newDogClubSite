@@ -9,37 +9,26 @@ export default function OfficersAndBoard() {
         <p>Meet the team leading our club</p>
       </section>
 
-      <section className={styles.content}>
+      <section className={styles.contentStacked}>
         <div className={styles.card}>
-          <h2>Executive Officers</h2>
-          <ul>
-            <li><strong>President:</strong> To be announced</li>
-            <li><strong>Vice President:</strong> To be announced</li>
-            <li><strong>Secretary:</strong> To be announced</li>
-            <li><strong>Treasurer:</strong> To be announced</li>
-          </ul>
-        </div>
+          <h2>Officers and Board Members</h2>
 
-        <div className={styles.card}>
-          <h2>Board of Directors</h2>
-          <ul>
-            <li>Training Director</li>
-            <li>Membership Chair</li>
-            <li>Events Coordinator</li>
-            <li>Building Manager</li>
-            <li>Newsletter Editor</li>
-            <li>Members at Large</li>
-          </ul>
-        </div>
+          <p><strong>President:</strong> Ted Nowlen</p>
+          <p><strong>Vice President:</strong> Clemence Cretaux</p>
+          <p><strong>Treasurer:</strong> Amy Sandhagen</p>
+          <p><strong>Corresponding Secretary/Membership Chair:</strong> ClaraMarie Schmalz</p>
+          <p><strong>Recording Secretary:</strong> Michelle Rengers</p>
+          <p><strong>Ex-Officio:</strong> Dan Mullaney</p>
+          <p><strong>Director at Large:</strong> Bill Tullock</p>
+          <p><strong>Director at Large:</strong> Amy Rusenko</p>
+          <p><strong>Enrollment Coordinator:</strong> Sharon Hareza</p>
+          <p><strong>Training Director:</strong> Pam Lewis</p>
 
-        <div className={styles.card}>
-          <h2>Get Involved</h2>
-          <p>
-            Our club is run entirely by volunteers. Board elections are held annually at
-            the December general meeting. If you're interested in serving on the board or
-            joining a committee, please speak with any current officer. We welcome members
-            who want to contribute to our club's success!
-          </p>
+          <h3>Other</h3>
+
+          <p><strong>Webmaster:</strong> Joe Shields</p>
+          <p><strong>Website Editor:</strong> Cindy Sumner</p>
+          <p><strong>Newsletter Editor:</strong> Clemence Cretaux</p>
         </div>
       </section>
 

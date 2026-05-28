@@ -16,7 +16,6 @@ import GiftCertificates from './pages/GiftCertificates';
 import History from './pages/History';
 import Membership from './pages/Membership';
 import MembersOnly from './pages/MembersOnly';
-import Newsletter from './pages/Newsletter';
 import OfficersAndBoard from './pages/OfficersAndBoard';
 import { UserDataProvider } from './context/UserDataContext';
 import './App.css';
@@ -45,7 +44,6 @@ function App() {
             <Route path="/history" element={<History />} />
             <Route path="/membership" element={<Membership />} />
             <Route path="/members-only" element={<MembersOnly />} />
-            <Route path="/newsletter" element={<Newsletter />} />
             <Route path="/officers-and-board" element={<OfficersAndBoard />} />
           </Routes>
         </main>

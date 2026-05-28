@@ -23,7 +23,6 @@ const sidebarLinks: SidebarLink[] = [
   { to: '/history', icon: '📜', label: 'History' },
   { to: '/membership', icon: '🤝', label: 'Membership' },
   { to: '/members-only', icon: '🔒', label: 'Members Only', authRequired: true },
-  { to: '/newsletter', icon: '📰', label: 'Newsletter' },
   { to: '/officers-and-board', icon: '👥', label: 'Officers & Board' },
 ];
 
