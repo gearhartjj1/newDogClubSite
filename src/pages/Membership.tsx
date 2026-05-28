@@ -9,35 +9,46 @@ export default function Membership() {
         <p>Join our community of dog enthusiasts</p>
       </section>
 
-      <section className={styles.content}>
+      <section className={styles.contentStacked}>
         <div className={styles.card}>
-          <h2>Why Join?</h2>
+          <h2>Membership</h2>
+
           <p>
-            Membership in the Keystone Canine Training Club gives you access to our training
-            facility, discounted class rates, voting privileges, and a wonderful community
-            of fellow dog lovers. Members also receive our newsletter and priority
-            registration for popular classes and events.
+            You do not have to be a member of Keystone Canine Training Club (KCTC) to take our classes. However, if you become a member, there are many benefits including a lower price for classes. Anyone over the age of 16 who owns and works a dog at KCTC or who actively participates in club events may apply for membership in the Club.
           </p>
-        </div>
 
-        <div className={styles.card}>
-          <h2>Membership Types & Dues</h2>
+          <p><strong>In order to become a member, you must:</strong></p>
+
           <ul>
-            <li><strong>Individual:</strong> $60/year</li>
-            <li><strong>Family (same household):</strong> $85/year</li>
-            <li><strong>Junior (under 18):</strong> $30/year</li>
-            <li><strong>Senior (65+):</strong> $45/year</li>
+            <li>Take two classes at the Non-Member rate (currently $100 for most classes).</li>
+            <li>After that, submit a membership application endorsed by two members (can be instructors), along with your annual dues (currently $70). Then your name is published in our monthly newsletter.</li>
+            <li>Then the membership votes on your application at a membership meeting held every other month.</li>
+            <li>After you are voted into membership, your class price drops to the Members' rate (currently $30).</li>
+            <li>If you become a member after the beginning of our fiscal year, your next year's dues are pro-rated.</li>
           </ul>
-          <p>Dues are payable annually on your membership anniversary date.</p>
-        </div>
-
-        <div className={styles.card}>
-          <h2>How to Join</h2>
+          <br/>
           <p>
-            To become a member, complete a membership application form and submit it with
-            your dues payment. New members must attend two general meetings and have a
-            sponsor who is a current member in good standing. Contact us if you need help
-            finding a sponsor — we're happy to connect you!
+            All members must volunteer their services annually for at least one of the Club's dog shows, community events, or special events. You can download a membership application by clicking on <Link to="/forms">Forms</Link>.
+          </p>
+
+          <h2>What are the benefits of belonging to Keystone Canine Training Club?</h2>
+
+          <h3><strong>Lots of benefits!!!</strong></h3>
+
+          <p>
+            <strong>Financial:</strong> After paying the annual membership fee, members may attend classes for a reduced cost.
+          </p>
+
+          <p>
+            <strong>Educational:</strong> Members get to work their dogs and get personal tips and attention from some of the most successful amateur and professional dog trainers in Western Pennsylvania.
+          </p>
+
+          <p>
+            <strong>Family:</strong> Members not only develop a well behaved dog, but also get to participate in wholesome, healthy activities like Agility, Rally, Scentwork and Tricks that the whole family can enjoy together!
+          </p>
+
+          <p>
+            <strong>Emotional:</strong> Keystone Canine Training Club members and their dogs serve the public good in many different ways, including school demonstrations and nursing home visits. There is no more enjoyable way to feel good about yourself and give back to the community at the same time!
           </p>
         </div>
       </section>
