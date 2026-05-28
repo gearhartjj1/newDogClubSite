@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { useUserData } from '../context/UserDataContext';
 import styles from './Sidebar.module.css';
 
 interface SidebarLink {
@@ -6,6 +7,7 @@ interface SidebarLink {
   icon: string;
   label: string;
   external?: boolean;
+  authRequired?: boolean;
 }
 
 const sidebarLinks: SidebarLink[] = [
@@ -20,29 +22,33 @@ const sidebarLinks: SidebarLink[] = [
   { to: '/gift-certificates', icon: '🎁', label: 'Gift Certificates' },
   { to: '/history', icon: '📜', label: 'History' },
   { to: '/membership', icon: '🤝', label: 'Membership' },
-  { to: '/members-only', icon: '🔒', label: 'Members Only' },
+  { to: '/members-only', icon: '🔒', label: 'Members Only', authRequired: true },
   { to: '/newsletter', icon: '📰', label: 'Newsletter' },
   { to: '/officers-and-board', icon: '👥', label: 'Officers & Board' },
 ];
 
 export default function Sidebar() {
+  const { userData } = useUserData();
+
   return (
     <aside className={styles.sidebar}>
       <h3 className={styles.heading}>Quick Access</h3>
       <nav className={styles.nav}>
-        {sidebarLinks.map((link) =>
-          link.external ? (
-            <a key={link.to} href={link.to} target="_blank" rel="noopener noreferrer" className={styles.button}>
-              <span className={styles.icon}>{link.icon}</span>
-              <span className={styles.label}>{link.label}</span>
-            </a>
-          ) : (
-            <Link key={link.to} to={link.to} className={styles.button}>
-              <span className={styles.icon}>{link.icon}</span>
-              <span className={styles.label}>{link.label}</span>
-            </Link>
-          )
-        )}
+        {sidebarLinks
+          .filter((link) => !link.authRequired || userData)
+          .map((link) =>
+            link.external ? (
+              <a key={link.to} href={link.to} target="_blank" rel="noopener noreferrer" className={styles.button}>
+                <span className={styles.icon}>{link.icon}</span>
+                <span className={styles.label}>{link.label}</span>
+              </a>
+            ) : (
+              <Link key={link.to} to={link.to} className={styles.button}>
+                <span className={styles.icon}>{link.icon}</span>
+                <span className={styles.label}>{link.label}</span>
+              </Link>
+            )
+          )}
       </nav>
     </aside>
   );
