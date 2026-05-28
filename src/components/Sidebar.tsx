@@ -13,7 +13,7 @@ interface SidebarLink {
 const sidebarLinks: SidebarLink[] = [
   { to: '/', icon: '🏠', label: 'Home' },
   { to: '/building-usage', icon: '🏢', label: 'Building Usage' },
-  { to: '/KCTC Calendar.pdf', icon: '📅', label: 'Calendar', external: true },
+  { to: '/KCTC%20Calendar.pdf', icon: '📅', label: 'Calendar', external: true },
   { to: '/classes', icon: '🎓', label: 'Classes' },
   { to: '/class-prices', icon: '💰', label: 'Class Prices' },
   { to: '/contact', icon: '📧', label: 'Contact Us' },
