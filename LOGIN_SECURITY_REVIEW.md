@@ -10,49 +10,49 @@ The current login system has several critical security vulnerabilities that need
 
 ## 🚨 Critical Security Issues
 
-### 1. Plaintext Password Storage
+### 1. Plaintext Password Storage — Pending
 - **Issue**: Passwords are stored and compared as plain text in the database
 - **Risk**: Anyone with database access can read all passwords; violates GDPR/privacy regulations
 - **Fix**: Use bcrypt (or Argon2) to hash passwords before storing
 - **Priority**: CRITICAL
 - **Files**: `server/routes/signin.ts`
 
-### 2. No Authentication Token/Session Management
+### 2. No Authentication Token/Session Management — Done
 - **Issue**: User data is stored only in React context (client-side)
 - **Risk**: No server-side session validation on subsequent requests; vulnerable to XSS attacks and impersonation
 - **Fix**: Implement JWT tokens or session-based authentication
 - **Priority**: CRITICAL
 - **Files**: `src/context/UserDataContext.tsx`, `src/services/api.ts`, `server/routes/signin.ts`
 
-### 3. Missing HTTPS Enforcement
+### 3. Missing HTTPS Enforcement — Done
 - **Issue**: Credentials are sent over HTTP (in dev) without encryption
 - **Risk**: Credentials vulnerable to man-in-the-middle (MITM) attacks
 - **Fix**: Enforce HTTPS in production; use secure/httpOnly cookies
 - **Priority**: CRITICAL
 - **Files**: `server/index.ts`, environment configuration
 
-### 4. No CSRF Protection
+### 4. No CSRF Protection — Pending
 - **Issue**: No CSRF tokens to prevent cross-site request forgery
 - **Risk**: Attackers can submit login requests from malicious sites
 - **Fix**: Implement CSRF token middleware
 - **Priority**: HIGH
 - **Files**: `server/index.ts`, `src/services/api.ts`
 
-### 5. No Rate Limiting
+### 5. No Rate Limiting — Pending
 - **Issue**: Unlimited login attempts allow brute force attacks
 - **Risk**: Attackers can try thousands of password combinations
 - **Fix**: Implement rate limiting on `POST /api/signin` (e.g., 5 attempts per 15 minutes)
 - **Priority**: HIGH
 - **Files**: `server/routes/signin.ts`
 
-### 6. Entire User Object Returned in Response
+### 6. Entire User Object Returned in Response — Pending
 - **Issue**: All sensitive fields are exposed to the client after login
 - **Risk**: Database column names and structure exposed; unnecessary data leakage
 - **Fix**: Return only necessary fields: `{ id, username, email }` (no Phone, Family, etc.)
 - **Priority**: HIGH
 - **Files**: `server/routes/signin.ts`, `src/pages/Login.tsx`
 
-### 7. Logging Sensitive Data
+### 7. Logging Sensitive Data — Pending
 - **Issue**: Console logs contain full user objects and database queries
 - **Risk**: Credentials and sensitive data recorded in logs; visible in development tools
 - **Fix**: Remove sensitive data from logs; log to secure file instead with appropriate filtering
@@ -63,33 +63,33 @@ The current login system has several critical security vulnerabilities that need
 
 ## ⚠️ Other Important Issues
 
-### 8. No Password Strength Requirements
+### 8. No Password Strength Requirements — Pending
 - **Issue**: No minimum length, complexity, or character requirements
 - **Risk**: Users can set weak passwords (e.g., "123", "test")
 - **Fix**: Enforce password policy: minimum 12 characters, mixed case, numbers, symbols
 - **Priority**: MEDIUM
 
-### 9. No Logout Mechanism
+### 9. No Logout Mechanism — Done
 - **Issue**: Users can't securely logout
 - **Risk**: Session doesn't end; token remains valid
 - **Fix**: Implement logout endpoint that invalidates tokens/sessions
 - **Priority**: MEDIUM
 - **Files**: New route needed: `server/routes/logout.ts`
 
-### 10. Frontend State Loss on Refresh
+### 10. Frontend State Loss on Refresh — Done
 - **Issue**: User data disappears on page reload since it's only in React context
 - **Risk**: Poor UX; users forced to re-login after refresh
 - **Fix**: Store auth token in localStorage/sessionStorage, validate token on app load
 - **Priority**: MEDIUM
 - **Files**: `src/App.tsx`, `src/context/UserDataContext.tsx`
 
-### 11. No Password Change/Reset Flow
+### 11. No Password Change/Reset Flow — Pending
 - **Issue**: Users can't update their password; no "forgot password" functionality
 - **Risk**: Users stuck with potentially compromised passwords
 - **Fix**: Implement password change endpoint and email-based password reset
 - **Priority**: MEDIUM
 
-### 12. Unusual Database Schema
+### 12. Unusual Database Schema — Pending
 - **Issue**: Using `LastName` as username seems unconventional
 - **Risk**: Confusion between usernames and actual names; potential for duplicates
 - **Fix**: Consider adding a dedicated `Username` column to Teacher table
