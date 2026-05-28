@@ -109,8 +109,12 @@ if (process.env.NODE_ENV === 'production') {
   const clientPath = path.join(__dirname, '../dist');
   app.use(express.static(clientPath));
 
-  // SPA fallback - serve index.html for non-API routes
+  // SPA fallback - serve index.html for non-API routes (skip file requests)
   app.get('*', (req, res) => {
+    if (req.path.match(/\.[a-zA-Z0-9]+$/)) {
+      // If it looks like a file request but wasn't served by static, return 404
+      return res.status(404).send('File not found');
+    }
     res.sendFile(path.join(clientPath, 'index.html'));
   });
 } else {

@@ -32,11 +32,14 @@ Member profile page
 Signing up for classes
 - UI to show current available classes --- done
 - Logic to show remaining openings --- done
-- Ability to be added to waitlist
+- Ability to be added to waitlist --- done
 - Logic before allowing sign up to make sure the class is still open
+    = Run check when loading form, switch to waitlist ui if it was taken
+    - Run check when submistting, if it is full then show modal that they were added to waitlist instead
     - If the class closed while you signed up, then show option to be added to waitlist
+- Refresh button on page to quickly verify what is still available to sign up for
 - Payment logic
-    - Review how it works currently
+    - Review how it works currently --- has id on database indicating how it was paid for
     - Get paypal integratoion working
 
 
