@@ -29,11 +29,6 @@ export default function Navigation() {
             </Link>
           </li>
           <li>
-            <Link to="/events" onClick={() => setMobileMenuOpen(false)}>
-              Events
-            </Link>
-          </li>
-          <li>
             <Link to="/classes" onClick={() => setMobileMenuOpen(false)}>
               Classes
             </Link>
