@@ -9,32 +9,18 @@ export default function GiftCertificates() {
         <p>Give the gift of training</p>
       </section>
 
-      <section className={styles.content}>
-        <div className={styles.card}>
-          <h2>The Perfect Gift</h2>
+      <section className={styles.contentStacked}>
+        <div className={styles.card} style={{ textAlign: 'center' }}>
+          <h2>Gift Certificates</h2>
           <p>
-            Know someone who just got a new puppy? Have a friend who's been wanting to try
-            agility or rally? A Keystone Canine Training Club gift certificate is the perfect
-            way to help them get started on their training journey.
+            KCTC Gift Certificates make great gifts! You can order one in any denomination.
+            To place your order, send your check to our mailing address (PO Box 921, Bethel Park
+            PA 15102-0921) along with your name and address. On the check in the comments section,
+            please indicate "Gift Certificate". We will then mail you a Gift Certificate in the
+            amount you send. They are good for any KCTC class.
           </p>
-        </div>
-
-        <div className={styles.card}>
-          <h2>Available Options</h2>
-          <ul>
-            <li><strong>Class Gift Certificate:</strong> Good toward any group class</li>
-            <li><strong>Custom Amount:</strong> Choose any dollar value</li>
-            <li><strong>Private Lesson Package:</strong> One or more private sessions</li>
-            <li><strong>Membership Gift:</strong> Sponsor a new member's annual dues</li>
-          </ul>
-        </div>
-
-        <div className={styles.card}>
-          <h2>How to Purchase</h2>
           <p>
-            Gift certificates can be purchased by contacting the club treasurer or any
-            board member. Certificates are available in physical or digital format and
-            never expire. Contact us at info@keystonecanine.org to arrange your purchase.
+            <a href="/GIFT CERTIFICATE.pdf" download>Sample Gift Certificates</a>
           </p>
         </div>
       </section>
