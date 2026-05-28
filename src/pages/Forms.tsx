@@ -9,40 +9,41 @@ export default function Forms() {
         <p>Downloadable forms for members and applicants</p>
       </section>
 
-      <section className={styles.content}>
+      <section className={styles.contentStacked}>
         <div className={styles.card}>
-          <h2>Membership Forms</h2>
-          <ul>
-            <li>New Member Application</li>
-            <li>Membership Renewal Form</li>
-            <li>Member Information Update</li>
-            <li>Volunteer Sign-Up Sheet</li>
-          </ul>
-        </div>
-
-        <div className={styles.card}>
-          <h2>Class & Training Forms</h2>
-          <ul>
-            <li>Class Registration Form</li>
-            <li>Liability Waiver</li>
-            <li>Vaccination Record Form</li>
-            <li>Private Lesson Request</li>
-            <li>Building Usage Request</li>
-          </ul>
-        </div>
-
-        <div className={styles.card}>
-          <h2>Event Forms</h2>
-          <ul>
-            <li>Trial Entry Form</li>
-            <li>Fun Match Entry</li>
-            <li>Event Volunteer Form</li>
-            <li>Facility Rental Agreement</li>
-          </ul>
+          <h2>Forms</h2>
+          <hr />
           <p>
-            Please contact the club secretary if you need assistance with any forms
-            or have questions about which form to use.
+            Here is the link to the enrollment instructions and the{' '}
+            <Link to="/classes">Online Enrollment Form</Link>, which are built into the
+            CLASS SCHEDULE page. We no longer accept hardcopy enrollment forms.
           </p>
+
+          <hr />
+
+          <h3>Hardcopy Forms (PDF format)</h3>
+
+          <hr style={{ border: 'none', borderTop: '1px dashed #ccc' }} />
+
+          <ul>
+            <li><a href="/KCTC LIABILITY WAIVER Version May 2026.pdf" download>Liability Waiver and Refund Policy</a> <em>Revision 5/12/26</em></li>
+            <li><a href="/EVENT LIABILITY WAIVER 4-14-15.pdf" download>Event Liability Waiver Form</a> <em>Revision 4-14-15</em></li>
+            <li><a href="/LIABILITY WAIVER FOR VOLUNTEERS 4-12-15.pdf" download>Liability Waiver for Volunteers</a> <em>Revision 4-12-15</em></li>
+          </ul>
+
+          <hr style={{ border: 'none', borderTop: '1px dashed #ccc' }} />
+
+          <ul>
+            <li><a href="/MEMBERSHIP APP 1-18-16.pdf" download>Membership Application</a> <em>Revision 1-18-16</em></li>
+            <li><a href="/MEMBERSHIP RENEWAL FORM.pdf" download>Membership Renewal</a> <em>Revision 2026-2027</em></li>
+          </ul>
+
+          <hr style={{ border: 'none', borderTop: '1px dashed #ccc' }} />
+
+          <ul>
+            <li><a href="/Volunteer Timesheet.pdf" download>Volunteer Timesheet (PDF format)</a> or <a href="/Volunteer Timesheet.doc" download>Volunteer Timesheet (MS Word format)</a></li>
+            <li><a href="#" download>KCTC Flyer</a></li>
+          </ul>
         </div>
       </section>
 
