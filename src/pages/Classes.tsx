@@ -21,7 +21,7 @@ export default function Classes() {
     <div className={styles.container}>
       <header className={styles.header}>
         <h1>🎓 Training Classes</h1>
-        <p>Professional dog training programs for all levels</p>
+        <p>Dog training programs for all levels</p>
       </header>
 
       <div className={styles.tableWrapper}>
@@ -32,7 +32,6 @@ export default function Classes() {
               <th>Instructor</th>
               <th>Schedule</th>
               <th>Location</th>
-              <th>Price</th>
               <th>Enrollment</th>
               <th>Action</th>
             </tr>
@@ -46,7 +45,6 @@ export default function Classes() {
                   {dogClass.Start} at {dogClass.Time}
                 </td>
                 <td>{dogClass.Room}</td>
-                <td>${dogClass.Rate}/mo</td>
                 <td>
                   <div className={styles.enrollmentCell}>
                     <span className={styles.enrollmentCount}>
@@ -75,7 +73,7 @@ export default function Classes() {
                       to={`/signup?classId=${dogClass.ID}&waitlist=true`}
                       className={styles.waitlistButtonSmall}
                     >
-                      Join Waitlist
+                      Enroll
                     </Link>
                   )}
                 </td>
