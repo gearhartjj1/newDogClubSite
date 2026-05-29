@@ -9,6 +9,12 @@ import { fileURLToPath } from 'url';
 // Load environment variables
 dotenv.config();
 
+// Prevent unhandled promise rejections from crashing the process
+// (e.g., MySQL session store connection timeouts)
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+});
+
 // Import routes
 import dogClassesRouter from './routes/dogClasses.js';
 import classesRouter from './routes/classes.js';
@@ -40,7 +46,13 @@ const sessionStore = new MySQLStore({
   clearExpired: true,
   checkExpirationInterval: 900000, // 15 minutes
   expiration: 86400000, // 24 hours
+  createDatabaseTable: true,
 }, pool as any);
+
+// Handle session store errors gracefully instead of crashing
+sessionStore.on?.('error', (error: Error) => {
+  console.error('Session store error:', error.message);
+});
 
 app.use(session({
   store: sessionStore,
