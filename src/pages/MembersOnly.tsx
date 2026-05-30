@@ -2,7 +2,10 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import styles from './MembersOnly.module.css';
 
+//TODO: Manual meeting notes is a terrible, this all needs to have a method for admins to upload new notes and have all this on the server in a simple loop
 const meetingNotesOptions = [
+  { label: '3/21/2026', value: '/meetingMinutes/2026/Keystone Membership Meeting 3-15-2026 (final).pdf' },
+  { label: '1/18/2026', value: '/meetingMinutes/2026/Keystone Member Meeting 1-18-2026 Final.pdf' },
   { label: '11/16/2025', value: '/meetingMinutes/2025/Keystone Membership Meeting 11-16-25 final.pdf' },
   { label: '9/21/2025', value: '/meetingMinutes/2025/Membership Meeting Sept 21 2025.pdf' },
   { label: '7/20/2025', value: '/meetingMinutes/2025/KCTC Memebership Meeting 7-20-2025.pdf' },
