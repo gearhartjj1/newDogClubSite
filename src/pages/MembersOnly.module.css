@@ -1,0 +1,158 @@
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.hero {
+  text-align: center;
+  padding: 50px 20px;
+  background: linear-gradient(135deg, #0d9488 0%, #134e4a 100%);
+  color: white;
+  border-radius: 8px;
+  margin: 20px 0;
+}
+
+.hero h1 {
+  font-size: 2.5rem;
+  margin: 0 0 15px 0;
+}
+
+.hero p {
+  font-size: 1.2rem;
+  margin: 0;
+  opacity: 0.9;
+}
+
+.sectionsWrapper {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 40px;
+  padding: 40px 0;
+}
+
+.section {
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 30px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.section h2 {
+  margin-top: 0;
+  color: #0d9488;
+  font-size: 1.5rem;
+  border-bottom: 2px solid #e0e0e0;
+  padding-bottom: 12px;
+  margin-bottom: 20px;
+}
+
+.documentList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.documentItem {
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.documentItem:last-child {
+  border-bottom: none;
+}
+
+.documentLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #0d9488;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 1rem;
+  transition: color 0.3s;
+}
+
+.documentLink:hover {
+  color: #134e4a;
+  text-decoration: underline;
+}
+
+.dropdownGroup {
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.dropdownGroup:last-child {
+  border-bottom: none;
+}
+
+.dropdownLabel {
+  display: block;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 8px;
+  font-size: 1rem;
+}
+
+.dropdownRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.dropdown {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  color: #333;
+  background: white;
+  cursor: pointer;
+  transition: border-color 0.3s;
+}
+
+.dropdown:focus {
+  outline: none;
+  border-color: #0d9488;
+  box-shadow: 0 0 0 2px rgba(13, 148, 136, 0.15);
+}
+
+.downloadBtn {
+  padding: 8px 16px;
+  background: #0d9488;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.3s;
+  white-space: nowrap;
+}
+
+.downloadBtn:hover {
+  background: #134e4a;
+}
+
+.downloadBtn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.backLink {
+  padding: 20px 0 40px;
+}
+
+.backLink a {
+  color: #0d9488;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s;
+}
+
+.backLink a:hover {
+  color: #134e4a;
+}
