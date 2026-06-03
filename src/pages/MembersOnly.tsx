@@ -32,17 +32,25 @@ const meetingNotesOptions = [
 ];
 
 const historicalByLawsOptions = [
-  { label: '2024 Revision', value: '/documents/historical/bylaws-2024.pdf' },
-  { label: '2020 Revision', value: '/documents/historical/bylaws-2020.pdf' },
-  { label: '2015 Revision', value: '/documents/historical/bylaws-2015.pdf' },
-  { label: 'Original', value: '/documents/historical/bylaws-original.pdf' },
+  { label: '11-18-19', value: '/historicalBylaws/BYLAWS_11-18-19.pdf' },
+  { label: '03-21-16', value: '/historicalBylaws/BYLAWS 3-21-16.pdf' },
+  { label: '08-21-12', value: '/historicalBylaws/BYLAWS 8-21-12.pdf' },
+  { label: '09-25-10', value: '/historicalBylaws/BYLAWS 9-25-10.pdf' },
+  { label: '02-19-10', value: '/historicalBylaws/BYLAWS 2-19-10.pdf' },
 ];
 
 const historicalPoliciesOptions = [
-  { label: '2024 Revision', value: '/documents/historical/policies-2024.pdf' },
-  { label: '2020 Revision', value: '/documents/historical/policies-2020.pdf' },
-  { label: '2015 Revision', value: '/documents/historical/policies-2015.pdf' },
-  { label: 'Original', value: '/documents/historical/policies-original.pdf' },
+  { label: '3-13-22', value: '/historicalPolicies/POLICIES-AND-PROCEDURES_3-13-22.pdf' },
+  { label: '3-27-20', value: '/historicalPolicies/POLICIES AND PROCEDURES 3-27-20.pdf' },
+  { label: '5-12-16', value: '/historicalPolicies/POLICIES AND PROCEDURES 5-12-16.pdf' },
+  { label: '11-10-13', value: '/historicalPolicies/POLICIES AND PROCEDURES 11-10-13.pdf' },
+  { label: '1-16-12', value: '/historicalPolicies/POLICIES AND PROCEDURES 1-16-12.pdf' },
+  { label: '11-16-11', value: '/historicalPolicies/POLICIES AND PROCEDURES 11-16-11.pdf' },
+  { label: '6-25-11', value: '/historicalPolicies/POLICIES AND PROCEDURES 6-25-11.pdf' },
+  { label: '5-23-11', value: '/historicalPolicies/POLICIES AND PROCEDURES 5-23-11.pdf' },
+  { label: '4-9-11', value: '/historicalPolicies/POLICIES AND PROCEDURES 4-9-11.pdf' },
+  { label: '9-24-10', value: '/historicalPolicies/POLICIES AND PROCEDURES 9-24-10.pdf' },
+  { label: '4-23-10', value: '/historicalPolicies/POLICIES AND PROCEDURES 4-23-10.pdf' },
 ];
 
 export default function MembersOnly() {
