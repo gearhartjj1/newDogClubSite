@@ -3,11 +3,22 @@ import pool from '../config/database.js';
 
 const router = express.Router();
 
+const getCurrentSession = async (): Promise<string> => {
+  try {
+    const result = await pool.query('SELECT Session from kctcsession where id = 0');
+    return (result[0] as any)[0].Session as string;
+  }  catch (error) {
+    console.error('Error fetching current session: ', error);
+    return "";
+  }
+}
+
 // Get all dog classes
 router.get('/', async (req: Request, res: Response) => {
   try {
-    const query = 'SELECT c.*, COUNT(e.ID) AS DogsInClass FROM KCTCSession c INNER JOIN Enrollment e ON c.ID = e.SID WHERE c.Session = "2024-V" GROUP BY c.ID, c.class ORDER BY c.class';
-    const dogClasses = await pool.query(query);
+    const currentSession = await getCurrentSession();
+    const query = 'SELECT c.*, COUNT(e.ID) AS DogsInClass FROM KCTCSession c LEFT JOIN Enrollment e ON c.ID = e.SID WHERE c.Session = ? GROUP BY c.ID, c.class ORDER BY c.class';
+    const dogClasses = await pool.query(query, [currentSession]);
     res.json(dogClasses);
   } catch (error) {
     console.error('Error fetching dog classes: ', error);
