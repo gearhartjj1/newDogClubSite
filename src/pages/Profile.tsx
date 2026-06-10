@@ -60,7 +60,7 @@ export default function Profile() {
             id: cls.ID,
             className: cls.Class,
             instructor: cls.Instructors || 'N/A',
-            completedDate: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long' }),
+            completedDate: cls.Start + ' ' + (cls.Session ? cls.Session.split('-')[0] : ''),
           })));
         }
       } catch (error) {
