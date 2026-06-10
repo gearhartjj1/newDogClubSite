@@ -69,6 +69,10 @@
   color: #333;
 }
 
+.waitListedBadge {
+  color: rgb(233, 58, 58);
+}
+
 .enrollmentCell {
   display: flex;
   flex-direction: column;

@@ -29,6 +29,7 @@ export default function Classes() {
           <thead>
             <tr>
               <th>Class Name</th>
+              <th>Prerequisite</th>
               <th>Instructor</th>
               <th>Schedule</th>
               <th>Location</th>
@@ -39,7 +40,11 @@ export default function Classes() {
           <tbody>
             {dogClasses.map((dogClass) => (
               <tr key={dogClass.ID}>
-                <td className={styles.className}>{dogClass.Class}</td>
+                <td className={styles.className}>
+                  <span>{dogClass.Class}</span>
+                  {(dogClass.DogsInClass >= dogClass.MaxDog) && <><br/><span className={styles.waitListedBadge}>Waitlisted</span></>}
+                </td>
+                <td>{dogClass.Prerequisites}</td>
                 <td>{dogClass.Instructors}</td>
                 <td>
                   {dogClass.Start} at {dogClass.Time}
