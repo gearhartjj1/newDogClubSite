@@ -16,14 +16,30 @@ export default function Classes() {
       };
       fetchDogClasses();
     }, []);
-  
-  return (
-    <div className={styles.container}>
-      <header className={styles.header}>
-        <h1>🎓 Training Classes</h1>
-        <p>Dog training programs for all levels</p>
-      </header>
 
+  // Helper function to parse date string for sorting
+  const parseDate = (dateString: string): Date => {
+    // Try to parse the date string - handle various formats
+    const date = new Date(dateString);
+    return isNaN(date.getTime()) ? new Date(0) : date;
+  };
+
+  // Sort classes by date and separate into front and back sections
+  const sortedClasses = [...dogClasses].sort((a, b) => {
+    return parseDate(a.Start).getTime() - parseDate(b.Start).getTime();
+  });
+
+  const frontClasses = sortedClasses.filter(dogClass => 
+    dogClass.Room?.toLowerCase().includes('front')
+  );
+
+  const backClasses = sortedClasses.filter(dogClass => 
+    dogClass.Room?.toLowerCase().includes('back')
+  );
+
+  const ClassTable = ({ classes, title }: { classes: DogClass[]; title: string }) => (
+    <div className={styles.section}>
+      <h2 className={styles.sectionTitle}>{title}</h2>
       <div className={styles.tableWrapper}>
         <table className={styles.classesTable}>
           <thead>
@@ -38,7 +54,7 @@ export default function Classes() {
             </tr>
           </thead>
           <tbody>
-            {dogClasses.map((dogClass) => (
+            {classes.map((dogClass) => (
               <tr key={dogClass.ID}>
                 <td className={styles.className}>
                   <span>{dogClass.Class}</span>
@@ -87,6 +103,18 @@ export default function Classes() {
           </tbody>
         </table>
       </div>
+    </div>
+  );
+  
+  return (
+    <div className={styles.container}>
+      <header className={styles.header}>
+        <h1>🎓 Training Classes</h1>
+        <p>Dog training programs for all levels</p>
+      </header>
+
+      {frontClasses.length > 0 && <ClassTable classes={frontClasses} title="Front Room Classes" />}
+      {backClasses.length > 0 && <ClassTable classes={backClasses} title="Back Room Classes" />}
     </div>
   );
 }

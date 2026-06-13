@@ -132,6 +132,7 @@ export default function ClassSignup() {
       'PayPal': 1,
       'Cash': 2,
       'Check': 3,
+      'Instructor Perk': 4,
       'Waitlist': 7,
     };
 
@@ -356,6 +357,7 @@ export default function ClassSignup() {
               {!isWaitlist && <option value="PayPal">PayPal</option>}
               {!isWaitlist && <option value="Cash">Cash</option>}
               {!isWaitlist && <option value="Check">Check</option>}
+              {!isWaitlist && <option value="Instructor Perk">Instructor Perk</option>}
               {isWaitlist && <option value="Waitlist">Waitlist</option>}
             </select>
           </div>
