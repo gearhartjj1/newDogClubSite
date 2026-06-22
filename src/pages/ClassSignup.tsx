@@ -4,28 +4,6 @@ import styles from './ClassSignup.module.css';
 import { dogClassAPI, memberDogsAPI, type DogClass } from '../services/api';
 import { useUserData, type Dog } from '../context/UserDataContext';
 
-/*
-  Design requirements of new signup form;
-  - Members should be able to select their dog from a dropdown
-  - Form should know that the user is already signed in, UI should indicate they are logged in as a member
-  ---- No need to select checkbox to indicate they are a member
-  - Non-members can enter dogs information manually
-  - There should be a dropdown to select the class they want
-  ---- If the user gets to the page from the class list the dropdown should auto select the item
-  ---- If the user goes directly to the signup from a dedicate button the dropdown should be empty
-*/
-
-/*
-  TODO:
-  - Update class dropdown to pull classes from database
-  - Update form submission to send data to backend and save to database
-  - Create backlog, focus on each section that needs built and then expand fro thers
-*/
-
-/*
-  - Get form submission working and send to api
-*/
-
 export default function ClassSignup() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -137,7 +115,6 @@ export default function ClassSignup() {
     };
 
     setSubmitted(true);
-    //TODO: send call to api
     await dogClassAPI.create(submissionData);
     // Simulate form submission
     setTimeout(() => {
@@ -370,7 +347,7 @@ export default function ClassSignup() {
               onChange={handleChange}
             />
             <label htmlFor="agreeTerms">
-              I agree to the terms and conditions and understand the class policies *
+              I accept the KCTC LIABILITY WAIVER AND REFUND POLICY, and COVID-19 WAIVER (click <a href="/LIABILITY_AND_COVID_WAIVER.pdf" target="_blank" rel="noopener noreferrer">here</a> for the link)
             </label>
           </div>
         </div>
