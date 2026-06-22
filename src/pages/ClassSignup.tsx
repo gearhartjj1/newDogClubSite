@@ -60,6 +60,7 @@ export default function ClassSignup() {
     classId: classId || '',
     paymentMethod: isWaitlist ? 'Waitlist' : '',
     agreeTerms: false,
+    prerequesitesMet: false,
     userId: userData?.id || null,
   });
 
@@ -97,6 +98,11 @@ export default function ClassSignup() {
 
     if (!formData.agreeTerms) {
       alert('Please agree to the terms and conditions');
+      return;
+    }
+
+    if (!formData.prerequesitesMet) {
+      alert('Please confirm that you meet the prerequisites for this class');
       return;
     }
 
@@ -348,6 +354,18 @@ export default function ClassSignup() {
             />
             <label htmlFor="agreeTerms">
               I accept the KCTC LIABILITY WAIVER AND REFUND POLICY, and COVID-19 WAIVER (click <a href="/LIABILITY_AND_COVID_WAIVER.pdf" target="_blank" rel="noopener noreferrer">here</a> for the link)
+            </label>
+          </div>
+          <div className={styles.checkboxGroup}>
+            <input
+              type="checkbox"
+              id="prerequesitesMet"
+              name="prerequesitesMet"
+              checked={formData.prerequesitesMet}
+              onChange={handleChange}
+            />
+            <label htmlFor="prerequesitesMet">
+              Yes, I have completed KCTC Class Prerequisites OR My class choice has been approved by KCTC personnel
             </label>
           </div>
         </div>
