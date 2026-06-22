@@ -44,11 +44,12 @@ export default function Classes() {
         <table className={styles.classesTable}>
           <thead>
             <tr>
-              <th>Class Name</th>
+              <th>Class</th>
               <th>Prerequisite</th>
               <th>Instructor</th>
-              <th>Schedule</th>
-              <th>Location</th>
+              <th>Start</th>
+              <th>Day</th>
+              <th>Time</th>
               <th>Enrollment</th>
               <th>Action</th>
             </tr>
@@ -63,9 +64,10 @@ export default function Classes() {
                 <td>{dogClass.Prerequisites}</td>
                 <td>{dogClass.Instructors}</td>
                 <td>
-                  {dogClass.Start} at {dogClass.Time}
+                  {dogClass.Start}
                 </td>
-                <td>{dogClass.Room}</td>
+                <td>{dogClass.Day}</td>
+                <td>{dogClass.Time}</td>
                 <td>
                   <div className={styles.enrollmentCell}>
                     <span className={styles.enrollmentCount}>
