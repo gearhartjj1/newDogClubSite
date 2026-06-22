@@ -44,30 +44,32 @@ export default function Classes() {
         <table className={styles.classesTable}>
           <thead>
             <tr>
-              <th>Class</th>
-              <th>Prerequisite</th>
-              <th>Instructor</th>
-              <th>Start</th>
-              <th>Day</th>
-              <th>Time</th>
-              <th>Enrollment</th>
+              <th style={{width: '8%'}}>Code</th>
+              <th style={{width: '25%'}}>Class</th>
+              <th style={{width: '20%'}}>Prerequisite</th>
+              <th style={{width: '15%'}}>Instructor</th>
+              <th style={{width: '8%'}}>Start</th>
+              <th style={{width: '5%'}}>Day</th>
+              <th style={{width: '10%'}}>Time</th>
+              <th style={{width: '9%'}}>Enrollment</th>
               <th>Action</th>
             </tr>
           </thead>
           <tbody>
             {classes.map((dogClass) => (
               <tr key={dogClass.ID}>
-                <td className={styles.className}>
+                <td title={dogClass.Code}>{dogClass.Code}</td>
+                <td className={styles.className} title={dogClass.Class}>
                   <span>{dogClass.Class}</span>
                   {(dogClass.DogsInClass >= dogClass.MaxDog) && <><br/><span className={styles.waitListedBadge}>Waitlisted</span></>}
                 </td>
-                <td>{dogClass.Prerequisites}</td>
-                <td>{dogClass.Instructors}</td>
-                <td>
+                <td title={dogClass.Prerequisites}>{dogClass.Prerequisites}</td>
+                <td title={dogClass.Instructors}>{dogClass.Instructors}</td>
+                <td title={dogClass.Start}>
                   {dogClass.Start}
                 </td>
-                <td>{dogClass.Day}</td>
-                <td>{dogClass.Time}</td>
+                <td title={dogClass.Day}>{dogClass.Day}</td>
+                <td title={dogClass.Time}>{dogClass.Time}</td>
                 <td>
                   <div className={styles.enrollmentCell}>
                     <span className={styles.enrollmentCount}>
