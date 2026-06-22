@@ -33,12 +33,7 @@ export default function ClassSignup() {
   const classId = searchParams.get('classId');
   const isWaitlist = searchParams.get('waitlist') === 'true';
   const [dogClasses, setDogClasses] = useState<DogClass[]>([]);
-  const [availableDogs, setAvailableDogs] = useState<Dog[]>([
-    { id: 1, name: 'Max', breed: 'Golden Retriever', age: '3 years' },
-    { id: 2, name: 'Bella', breed: 'Labrador', age: '2 years' },
-    { id: 3, name: 'Charlie', breed: 'German Shepherd', age: '4 years' },
-    { id: 4, name: 'Lucy', breed: 'Beagle', age: '1 year' },
-  ]);
+  const [availableDogs, setAvailableDogs] = useState<Dog[]>([]);
 
   useEffect(() => {
     const fetchDogClasses = async () => {
@@ -244,19 +239,21 @@ export default function ClassSignup() {
         <div className={styles.section}>
           <h2>Your Dog's Information</h2>
 
-          <div className={styles.checkboxGroup}>
-            <input
-              type="checkbox"
-              id="useUsersDogs"
-              name="useUsersDogs"
-              checked={useUsersDogs}
-              onChange={(e) => {
-                setUseUsersDogs(e.target.checked);
-                setSelectedDogId('');
-              }}
-            />
-            <label htmlFor="useUsersDogs">Use one of my dogs</label>
-          </div>
+          {availableDogs.length ? (
+            <div className={styles.checkboxGroup}>
+              <input
+                type="checkbox"
+                id="useUsersDogs"
+                name="useUsersDogs"
+                checked={useUsersDogs}
+                onChange={(e) => {
+                  setUseUsersDogs(e.target.checked);
+                  setSelectedDogId('');
+                }}
+              />
+              <label htmlFor="useUsersDogs">Use one of my dogs</label>
+            </div>
+          ) : <></>}
 
           {useUsersDogs ? (
             <div className={styles.formGroup}>

@@ -47,8 +47,6 @@ Security
 - It is bad
 - Plain text passwords?
 
-
-
 Code	Payment Method	Notes
 1	PayPal	Online payment processed immediately
 2	Check	Payment due by specified date
@@ -58,3 +56,19 @@ Code	Payment Method	Notes
 6	Gift Certificate	Redeem gift certificate
 7	Waitlisted	No payment yet - waiting for class opening
 9	Deleted	Cancelled/deleted enrollment (not shown to users)
+
+TODO 6-7-26
+- Add class prerequesites to course page  --- DONE
+- Add refresh button to course page
+- Add WAITLISTED text to classes that are full --- DONE
+- Update completed date on class history section --- DONE
+- Add logic for controlling when session is open and closed for registration
+- Add logic to make sure class is still open before adding list
+   - If class is full, show a modal indicating it is full and ask if you want to join waitlist
+- Add Dog table to production database
+- Create Qa and Prod hosting on railway
+   - Update variables accordingly for each database
+- Create change password functionality
+   - Update passwords to NOT BE PLAINTEXT
+- Look into PayPal integration?
+- Look into email automation for class signups
