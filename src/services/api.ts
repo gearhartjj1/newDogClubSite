@@ -48,7 +48,6 @@ export const dogClassAPI = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(dogClassData),
     });
-    if (!response.ok) throw new Error('Failed to create dog class');
     return response.json();
   },
 

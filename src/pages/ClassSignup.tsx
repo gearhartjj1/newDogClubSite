@@ -65,6 +65,7 @@ export default function ClassSignup() {
   });
 
   const [submitted, setSubmitted] = useState(false);
+  const [classWaitListed, setClassWaitListed] = useState(false);
 
   const classes = dogClasses.map((cls) => ({ id: cls.ID, name: cls.Class }));
 
@@ -118,17 +119,23 @@ export default function ClassSignup() {
     const submissionData = {
       ...formData,
       paymentMethod: paymentMethodMap[formData.paymentMethod] || 1,
+      dogClassName: classes.find((cls) => cls.id === parseInt(formData.classId))?.name || '',
     };
 
     setSubmitted(true);
-    await dogClassAPI.create(submissionData);
+    const apiResponse = await dogClassAPI.create(submissionData);
+    console.log('API Response:', apiResponse);
+    if (apiResponse.status === 'waitlisted') {
+      setClassWaitListed(true);
+    }
     // Simulate form submission
     setTimeout(() => {
       navigate('/');
     }, 3000);
   };
 
-  if (submitted) {
+  //TODO: this logic isn't working?
+  if (submitted && !classWaitListed) {
     return (
       <div className={styles.container}>
         <div className={styles.successMessage}>
@@ -136,6 +143,22 @@ export default function ClassSignup() {
           <h1>Thank You!</h1>
           <p>Your registration has been submitted successfully.</p>
           <p>We'll contact you soon to confirm your enrollment.</p>
+          <button onClick={() => navigate('/')} className={styles.button}>
+            Return to Home
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (submitted && classWaitListed) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.successMessage}>
+          <div className={styles.successIcon}>⚠️</div>
+          <h1>Class Full</h1>
+          <p>The class you tried to sign up for is full.</p>
+          <p>You have been added to the waitlist.</p>
           <button onClick={() => navigate('/')} className={styles.button}>
             Return to Home
           </button>
