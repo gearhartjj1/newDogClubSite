@@ -46,13 +46,13 @@ router.post('/', async (req: Request, res: Response) => {
     // Create a transporter using SMTP
     const transporter = nodemailer.createTransport({
       host: "smtp.gmail.com",
-      port: 587,
-      secure: false, // use STARTTLS (upgrade connection to TLS after connecting)
+      port: 465,
+      secure: true, // use direct TLS connection
       auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS,
       },
-      family: 4, // Force IPv4 - Railway doesn't support outbound IPv6
+      localAddress: '0.0.0.0', // Force IPv4 - Railway doesn't support outbound IPv6
     } as nodemailer.TransportOptions);
 
     try {
