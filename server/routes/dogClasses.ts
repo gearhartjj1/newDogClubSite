@@ -52,7 +52,8 @@ router.post('/', async (req: Request, res: Response) => {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS,
       },
-    });
+      family: 4, // Force IPv4 - Railway doesn't support outbound IPv6
+    } as nodemailer.TransportOptions);
 
     try {
       await transporter.verify();
