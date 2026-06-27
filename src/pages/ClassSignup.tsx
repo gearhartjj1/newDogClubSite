@@ -109,7 +109,7 @@ export default function ClassSignup() {
 
     // Map payment method text to numeric value
     const paymentMethodMap: { [key: string]: number } = {
-      'PayPal': 1,
+      // 'PayPal': 1,
       'Cash': 2,
       'Check': 3,
       'Instructor Perk': 4,
@@ -357,7 +357,7 @@ export default function ClassSignup() {
               required
             >
               {!isWaitlist && <option value="">- Choose a payment method -</option>}
-              {!isWaitlist && <option value="PayPal">PayPal</option>}
+              {/* {!isWaitlist && <option value="PayPal">PayPal</option>} */}
               {!isWaitlist && <option value="Cash">Cash</option>}
               {!isWaitlist && <option value="Check">Check</option>}
               {!isWaitlist && <option value="Instructor Perk">Instructor Perk</option>}
