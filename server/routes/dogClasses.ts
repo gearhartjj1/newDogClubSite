@@ -1,6 +1,6 @@
 import express, { Request, Response } from 'express';
 import pool from '../config/database.js';
-import nodemailer from 'nodemailer';
+import emailService from '../config/emailService.js';
 
 const router = express.Router();
 
@@ -43,25 +43,6 @@ router.get('/user/:userId', async (req: Request, res: Response) => {
 // Create event (admin)
 router.post('/', async (req: Request, res: Response) => {
   try {
-    // Create a transporter using SMTP
-    const transporter = nodemailer.createTransport({
-      host: "smtp.gmail.com",
-      port: 465,
-      secure: true, // use direct TLS connection
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
-      },
-      localAddress: '0.0.0.0', // Force IPv4 - Railway doesn't support outbound IPv6
-    } as nodemailer.TransportOptions);
-
-    try {
-      await transporter.verify();
-      console.log("Server is ready to take our messages");
-    } catch (err) {
-      console.error("Verification failed:", err);
-    }
-
     //query the database to make sure there are still spots open for the class
     const dogsInClassQuery = 'SELECT MaxDog, COUNT(e.ID) AS DogsInClass FROM KCTCSession c LEFT JOIN Enrollment e ON c.ID = e.SID WHERE c.ID = ?';
     const dogsInClassResult = await pool.query(dogsInClassQuery, [req.body.classId]);
@@ -148,17 +129,7 @@ router.post('/', async (req: Request, res: Response) => {
           </table>
         </div>`;
     }
-    try {
-      await transporter.sendMail({
-        from: '"KCTC" <jacobjamesgearhart@gmail.com>', // sender address
-        to: req.body.email, // list of recipients
-        subject: "KEYSTONE CANINE TRAINING CLUB CLASS ENROLLMENT", // subject line
-        text: "KCTC registration information", // plain text body
-        html: emailHtml,
-      });
-    } catch (err) {
-      console.error("Error while sending mail:", err);
-    }
+    await emailService.sendEmail(req.body.email, 'KEYSTONE CANINE TRAINING CLUB CLASS ENROLLMENT', emailHtml);
     if (spotsOpen) {
       res.status(201).json({
         message: 'Event created - connect to database',
