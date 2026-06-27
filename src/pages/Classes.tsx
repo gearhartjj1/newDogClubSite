@@ -9,13 +9,21 @@ import { dogClassAPI, type DogClass } from '../services/api';
 //Or maybe there isn't something to enforce the max number of dogs
 export default function Classes() {
   const [dogClasses, setDogClasses] = useState<DogClass[]>([]);
-    useEffect(() => {
-      const fetchDogClasses = async () => {
-        const queryDogClasses = await dogClassAPI.getAll();
-        setDogClasses(queryDogClasses);
-      };
-      fetchDogClasses();
-    }, []);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const fetchDogClasses = async () => {
+    setIsRefreshing(true);
+    try {
+      const queryDogClasses = await dogClassAPI.getAll();
+      setDogClasses(queryDogClasses);
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchDogClasses();
+  }, []);
 
   // Helper function to parse date string for sorting
   const parseDate = (dateString: string): Date => {
@@ -37,9 +45,9 @@ export default function Classes() {
     dogClass.Room?.toLowerCase().includes('back')
   );
 
-  const ClassTable = ({ classes, title }: { classes: DogClass[]; title: string }) => (
-    <div className={styles.section}>
-      <h2 className={styles.sectionTitle}>{title}</h2>
+  const ClassTable = ({ classes, title }: { classes: DogClass[]; title?: string }) => (
+    <div>
+      {title && <h2 className={styles.sectionTitle}>{title}</h2>}
       <div className={styles.tableWrapper}>
         <table className={styles.classesTable}>
           <thead>
@@ -113,7 +121,16 @@ export default function Classes() {
   return (
     <div className={styles.container}>
       <header className={styles.header}>
-        <h1>🎓 Training Classes</h1>
+        <div className={styles.headerTitle}>
+          <h1>🎓 Training Classes</h1>
+          <button
+            className={styles.refreshButton}
+            onClick={fetchDogClasses}
+            disabled={isRefreshing}
+          >
+            {isRefreshing ? 'Refreshing...' : '↻ Refresh'}
+          </button>
+        </div>
         <p>Dog training programs for all levels</p>
       </header>
 

@@ -23,6 +23,33 @@
   margin: 0;
 }
 
+.headerTitle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+}
+
+.refreshButton {
+  padding: 6px 14px;
+  background-color: #0d9488;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.refreshButton:hover:not(:disabled) {
+  background-color: #0f766e;
+}
+
+.refreshButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .tableWrapper {
   background: white;
   border-radius: 8px;
