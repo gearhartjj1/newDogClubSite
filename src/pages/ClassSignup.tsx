@@ -130,7 +130,7 @@ export default function ClassSignup() {
     }
     // Simulate form submission
     setTimeout(() => {
-      navigate('/');
+      navigate('/classes');
     }, 3000);
   };
 
@@ -143,8 +143,8 @@ export default function ClassSignup() {
           <h1>Thank You!</h1>
           <p>Your registration has been submitted successfully.</p>
           <p>We'll contact you soon to confirm your enrollment.</p>
-          <button onClick={() => navigate('/')} className={styles.button}>
-            Return to Home
+          <button onClick={() => navigate('/classes')} className={styles.button}>
+            Return to Classes
           </button>
         </div>
       </div>
@@ -159,8 +159,8 @@ export default function ClassSignup() {
           <h1>Class Full</h1>
           <p>The class you tried to sign up for is full.</p>
           <p>You have been added to the waitlist.</p>
-          <button onClick={() => navigate('/')} className={styles.button}>
-            Return to Home
+          <button onClick={() => navigate('/classes')} className={styles.button}>
+            Return to Classes
           </button>
         </div>
       </div>
