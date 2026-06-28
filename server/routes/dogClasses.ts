@@ -76,6 +76,10 @@ router.post('/', async (req: Request, res: Response) => {
           <h3 style="color: #2c3e50;">Enrollment Information</h3>
           <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
             <tr style="background-color: #f8f9fa;">
+              <td style="padding: 8px 12px; font-weight: bold; border: 1px solid #dee2e6;">Signup ID</td>
+              <td style="padding: 8px 12px; border: 1px solid #dee2e6;">${newIdValue}</td>
+            </tr>
+            <tr>
               <td style="padding: 8px 12px; font-weight: bold; border: 1px solid #dee2e6;">Account holder name</td>
               <td style="padding: 8px 12px; border: 1px solid #dee2e6;">${req.body.firstName} ${req.body.lastName}</td>
             </tr>
@@ -111,6 +115,10 @@ router.post('/', async (req: Request, res: Response) => {
           <h3 style="color: #2c3e50;">Waitlist Details</h3>
           <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
             <tr style="background-color: #f8f9fa;">
+              <td style="padding: 8px 12px; font-weight: bold; border: 1px solid #dee2e6;">Signup ID</td>
+              <td style="padding: 8px 12px; border: 1px solid #dee2e6;">${newIdValue}</td>
+            </tr>
+            <tr>
               <td style="padding: 8px 12px; font-weight: bold; border: 1px solid #dee2e6;">Class Name</td>
               <td style="padding: 8px 12px; border: 1px solid #dee2e6;">${req.body.dogClassName}</td>
             </tr>
