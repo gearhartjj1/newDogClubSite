@@ -4,13 +4,16 @@ import emailService from '../config/emailService.js';
 
 const router = express.Router();
 
-const getCurrentSession = async (): Promise<string> => {
+const getCurrentSession = async (): Promise<{ session: string; code: string, startDate: string }> => {
   try {
-    const result = await pool.query('SELECT Session from kctcsession where id = 0');
-    return (result[0] as any)[0].Session as string;
+    //The session being opened is controlled in the Code value and the session start date is in the Class value
+    //Not great, a little hacky, but will do for now
+    const result = await pool.query('SELECT Session, Code, Class from kctcsession where id = 0');
+    const row = (result[0] as any)[0];
+    return { session: row.Session, code: row.Code, startDate: row.Class };
   }  catch (error) {
     console.error('Error fetching current session: ', error);
-    return "";
+    return { session: '', code: '', startDate: '' };
   }
 }
 
@@ -19,13 +22,29 @@ router.get('/', async (req: Request, res: Response) => {
   try {
     const currentSession = await getCurrentSession();
     const query = 'SELECT c.*, COUNT(e.ID) AS DogsInClass FROM KCTCSession c LEFT JOIN Enrollment e ON c.ID = e.SID WHERE c.Session = ? GROUP BY c.ID, c.class ORDER BY c.class';
-    const dogClasses = await pool.query(query, [currentSession]);
+    const dogClasses = await pool.query(query, [currentSession.session]);
     res.json(dogClasses);
   } catch (error) {
     console.error('Error fetching dog classes: ', error);
     res.status(500).json({ error: 'Failed to fetch dog classes' });
   }
 });
+
+router.get('/session-status', async (req: Request, res: Response) => {
+  const currentSession = await getCurrentSession();
+  console.log(`Checking session status for session: ${currentSession.session}, Code: ${currentSession.code}, Start Date: ${currentSession.startDate}`);
+  const sessionsOpen = currentSession.code == 'A';
+  const currentDate = new Date();
+  const sessionStartDate = new Date(currentSession.startDate);
+  const pastSessionStart = currentDate > sessionStartDate;
+  console.log(`Current session: ${currentSession.session}, Code: ${currentSession.code}, Start Date: ${currentSession.startDate}`);
+  console.log(`Session status check: sessionsOpen=${sessionsOpen}, pastSessionStart=${pastSessionStart}`);
+  console.log(`Current date: ${currentDate}, Session start date: ${sessionStartDate}`);
+  //sessionStatus: 0 = session signup not started, 1 = session open, 2 = session closed because of being past signup
+  const sessionStatus = sessionsOpen ? 1 : (pastSessionStart ? 2 : 0);
+  console.log(`Determined session status: ${sessionStatus}`);
+  res.json(sessionStatus);
+})
 
 // Get all dog classes joined by a specific user
 router.get('/user/:userId', async (req: Request, res: Response) => {
@@ -51,11 +70,18 @@ router.post('/', async (req: Request, res: Response) => {
     const spotsOpen = dogsInClassCount < maxDogs;
     const forcedWaitlist = req.body.paymentMethod !== 7 && !spotsOpen;
 
+    // Extract numeric value from dogAge (e.g. "5 years" -> 5)
+    let parsedDogAge: number | null = null;
+    if (req.body.dogAge != null) {
+      const match = String(req.body.dogAge).match(/\d+(\.\d+)?/);
+      parsedDogAge = match ? parseFloat(match[0]) : null;
+    }
+
     const maxIdResult = await pool.query('SELECT MAX(ID) AS maxId FROM Enrollment');
     //TODO: this works well, but I should probably add some error handling here in case of failures
     const newIdValue = (maxIdResult[0] as any)[0].maxId + 1;
     const newQuery = 'INSERT INTO Enrollment VALUES (?, ?, ?, \'Y\', \'Y\', ?, ?, ?, ?, \'Y\', \'None\', \'internet\', ?)';
-    const response = await pool.query(newQuery, [newIdValue, req.body.userId, req.body.classId, spotsOpen ? req.body.paymentMethod : 7, req.body.dogName, req.body.dogAge, req.body.dogBreed, Date.now()]);
+    const response = await pool.query(newQuery, [newIdValue, req.body.userId, req.body.classId, spotsOpen ? req.body.paymentMethod : 7, req.body.dogName, parsedDogAge, req.body.dogBreed, Date.now()]);
 
     //if class is sign up succeeds then send confirmation email
     //TODO: Should also figure out the email info for the club email or make a custom one
