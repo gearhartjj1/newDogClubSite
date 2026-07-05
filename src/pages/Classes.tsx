@@ -3,12 +3,11 @@ import styles from './Classes.module.css';
 import { useEffect, useState } from 'react';
 import { dogClassAPI, type DogClass } from '../services/api';
 
-//TODO: check the data from the database to make sure the number of dogs enrolled is correct
-//There are a lot of classes that have more than the max for the class
-//But that could just be because the data is test data
-//Or maybe there isn't something to enforce the max number of dogs
 export default function Classes() {
   const [dogClasses, setDogClasses] = useState<DogClass[]>([]);
+  const [sessionStatus, setSessionStatus] = useState<number | undefined>(undefined); // 0 = not started, 1 = open, 2 = closed
+  const [sessionStartDate, setSessionStartDate] = useState<string>('');
+  const [sessionName, setSessionName] = useState<string>('');
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const fetchDogClasses = async () => {
@@ -16,6 +15,10 @@ export default function Classes() {
     try {
       const queryDogClasses = await dogClassAPI.getAll();
       setDogClasses(queryDogClasses);
+      const sessionStatusResponse = await dogClassAPI.getSessionStatus();
+      setSessionStatus(sessionStatusResponse.sessionStatus);
+      setSessionStartDate(sessionStatusResponse.sessionStartDate);
+      setSessionName(sessionStatusResponse.sessionName);
     } finally {
       setIsRefreshing(false);
     }
@@ -60,7 +63,7 @@ export default function Classes() {
               <th style={{width: '5%'}}>Day</th>
               <th style={{width: '10%'}}>Time</th>
               <th style={{width: '9%'}}>Enrollment</th>
-              <th>Action</th>
+              {sessionStatus === 1 && <th>Action</th>}
             </tr>
           </thead>
           <tbody>
@@ -93,6 +96,7 @@ export default function Classes() {
                     </div>
                   </div>
                 </td>
+                {sessionStatus === 1 && (
                 <td>
                   {dogClass.DogsInClass < dogClass.MaxDog ? (
                     <Link
@@ -110,6 +114,7 @@ export default function Classes() {
                     </Link>
                   )}
                 </td>
+                )}
               </tr>
             ))}
           </tbody>
@@ -122,7 +127,7 @@ export default function Classes() {
     <div className={styles.container}>
       <header className={styles.header}>
         <div className={styles.headerTitle}>
-          <h1>🎓 Training Classes</h1>
+          <h1>🎓 Training Classes - {sessionName}</h1>
           <button
             className={styles.refreshButton}
             onClick={fetchDogClasses}
@@ -134,6 +139,14 @@ export default function Classes() {
         <p>Dog training programs for all levels</p>
       </header>
 
+      {
+        sessionStatus !== undefined &&
+        <div className={styles.sessionStatus}>
+          {sessionStatus === 0 && <span className={styles.statusPending}>Enrollment opens on {new Date(sessionStartDate).toLocaleDateString()}</span>}
+          {sessionStatus === 1 && <span className={styles.statusOpen}>Registration is currently open</span>}
+          {sessionStatus === 2 && <span className={styles.statusClosed}>Registration is closed</span>}
+        </div>
+      }
       {frontClasses.length > 0 && <ClassTable classes={frontClasses} title="Front Room Classes" />}
       {backClasses.length > 0 && <ClassTable classes={backClasses} title="Back Room Classes" />}
     </div>

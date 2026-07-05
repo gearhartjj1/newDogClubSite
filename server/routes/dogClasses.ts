@@ -32,18 +32,17 @@ router.get('/', async (req: Request, res: Response) => {
 
 router.get('/session-status', async (req: Request, res: Response) => {
   const currentSession = await getCurrentSession();
-  console.log(`Checking session status for session: ${currentSession.session}, Code: ${currentSession.code}, Start Date: ${currentSession.startDate}`);
   const sessionsOpen = currentSession.code == 'A';
   const currentDate = new Date();
   const sessionStartDate = new Date(currentSession.startDate);
   const pastSessionStart = currentDate > sessionStartDate;
-  console.log(`Current session: ${currentSession.session}, Code: ${currentSession.code}, Start Date: ${currentSession.startDate}`);
-  console.log(`Session status check: sessionsOpen=${sessionsOpen}, pastSessionStart=${pastSessionStart}`);
-  console.log(`Current date: ${currentDate}, Session start date: ${sessionStartDate}`);
   //sessionStatus: 0 = session signup not started, 1 = session open, 2 = session closed because of being past signup
-  const sessionStatus = sessionsOpen ? 1 : (pastSessionStart ? 2 : 0);
-  console.log(`Determined session status: ${sessionStatus}`);
-  res.json(sessionStatus);
+  const sessionData = {
+    sessionStatus: sessionsOpen ? 1 : (pastSessionStart ? 2 : 0),
+    sessionStartDate: sessionStartDate,
+    sessionName: currentSession.session
+  }
+  res.json(sessionData);
 })
 
 // Get all dog classes joined by a specific user

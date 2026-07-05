@@ -57,6 +57,12 @@ export const dogClassAPI = {
     const data = await response.json();
     return data[0] as DogClass[];
   },
+
+  getSessionStatus: async () => {
+    const response = await fetch(`${API_URL}/dog-classes/session-status`, fetchOptions);
+    if (!response.ok) throw new Error('Failed to fetch session status');
+    return response.json();
+  }
 };
 
 // Classes API
