@@ -136,17 +136,13 @@ export default function Classes() {
             {isRefreshing ? 'Refreshing...' : '↻ Refresh'}
           </button>
         </div>
-        <p>Dog training programs for all levels</p>
-      </header>
-
-      {
-        sessionStatus !== undefined &&
-        <div className={styles.sessionStatus}>
+        <p>
           {sessionStatus === 0 && <span className={styles.statusPending}>Enrollment opens on {new Date(sessionStartDate).toLocaleDateString()}</span>}
           {sessionStatus === 1 && <span className={styles.statusOpen}>Registration is currently open</span>}
           {sessionStatus === 2 && <span className={styles.statusClosed}>Registration is closed</span>}
-        </div>
-      }
+        </p>
+      </header>
+
       {frontClasses.length > 0 && <ClassTable classes={frontClasses} title="Front Room Classes" />}
       {backClasses.length > 0 && <ClassTable classes={backClasses} title="Back Room Classes" />}
     </div>
