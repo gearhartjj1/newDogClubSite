@@ -137,7 +137,7 @@ export default function Classes() {
           </button>
         </div>
         <p>
-          {sessionStatus === 0 && <span className={styles.statusPending}>Enrollment opens on {new Date(sessionStartDate).toLocaleDateString()}</span>}
+          {sessionStatus === 0 && <span className={styles.statusPending}>Enrollment opens on {new Date(sessionStartDate).toLocaleDateString()} at 9:00 PM</span>}
           {sessionStatus === 1 && <span className={styles.statusOpen}>Registration is currently open</span>}
           {sessionStatus === 2 && <span className={styles.statusClosed}>Registration is closed</span>}
         </p>
