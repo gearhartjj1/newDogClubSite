@@ -1,6 +1,7 @@
 import express, { Request, Response } from 'express';
 import pool from '../config/database.js';
 import emailService from '../config/emailService.js';
+import emailServiceResend from '../config/emailServiceResend.js';
 
 const router = express.Router();
 
@@ -162,7 +163,7 @@ router.post('/', async (req: Request, res: Response) => {
           </table>
         </div>`;
     }
-    await emailService.sendEmail(req.body.email, 'KEYSTONE CANINE TRAINING CLUB CLASS ENROLLMENT', emailHtml);
+    await emailServiceResend.sendEmail(req.body.email, 'KEYSTONE CANINE TRAINING CLUB CLASS ENROLLMENT', emailHtml);
     if (spotsOpen) {
       res.status(201).json({
         message: 'Event created - connect to database',
