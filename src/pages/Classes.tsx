@@ -110,7 +110,7 @@ export default function Classes() {
                       to={`/signup?classId=${dogClass.ID}&waitlist=true`}
                       className={styles.waitlistButtonSmall}
                     >
-                      Enroll
+                      Join Wait-list
                     </Link>
                   )}
                 </td>
