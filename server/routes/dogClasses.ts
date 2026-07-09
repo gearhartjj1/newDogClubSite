@@ -97,7 +97,7 @@ router.post('/', async (req: Request, res: Response) => {
           <p>If we should find any issues with your enrollment, we will contact you. There is no need for you to contact us to confirm receipt of your enrollment.</p>
           <p><strong>Unless you use PayPal, bring your payment (cash or check) to the first class and give it to your instructor.</strong></p>
           <p>Thank you for choosing Keystone Canine Training Club. We look forward to seeing you in class!</p>
-          <p><em>If you are not a KCTC member, please bring a copy of your dog's up-to-date vaccine records to your first class and give it to your instructor.</em></p>
+          <p><em>If you are not a KCTC member, please bring a copy of your dog's up-to-date vaccine records and your signed Liability Waiver to your first class and give it to your instructor.</em></p>
           <hr style="border: 1px solid #3498db; margin: 20px 0;" />
           <h3 style="color: #2c3e50;">Enrollment Information</h3>
           <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
