@@ -33,11 +33,6 @@ export default function Navigation() {
               Classes
             </Link>
           </li>
-          <li>
-            <Link to="/signup" className={styles.cta} onClick={() => setMobileMenuOpen(false)}>
-              Sign Up
-            </Link>
-          </li>
           {userData ? (
             <li>
               <Link to="/profile" onClick={() => setMobileMenuOpen(false)}>
