@@ -58,29 +58,51 @@ router.get('/user/:userId', async (req: Request, res: Response) => {
   }
 });
 
-// Create event (admin)
+// Create enrollment
 router.post('/', async (req: Request, res: Response) => {
   try {
-    //query the database to make sure there are still spots open for the class
-    const dogsInClassQuery = 'SELECT MaxDog, COUNT(e.ID) AS DogsInClass FROM KCTCSession c LEFT JOIN Enrollment e ON c.ID = e.SID WHERE c.ID = ?';
-    const dogsInClassResult = await pool.query(dogsInClassQuery, [req.body.classId]);
+    // --- Input validation ---
+    const classId = parseInt(req.body.classId, 10);
+    const userId = parseInt(req.body.userId, 10);
+    const paymentMethod = parseInt(req.body.paymentMethod, 10);
+    const dogName = typeof req.body.dogName === 'string' ? req.body.dogName.trim() : '';
+    const dogBreed = typeof req.body.dogBreed === 'string' ? req.body.dogBreed.trim() : '';
+
+    if (isNaN(classId) || isNaN(userId) || isNaN(paymentMethod)) {
+      res.status(400).json({ error: 'classId, userId, and paymentMethod must be valid numbers' });
+      return;
+    }
+
+    if (!dogName) {
+      res.status(400).json({ error: 'dogName is required' });
+      return;
+    }
+
+    // --- Query the database to make sure there are still spots open for the class ---
+    const dogsInClassQuery = 'SELECT MaxDog, COUNT(e.ID) AS DogsInClass FROM KCTCSession c LEFT JOIN Enrollment e ON c.ID = e.SID WHERE c.ID = ? GROUP BY c.MaxDog';
+    const dogsInClassResult = await pool.query(dogsInClassQuery, [classId]);
     const dogsInClassCount = (dogsInClassResult[0] as any)[0].DogsInClass;
     const maxDogs = (dogsInClassResult[0] as any)[0].MaxDog;
     const spotsOpen = dogsInClassCount < maxDogs;
-    const forcedWaitlist = req.body.paymentMethod !== 7 && !spotsOpen;
+    const forcedWaitlist = paymentMethod !== 7 && !spotsOpen;
 
     // Extract numeric value from dogAge (e.g. "5 years" -> 5)
     let parsedDogAge: number | null = null;
-    if (req.body.dogAge != null) {
+    if (req.body.dogAge != null && String(req.body.dogAge).trim() !== '') {
       const match = String(req.body.dogAge).match(/\d+(\.\d+)?/);
       parsedDogAge = match ? parseFloat(match[0]) : null;
     }
 
     const maxIdResult = await pool.query('SELECT MAX(ID) AS maxId FROM Enrollment');
-    //TODO: this works well, but I should probably add some error handling here in case of failures
-    const newIdValue = (maxIdResult[0] as any)[0].maxId + 1;
+    const maxId = (maxIdResult[0] as any)[0].maxId;
+    const newIdValue = maxId != null ? maxId + 1 : 1;
+
+    // Format current date as MySQL-compatible datetime string
+    const enrollmentDate = new Date().toISOString().slice(0, 19).replace('T', ' ');
+
+    const effectivePaymentMethod = spotsOpen ? paymentMethod : 7;
     const newQuery = 'INSERT INTO Enrollment VALUES (?, ?, ?, \'Y\', \'Y\', ?, ?, ?, ?, \'Y\', \'None\', \'internet - new site\', ?)';
-    const response = await pool.query(newQuery, [newIdValue, req.body.userId, req.body.classId, spotsOpen ? req.body.paymentMethod : 7, req.body.dogName, parsedDogAge, req.body.dogBreed, Date.now()]);
+    const response = await pool.query(newQuery, [newIdValue, userId, classId, effectivePaymentMethod, dogName, parsedDogAge, dogBreed, enrollmentDate]);
 
     //if class is sign up succeeds then send confirmation email
     //TODO: Should also figure out the email info for the club email or make a custom one
