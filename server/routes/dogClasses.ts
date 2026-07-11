@@ -1,6 +1,5 @@
 import express, { Request, Response } from 'express';
 import pool from '../config/database.js';
-import emailService from '../config/emailService.js';
 import emailServiceResend from '../config/emailServiceResend.js';
 
 const router = express.Router();
