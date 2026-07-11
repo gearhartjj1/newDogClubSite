@@ -79,7 +79,7 @@ router.post('/', async (req: Request, res: Response) => {
     const maxIdResult = await pool.query('SELECT MAX(ID) AS maxId FROM Enrollment');
     //TODO: this works well, but I should probably add some error handling here in case of failures
     const newIdValue = (maxIdResult[0] as any)[0].maxId + 1;
-    const newQuery = 'INSERT INTO Enrollment VALUES (?, ?, ?, \'Y\', \'Y\', ?, ?, ?, ?, \'Y\', \'None\', \'internet\', ?)';
+    const newQuery = 'INSERT INTO Enrollment VALUES (?, ?, ?, \'Y\', \'Y\', ?, ?, ?, ?, \'Y\', \'None\', \'internet - new site\', ?)';
     const response = await pool.query(newQuery, [newIdValue, req.body.userId, req.body.classId, spotsOpen ? req.body.paymentMethod : 7, req.body.dogName, parsedDogAge, req.body.dogBreed, Date.now()]);
 
     //if class is sign up succeeds then send confirmation email
@@ -103,6 +103,10 @@ router.post('/', async (req: Request, res: Response) => {
             <tr style="background-color: #f8f9fa;">
               <td style="padding: 8px 12px; font-weight: bold; border: 1px solid #dee2e6;">Signup ID</td>
               <td style="padding: 8px 12px; border: 1px solid #dee2e6;">${newIdValue}</td>
+            </tr>
+            <tr style="background-color: #f8f9fa;">
+              <td style="padding: 8px 12px; font-weight: bold; border: 1px solid #dee2e6;">Class Code</td>
+              <td style="padding: 8px 12px; border: 1px solid #dee2e6;">${req.body.dogClassCode}</td>
             </tr>
             <tr>
               <td style="padding: 8px 12px; font-weight: bold; border: 1px solid #dee2e6;">Account holder name</td>
@@ -142,6 +146,10 @@ router.post('/', async (req: Request, res: Response) => {
             <tr style="background-color: #f8f9fa;">
               <td style="padding: 8px 12px; font-weight: bold; border: 1px solid #dee2e6;">Signup ID</td>
               <td style="padding: 8px 12px; border: 1px solid #dee2e6;">${newIdValue}</td>
+            </tr>
+            <tr style="background-color: #f8f9fa;">
+              <td style="padding: 8px 12px; font-weight: bold; border: 1px solid #dee2e6;">Class Code</td>
+              <td style="padding: 8px 12px; border: 1px solid #dee2e6;">${req.body.dogClassCode}</td>
             </tr>
             <tr>
               <td style="padding: 8px 12px; font-weight: bold; border: 1px solid #dee2e6;">Class Name</td>

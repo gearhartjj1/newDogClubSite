@@ -1,5 +1,5 @@
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import styles from './ClassSignup.module.css';
 import { dogClassAPI, memberDogsAPI, type DogClass } from '../services/api';
 import { useUserData, type Dog } from '../context/UserDataContext';
@@ -67,7 +67,7 @@ export default function ClassSignup() {
   const [submitted, setSubmitted] = useState(false);
   const [classWaitListed, setClassWaitListed] = useState(false);
 
-  const classes = dogClasses.map((cls) => ({ id: cls.ID, name: cls.Class }));
+  const classes = useMemo(() => dogClasses.map((cls) => ({ id: cls.ID, name: cls.Class, code: cls.Code })), [dogClasses]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
@@ -120,6 +120,7 @@ export default function ClassSignup() {
       ...formData,
       paymentMethod: paymentMethodMap[formData.paymentMethod] || 1,
       dogClassName: classes.find((cls) => cls.id === parseInt(formData.classId))?.name || '',
+      dogClassCode: classes.find((cls) => cls.id === parseInt(formData.classId))?.code || '',
     };
 
     setSubmitted(true);
