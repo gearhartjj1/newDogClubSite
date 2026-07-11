@@ -11,26 +11,31 @@ interface SidebarLink {
   authRequired?: boolean;
 }
 
-const sidebarLinks: SidebarLink[] = [
-  { to: '/', icon: '🏠', label: 'Home' },
-  { to: '/building-usage', icon: '🏢', label: 'Building Usage' },
-  { to: '/KCTC%20Calendar.pdf', icon: '📅', label: 'Calendar', external: true },
-  { to: '/classes', icon: '🎓', label: 'Classes' },
-  { to: '/class-prices', icon: '💰', label: 'Class Prices' },
-  { to: '/contact', icon: '📧', label: 'Contact Us' },
-  { to: '/directions', icon: '🗺️', label: 'Directions' },
-  { to: '/forms', icon: '📋', label: 'Forms' },
-  { to: '/gift-certificates', icon: '🎁', label: 'Gift Certificates' },
-  { to: '/history', icon: '📜', label: 'History' },
-  { to: '/membership', icon: '🤝', label: 'Membership' },
-  { to: '/members-only', icon: '🔒', label: 'Members Only', authRequired: true },
-  { to: '/officers-and-board', icon: '👥', label: 'Officers & Board' },
-];
-
 export default function Sidebar() {
   const { userData } = useUserData();
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
+
+  const profileButton: SidebarLink = userData
+    ? { to: '/profile', icon: '👤', label: userData.username }
+    : { to: '/login', icon: '🔑', label: 'Sign In' };
+
+  const sidebarLinks: SidebarLink[] = [
+    profileButton,
+    { to: '/', icon: '🏠', label: 'Home' },
+    { to: '/building-usage', icon: '🏢', label: 'Building Usage' },
+    { to: '/KCTC%20Calendar.pdf', icon: '📅', label: 'Calendar', external: true },
+    { to: '/classes', icon: '🎓', label: 'Classes' },
+    { to: '/class-prices', icon: '💰', label: 'Class Prices' },
+    { to: '/contact', icon: '📧', label: 'Contact Us' },
+    { to: '/directions', icon: '🗺️', label: 'Directions' },
+    { to: '/forms', icon: '📋', label: 'Forms' },
+    { to: '/gift-certificates', icon: '🎁', label: 'Gift Certificates' },
+    { to: '/history', icon: '📜', label: 'History' },
+    { to: '/membership', icon: '🤝', label: 'Membership' },
+    { to: '/members-only', icon: '🔒', label: 'Members Only', authRequired: true },
+    { to: '/officers-and-board', icon: '👥', label: 'Officers & Board' },
+  ];
 
   const handleLinkClick = () => {
     setIsOpen(false);
