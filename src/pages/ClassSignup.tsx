@@ -65,6 +65,7 @@ export default function ClassSignup() {
   });
 
   const [submitted, setSubmitted] = useState(false);
+  const [submissionInProgress, setSubmissionInProgress] = useState(false);
   const [classWaitListed, setClassWaitListed] = useState(false);
 
   const classes = useMemo(() => dogClasses.map((cls) => ({ id: cls.ID, name: cls.Class, code: cls.Code })), [dogClasses]);
@@ -95,6 +96,7 @@ export default function ClassSignup() {
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
+    setSubmissionInProgress(true);
     e.preventDefault();
 
     if (!formData.agreeTerms) {
@@ -123,9 +125,10 @@ export default function ClassSignup() {
       dogClassCode: classes.find((cls) => cls.id === parseInt(formData.classId))?.code || '',
     };
 
-    setSubmitted(true);
     const apiResponse = await dogClassAPI.create(submissionData);
     console.log('API Response:', apiResponse);
+    setSubmissionInProgress(false);
+    setSubmitted(true);
     if (apiResponse.status === 'waitlisted') {
       setClassWaitListed(true);
     }
@@ -135,7 +138,18 @@ export default function ClassSignup() {
     }, 3000);
   };
 
-  //TODO: this logic isn't working?
+  if (submissionInProgress) {
+    return (
+      <div className={styles.loadingOverlay}>
+        <div className={styles.loadingMessage}>
+          <div className={styles.loadingIcon}>⏳</div>
+          <h1>Submitting...</h1>
+          <p>Please wait while we process your registration.</p>
+        </div>
+      </div>
+    );
+  }
+
   if (submitted && !classWaitListed) {
     return (
       <div className={styles.container}>

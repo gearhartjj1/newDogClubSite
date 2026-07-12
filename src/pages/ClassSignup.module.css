@@ -174,3 +174,49 @@
 .button:hover {
   transform: scale(1.05);
 }
+
+.loadingOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.85);
+  z-index: 1000;
+}
+
+.loadingMessage {
+  text-align: center;
+  padding: 60px 40px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  max-width: 400px;
+  width: 90%;
+}
+
+.loadingMessage h1 {
+  font-size: 1.8rem;
+  color: #333;
+  margin: 0 0 12px 0;
+}
+
+.loadingMessage p {
+  color: #666;
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.loadingIcon {
+  font-size: 3.5rem;
+  margin-bottom: 20px;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.1); }
+}
