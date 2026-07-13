@@ -4,18 +4,41 @@ import styles from './ClassSignup.module.css';
 import { dogClassAPI, memberDogsAPI, type DogClass } from '../services/api';
 import { useUserData, type Dog } from '../context/UserDataContext';
 
+// Beta testing logger – prefixes all messages for easy filtering
+const betaLog = (action: string, details?: Record<string, unknown>) => {
+  const entry = {
+    timestamp: new Date().toISOString(),
+    component: 'ClassSignup',
+    action,
+    ...details,
+  };
+  console.log(`[BETA][ClassSignup] ${action}`, entry);
+};
+
 export default function ClassSignup() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { userData } = useUserData();
   const classId = searchParams.get('classId');
   const isWaitlist = searchParams.get('waitlist') === 'true';
+
+  // Log page load once
+  useEffect(() => {
+    betaLog('PAGE_LOAD', {
+      classId,
+      isWaitlist,
+      isLoggedIn: !!userData,
+      userId: userData?.id ?? null,
+    });
+  }, []);
   const [dogClasses, setDogClasses] = useState<DogClass[]>([]);
   const [availableDogs, setAvailableDogs] = useState<Dog[]>([]);
 
   useEffect(() => {
     const fetchDogClasses = async () => {
+      betaLog('FETCH_CLASSES_START');
       const queryDogClasses = await dogClassAPI.getAll();
+      betaLog('FETCH_CLASSES_COMPLETE', { count: queryDogClasses.length });
       setDogClasses(queryDogClasses);
     };
     fetchDogClasses();
@@ -26,6 +49,7 @@ export default function ClassSignup() {
     const fetchUserDogs = async () => {
       try {
         if (userData?.id) {
+          betaLog('FETCH_USER_DOGS_START', { userId: userData.id });
           const response = await memberDogsAPI.getByFamilyId(userData.id);
           if (response.success && response.data && response.data.length > 0) {
             const formattedDogs: Dog[] = response.data.map((dog: any) => ({
@@ -34,10 +58,14 @@ export default function ClassSignup() {
               breed: dog.breed,
               age: dog.age,
             }));
+            betaLog('FETCH_USER_DOGS_COMPLETE', { count: formattedDogs.length, dogNames: formattedDogs.map(d => d.name) });
             setAvailableDogs(formattedDogs);
+          } else {
+            betaLog('FETCH_USER_DOGS_COMPLETE', { count: 0 });
           }
         }
       } catch (error) {
+        betaLog('FETCH_USER_DOGS_ERROR', { error: String(error) });
         console.error('Error fetching member dogs:', error);
       }
     };
@@ -74,6 +102,8 @@ export default function ClassSignup() {
     const { name, value, type } = e.target;
     const checked = (e.target as HTMLInputElement).checked;
 
+    betaLog('FIELD_CHANGE', { field: name, type, value: type === 'checkbox' ? checked : value });
+
     setFormData((prev) => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value,
@@ -85,6 +115,7 @@ export default function ClassSignup() {
     const selectedDog = availableDogs.find((dog) => dog.id === dogId);
     
     if (selectedDog) {
+      betaLog('DOG_SELECTED', { dogId, dogName: selectedDog.name, dogBreed: selectedDog.breed });
       setSelectedDogId(dogId);
       setFormData((prev) => ({
         ...prev,
@@ -98,13 +129,27 @@ export default function ClassSignup() {
   const handleSubmit = async (e: React.FormEvent) => {
     setSubmissionInProgress(true);
     e.preventDefault();
+    const submitStartTime = Date.now();
+
+    betaLog('SUBMIT_ATTEMPT', {
+      classId: formData.classId,
+      paymentMethod: formData.paymentMethod,
+      dogName: formData.dogName,
+      dogBreed: formData.dogBreed,
+      isWaitlist,
+      userId: formData.userId,
+      agreeTerms: formData.agreeTerms,
+      prerequesitesMet: formData.prerequesitesMet,
+    });
 
     if (!formData.agreeTerms) {
+      betaLog('SUBMIT_VALIDATION_FAIL', { reason: 'terms_not_agreed' });
       alert('Please agree to the terms and conditions');
       return;
     }
 
     if (!formData.prerequesitesMet) {
+      betaLog('SUBMIT_VALIDATION_FAIL', { reason: 'prerequisites_not_confirmed' });
       alert('Please confirm that you meet the prerequisites for this class');
       return;
     }
@@ -125,15 +170,41 @@ export default function ClassSignup() {
       dogClassCode: classes.find((cls) => cls.id === parseInt(formData.classId))?.code || '',
     };
 
-    const apiResponse = await dogClassAPI.create(submissionData);
+    let apiResponse: any;
+    try {
+      apiResponse = await dogClassAPI.create(submissionData);
+      const duration = Date.now() - submitStartTime;
+      betaLog('SUBMIT_RESPONSE', {
+        status: apiResponse.status,
+        message: apiResponse.message,
+        error: apiResponse.error,
+        durationMs: duration,
+        classId: formData.classId,
+        dogName: formData.dogName,
+      });
+    } catch (error) {
+      const duration = Date.now() - submitStartTime;
+      betaLog('SUBMIT_ERROR', {
+        error: String(error),
+        durationMs: duration,
+        classId: formData.classId,
+        dogName: formData.dogName,
+      });
+      console.error('Signup submission error:', error);
+      setSubmissionInProgress(false);
+      return;
+    }
+
     console.log('API Response:', apiResponse);
     setSubmissionInProgress(false);
     setSubmitted(true);
     if (apiResponse.status === 'waitlisted') {
+      betaLog('WAITLISTED', { classId: formData.classId, dogName: formData.dogName });
       setClassWaitListed(true);
     }
-    // Simulate form submission
+    // Redirect after success message
     setTimeout(() => {
+      betaLog('REDIRECT_TO_CLASSES', { outcome: apiResponse.status === 'waitlisted' ? 'waitlisted' : 'enrolled' });
       navigate('/classes');
     }, 3000);
   };

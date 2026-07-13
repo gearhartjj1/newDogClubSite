@@ -4,6 +4,17 @@ import emailServiceResend from '../config/emailServiceResend.js';
 
 const router = express.Router();
 
+// Beta testing logger – structured JSON for easy searching
+const betaLog = (action: string, details?: Record<string, unknown>) => {
+  const entry = {
+    timestamp: new Date().toISOString(),
+    route: 'dogClasses',
+    action,
+    ...details,
+  };
+  console.log(`[BETA][dogClasses] ${action}`, JSON.stringify(entry));
+};
+
 const getCurrentSession = async (): Promise<{ session: string; code: string, startDate: string }> => {
   try {
     //The session being opened is controlled in the Code value and the session start date is in the Class value
@@ -20,11 +31,14 @@ const getCurrentSession = async (): Promise<{ session: string; code: string, sta
 // Get all dog classes
 router.get('/', async (req: Request, res: Response) => {
   try {
+    betaLog('GET_ALL_CLASSES_START');
     const currentSession = await getCurrentSession();
     const query = 'SELECT c.*, COUNT(e.ID) AS DogsInClass FROM KCTCSession c LEFT JOIN Enrollment e ON c.ID = e.SID WHERE c.Session = ? GROUP BY c.ID, c.class ORDER BY c.class';
     const dogClasses = await pool.query(query, [currentSession.session]);
+    betaLog('GET_ALL_CLASSES_COMPLETE', { session: currentSession.session, resultCount: (dogClasses[0] as any[])?.length ?? 0 });
     res.json(dogClasses);
   } catch (error) {
+    betaLog('GET_ALL_CLASSES_ERROR', { error: String(error) });
     console.error('Error fetching dog classes: ', error);
     res.status(500).json({ error: 'Failed to fetch dog classes' });
   }
@@ -60,6 +74,7 @@ router.get('/user/:userId', async (req: Request, res: Response) => {
 
 // Create enrollment
 router.post('/', async (req: Request, res: Response) => {
+  const enrollStartTime = Date.now();
   try {
     // --- Input validation ---
     const classId = parseInt(req.body.classId, 10);
@@ -68,12 +83,29 @@ router.post('/', async (req: Request, res: Response) => {
     const dogName = typeof req.body.dogName === 'string' ? req.body.dogName.trim() : '';
     const dogBreed = typeof req.body.dogBreed === 'string' ? req.body.dogBreed.trim() : '';
 
+    betaLog('ENROLLMENT_REQUEST', {
+      classId,
+      userId,
+      paymentMethod,
+      dogName,
+      dogBreed,
+      dogAge: req.body.dogAge,
+      firstName: req.body.firstName,
+      lastName: req.body.lastName,
+      email: req.body.email,
+      dogClassName: req.body.dogClassName,
+      dogClassCode: req.body.dogClassCode,
+      ip: req.ip,
+    });
+
     if (isNaN(classId) || isNaN(userId) || isNaN(paymentMethod)) {
+      betaLog('ENROLLMENT_VALIDATION_FAIL', { reason: 'invalid_numbers', classId: req.body.classId, userId: req.body.userId, paymentMethod: req.body.paymentMethod });
       res.status(400).json({ error: 'classId, userId, and paymentMethod must be valid numbers' });
       return;
     }
 
     if (!dogName) {
+      betaLog('ENROLLMENT_VALIDATION_FAIL', { reason: 'missing_dogName', userId });
       res.status(400).json({ error: 'dogName is required' });
       return;
     }
@@ -85,6 +117,15 @@ router.post('/', async (req: Request, res: Response) => {
     const maxDogs = (dogsInClassResult[0] as any)[0].MaxDog;
     const spotsOpen = dogsInClassCount < maxDogs;
     const forcedWaitlist = paymentMethod !== 7 && !spotsOpen;
+
+    betaLog('ENROLLMENT_CAPACITY_CHECK', {
+      classId,
+      dogsInClassCount,
+      maxDogs,
+      spotsOpen,
+      forcedWaitlist,
+      requestedPaymentMethod: paymentMethod,
+    });
 
     // Extract numeric value from dogAge (e.g. "5 years" -> 5)
     let parsedDogAge: number | null = null;
@@ -103,6 +144,18 @@ router.post('/', async (req: Request, res: Response) => {
     const effectivePaymentMethod = spotsOpen ? paymentMethod : 7;
     const newQuery = 'INSERT INTO Enrollment VALUES (?, ?, ?, \'Y\', \'Y\', ?, ?, ?, ?, \'Y\', \'None\', \'internet - new site\', ?)';
     const response = await pool.query(newQuery, [newIdValue, userId, classId, effectivePaymentMethod, dogName, parsedDogAge, dogBreed, enrollmentDate]);
+
+    betaLog('ENROLLMENT_DB_INSERT', {
+      enrollmentId: newIdValue,
+      classId,
+      userId,
+      effectivePaymentMethod,
+      dogName,
+      dogBreed,
+      parsedDogAge,
+      spotsOpen,
+      forcedWaitlist,
+    });
 
     //if class is sign up succeeds then send confirmation email
     //TODO: Should also figure out the email info for the club email or make a custom one
@@ -193,15 +246,22 @@ router.post('/', async (req: Request, res: Response) => {
         </div>`;
     }
     await emailServiceResend.sendEmail(req.body.email, 'KEYSTONE CANINE TRAINING CLUB CLASS ENROLLMENT', emailHtml);
+    betaLog('ENROLLMENT_EMAIL_SENT', { email: req.body.email, spotsOpen, enrollmentId: newIdValue });
+
+    const durationMs = Date.now() - enrollStartTime;
     if (spotsOpen) {
+      betaLog('ENROLLMENT_SUCCESS', { enrollmentId: newIdValue, classId, userId, dogName, durationMs });
       res.status(201).json({
         message: 'Event created - connect to database',
         status: 'ready'
       });
     } else {
+      betaLog('ENROLLMENT_WAITLISTED', { enrollmentId: newIdValue, classId, userId, dogName, forcedWaitlist, durationMs });
       res.status(400).json({ error: 'No spots available in the class', status: 'waitlisted' });
     }
   } catch (error) {
+    const durationMs = Date.now() - enrollStartTime;
+    betaLog('ENROLLMENT_ERROR', { error: String(error), body: req.body, durationMs });
     console.error('Error creating event: ', error);
     res.status(500).json({ error: 'Failed to create event' });
   }
