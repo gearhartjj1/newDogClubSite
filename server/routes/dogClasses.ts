@@ -98,8 +98,11 @@ router.post('/', async (req: Request, res: Response) => {
       ip: req.ip,
     });
 
+    //this is the issue, if you don't sign in you won't have a user id and this fix returns an error
+    //So the issue is that non-members have a generic entry created to track them even if they don't create an account
+    //I really don't like that, but I probably need to do that because I assume that ties down with enrollment lists and payments
     if (isNaN(classId) || isNaN(userId) || isNaN(paymentMethod)) {
-      betaLog('ENROLLMENT_VALIDATION_FAIL', { reason: 'invalid_numbers', classId: req.body.classId, userId: req.body.userId, paymentMethod: req.body.paymentMethod });
+      betaLog('ENROLLMENT_VALIDATION_FAIL', { reason:  'invalid_numbers', classId: req.body.classId, userId: req.body.userId, paymentMethod: req.body.paymentMethod });
       res.status(400).json({ error: 'classId, userId, and paymentMethod must be valid numbers' });
       return;
     }
@@ -142,7 +145,10 @@ router.post('/', async (req: Request, res: Response) => {
     const enrollmentDate = new Date().toISOString().slice(0, 19).replace('T', ' ');
 
     const effectivePaymentMethod = spotsOpen ? paymentMethod : 7;
-    const newQuery = 'INSERT INTO Enrollment VALUES (?, ?, ?, \'Y\', \'Y\', ?, ?, ?, ?, \'Y\', \'None\', \'internet - new site\', ?)';
+    //Todo: the memberYN value needs to be 1 if member and 0 if not, not Y or N
+    //Todo: the PaidYN needs to be updated to be 1 if paid and 0 if not, not Y or N
+    //select t.FirstName, t.LastName, e.* from  enrollment e join teacher t on e.PID = t.family where e.HeardAboutFrom = "internet - new site"
+    const newQuery = 'INSERT INTO Enrollment VALUES (?, ?, ?, \'1\', \'Y\', ?, ?, ?, ?, \'Y\', \'None\', \'internet - new site\', ?)';
     const response = await pool.query(newQuery, [newIdValue, userId, classId, effectivePaymentMethod, dogName, parsedDogAge, dogBreed, enrollmentDate]);
 
     betaLog('ENROLLMENT_DB_INSERT', {
