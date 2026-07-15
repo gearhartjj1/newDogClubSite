@@ -107,6 +107,7 @@ router.post('/', async (req: Request, res: Response) => {
       return;
     }
 
+    //ToDo: when the api returns 400 the UI should show an error and not success
     if (!dogName) {
       betaLog('ENROLLMENT_VALIDATION_FAIL', { reason: 'missing_dogName', userId });
       res.status(400).json({ error: 'dogName is required' });
@@ -165,6 +166,15 @@ router.post('/', async (req: Request, res: Response) => {
 
     //if class is sign up succeeds then send confirmation email
     //TODO: Should also figure out the email info for the club email or make a custom one
+    const paymentMethodNames: { [key: number]: string } = {
+      1: 'PayPal',
+      2: 'Cash',
+      3: 'Check',
+      4: 'Instructor Perk',
+      7: 'Waitlist',
+    };
+    const paymentMethodDisplay = paymentMethodNames[effectivePaymentMethod] || `Unknown (${effectivePaymentMethod})`;
+
     let emailHtml = "";
     if (spotsOpen) {
       emailHtml = `
@@ -207,7 +217,7 @@ router.post('/', async (req: Request, res: Response) => {
             </tr>
             <tr>
               <td style="padding: 8px 12px; font-weight: bold; border: 1px solid #dee2e6;">Payment Method</td>
-              <td style="padding: 8px 12px; border: 1px solid #dee2e6;">${req.body.paymentMethod}</td>
+              <td style="padding: 8px 12px; border: 1px solid #dee2e6;">${paymentMethodDisplay}</td>
             </tr>
             <tr style="background-color: #f8f9fa;">
               <td style="padding: 8px 12px; font-weight: bold; border: 1px solid #dee2e6;">Class Name</td>
