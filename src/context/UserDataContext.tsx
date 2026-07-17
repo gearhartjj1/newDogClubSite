@@ -13,6 +13,7 @@ export interface PastClass {
   className: string;
   instructor: string;
   completedDate: string;
+  dogName: string;
 }
 
 export interface UserInfo {

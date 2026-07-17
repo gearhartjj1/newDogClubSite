@@ -23,6 +23,7 @@ export interface DogClass {
   Start: string, //TODO: should be a Date but the data looks sketchy
   Time: string //TODO: should be a Time but the data looks sketchy
   DogsInClass: number;
+  DogName: string;
   }
 
 // Dog Classes API

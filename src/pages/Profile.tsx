@@ -61,7 +61,9 @@ export default function Profile() {
             className: cls.Class,
             instructor: cls.Instructors || 'N/A',
             completedDate: cls.Start + ' ' + (cls.Session ? cls.Session.split('-')[0] : ''),
-          })));
+            classDate: new Date(cls.Start + ' ' + (cls.Session ? cls.Session.split('-')[0] : '')),
+            dogName: cls.DogName || 'N/A',
+          })).sort((a, b) => b.classDate.getTime() - a.classDate.getTime())); // Sort by most recent
         }
       } catch (error) {
         console.error('Error fetching user classes:', error);
@@ -292,7 +294,8 @@ export default function Profile() {
                   <div className={styles.classInfo}>
                     <h3>📚 {cls.className}</h3>
                     <p><strong>Instructor:</strong> {cls.instructor}</p>
-                    <p><strong>Completed:</strong> {cls.completedDate}</p>
+                    <p><strong>Class start date:</strong> {cls.completedDate}</p>
+                    <p><strong>Dog name:</strong> {cls.dogName}</p>
                   </div>
                 </div>
               ))
