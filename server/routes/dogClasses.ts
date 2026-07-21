@@ -63,7 +63,7 @@ router.get('/session-status', async (req: Request, res: Response) => {
 router.get('/user/:userId', async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
-    const query = `SELECT c.*, e.DogName FROM KCTCSession c INNER JOIN Enrollment e ON c.ID = e.SID WHERE e.PID = ? and e.paymethod != 7 and e.paymethod != 9`;
+    const query = `SELECT c.*, e.DogName, e.ID AS EnrollmentID, e.PayMethod, e.PaidYN, e.DogBreed, e.DogAge FROM KCTCSession c INNER JOIN Enrollment e ON c.ID = e.SID WHERE e.PID = ? and e.paymethod != 7 and e.paymethod != 9`;
     const dogClasses = await pool.query(query, [userId]);
     res.json(dogClasses);
   } catch (error) {

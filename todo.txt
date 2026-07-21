@@ -43,6 +43,9 @@ Signing up for classes
     - Get paypal integratoion working
 
 
+SELECT c.*, e.* FROM KCTCSession c INNER JOIN Enrollment e ON c.ID = e.SID WHERE e.PID = 1742 and e.paymethod != 7 and e.paymethod != 9 and c.Session = "2026-IV" GROUP BY c.ID, c.class ORDER BY c.class
+SELECT c.*, e.* FROM KCTCSession c INNER JOIN Enrollment e ON c.ID = e.SID WHERE e.PID = 1742 and e.paymethod != 7 and e.paymethod != 9 and e.ID = 12767 GROUP BY c.ID, c.class ORDER BY c.class
+
 Security
 - It is bad
 - Plain text passwords?

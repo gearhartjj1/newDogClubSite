@@ -17,6 +17,7 @@ export default function Profile() {
 
   const [dogs, setDogs] = useState<Dog[]>([]);
   const [pastClasses, setPastClasses] = useState<PastClass[]>([]);
+  const [selectedClass, setSelectedClass] = useState<PastClass | null>(null);
 
   // there is a bu here where on refresh the userData is not loaded causing this to go to the login page
   // Redirect to login if not authenticated
@@ -56,6 +57,15 @@ export default function Profile() {
       try {
         if (userData?.id) {
           const response = await dogClassAPI.getByUserId(userData.id);
+
+          const paymentMethodNames: { [key: number]: string } = {
+            1: 'PayPal',
+            2: 'Cash',
+            3: 'Check',
+            4: 'Instructor Perk',
+            7: 'Waitlist',
+          };
+
           setPastClasses(response.map(cls => ({
             id: cls.ID,
             className: cls.Class,
@@ -63,6 +73,16 @@ export default function Profile() {
             completedDate: cls.Start + ' ' + (cls.Session ? cls.Session.split('-')[0] : ''),
             classDate: new Date(cls.Start + ' ' + (cls.Session ? cls.Session.split('-')[0] : '')),
             dogName: cls.DogName || 'N/A',
+            enrollmentId: (cls as any).EnrollmentID,
+            sessionId: cls.ID,
+            paymentMethod: paymentMethodNames[(cls as any).PayMethod] || `Unknown (${(cls as any).PayMethod})`,
+            paidStatus: (cls as any).PaidYN === '1' || (cls as any).PaidYN === 'Y' ? 'Paid' : 'Unpaid',
+            dogBreed: (cls as any).DogBreed || 'N/A',
+            dogAge: (cls as any).DogAge != null ? String((cls as any).DogAge) : 'N/A',
+            session: cls.Session || 'N/A',
+            day: (cls as any).Day || 'N/A',
+            time: (cls as any).Time || 'N/A',
+            room: (cls as any).Room || 'N/A',
           })).sort((a, b) => b.classDate.getTime() - a.classDate.getTime())); // Sort by most recent
         }
       } catch (error) {
@@ -290,19 +310,91 @@ export default function Profile() {
               <p className={styles.emptyState}>No classes completed yet.</p>
             ) : (
               pastClasses.map((cls) => (
-                <div key={cls.id} className={styles.classCard}>
+                <div key={cls.enrollmentId} className={styles.classCard}>
                   <div className={styles.classInfo}>
                     <h3>📚 {cls.className}</h3>
                     <p><strong>Instructor:</strong> {cls.instructor}</p>
                     <p><strong>Class start date:</strong> {cls.completedDate}</p>
                     <p><strong>Dog name:</strong> {cls.dogName}</p>
                   </div>
+                  <button
+                    className={styles.expandButton}
+                    onClick={() => setSelectedClass(cls)}
+                  >
+                    View Details
+                  </button>
                 </div>
               ))
             )}
           </div>
         </section>
       </div>
+
+      {/* Class Details Modal */}
+      {selectedClass && (
+        <div className={styles.modalOverlay} onClick={() => setSelectedClass(null)}>
+          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.modalHeader}>
+              <h2>📚 {selectedClass.className}</h2>
+              <button className={styles.modalClose} onClick={() => setSelectedClass(null)}>✕</button>
+            </div>
+            <div className={styles.modalBody}>
+              <div className={styles.modalGrid}>
+                <div className={styles.modalItem}>
+                  <label>Session</label>
+                  <p>{selectedClass.session}</p>
+                </div>
+                <div className={styles.modalItem}>
+                  <label>Session ID</label>
+                  <p>{selectedClass.sessionId}</p>
+                </div>
+                <div className={styles.modalItem}>
+                  <label>Enrollment ID</label>
+                  <p>{selectedClass.enrollmentId}</p>
+                </div>
+                <div className={styles.modalItem}>
+                  <label>Class Start Date</label>
+                  <p>{selectedClass.completedDate}</p>
+                </div>
+                <div className={styles.modalItem}>
+                  <label>Day &amp; Time</label>
+                  <p>{selectedClass.day} at {selectedClass.time}</p>
+                </div>
+                <div className={styles.modalItem}>
+                  <label>Room</label>
+                  <p>{selectedClass.room}</p>
+                </div>
+                <div className={styles.modalItem}>
+                  <label>Instructor</label>
+                  <p>{selectedClass.instructor}</p>
+                </div>
+                <div className={styles.modalItem}>
+                  <label>Dog Name</label>
+                  <p>{selectedClass.dogName}</p>
+                </div>
+                <div className={styles.modalItem}>
+                  <label>Dog Breed</label>
+                  <p>{selectedClass.dogBreed}</p>
+                </div>
+                <div className={styles.modalItem}>
+                  <label>Dog Age</label>
+                  <p>{selectedClass.dogAge}</p>
+                </div>
+                <div className={styles.modalItem}>
+                  <label>Payment Method</label>
+                  <p>{selectedClass.paymentMethod}</p>
+                </div>
+                <div className={styles.modalItem}>
+                  <label>Payment Status</label>
+                  <p className={selectedClass.paidStatus === 'Paid' ? styles.statusPaid : styles.statusUnpaid}>
+                    {selectedClass.paidStatus}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

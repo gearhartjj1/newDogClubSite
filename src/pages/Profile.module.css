@@ -255,6 +255,9 @@
 }
 
 .classCard {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   padding: 20px;
   background-color: #f9f9f9;
   border: 1px solid #eee;
@@ -272,6 +275,121 @@
   margin: 5px 0;
   color: #666;
   font-size: 14px;
+}
+
+.expandButton {
+  padding: 8px 16px;
+  background-color: #0d9488;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  white-space: nowrap;
+}
+
+.expandButton:hover {
+  background-color: #0f766e;
+}
+
+/* Class Details Modal */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modalContent {
+  background: white;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 600px;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 2px solid #0d9488;
+}
+
+.modalHeader h2 {
+  margin: 0;
+  font-size: 20px;
+  color: #333;
+  border: none;
+  padding: 0;
+}
+
+.modalClose {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: #666;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.modalClose:hover {
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+.modalBody {
+  padding: 24px;
+}
+
+.modalGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.modalItem {
+  padding: 12px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  border-left: 3px solid #0d9488;
+}
+
+.modalItem label {
+  display: block;
+  font-weight: 600;
+  color: #666;
+  font-size: 12px;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.modalItem p {
+  margin: 0;
+  color: #333;
+  font-size: 15px;
+}
+
+.statusPaid {
+  color: #2e7d32;
+  font-weight: 600;
+}
+
+.statusUnpaid {
+  color: #d32f2f;
+  font-weight: 600;
 }
 
 .emptyState {
@@ -316,5 +434,23 @@
 
   .formRow {
     grid-template-columns: 1fr;
+  }
+
+  .classCard {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+
+  .expandButton {
+    width: 100%;
+  }
+
+  .modalGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .modalContent {
+    width: 95%;
   }
 }

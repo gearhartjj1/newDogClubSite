@@ -14,6 +14,16 @@ export interface PastClass {
   instructor: string;
   completedDate: string;
   dogName: string;
+  enrollmentId: number;
+  sessionId: number;
+  paymentMethod: string;
+  paidStatus: string;
+  dogBreed: string;
+  dogAge: string;
+  session: string;
+  day: string;
+  time: string;
+  room: string;
 }
 
 export interface UserInfo {
