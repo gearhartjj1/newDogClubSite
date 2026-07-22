@@ -335,59 +335,30 @@ export default function Profile() {
         <div className={styles.modalOverlay} onClick={() => setSelectedClass(null)}>
           <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
             <div className={styles.modalHeader}>
-              <h2>📚 {selectedClass.className}</h2>
+              <h2>📚 {selectedClass.className} | Invoice #: {selectedClass.enrollmentId} | Account # {userData.id}</h2>
               <button className={styles.modalClose} onClick={() => setSelectedClass(null)}>✕</button>
             </div>
             <div className={styles.modalBody}>
               <div className={styles.modalGrid}>
                 <div className={styles.modalItem}>
-                  <label>Session</label>
-                  <p>{selectedClass.session}</p>
+                  <label>User Info</label>
+                  <p>{userData.userInfo?.name}</p>
+                  <p>{userData.userInfo?.email}</p>
+                  <p>{userData.userInfo?.phone}</p>
                 </div>
                 <div className={styles.modalItem}>
-                  <label>Session ID</label>
-                  <p>{selectedClass.sessionId}</p>
+                  <label>Class Date Info</label>
+                  <p>{selectedClass.session} | {selectedClass.room} | classCode | {selectedClass.className} | {selectedClass.completedDate} | {selectedClass.time} | {selectedClass.instructor}</p>
                 </div>
                 <div className={styles.modalItem}>
-                  <label>Enrollment ID</label>
-                  <p>{selectedClass.enrollmentId}</p>
+                  <label>Dog Info</label>
+                  <p>Dog Name: {selectedClass.dogName} | Age: {selectedClass.dogAge} | Breed: {selectedClass.dogBreed}</p>
                 </div>
                 <div className={styles.modalItem}>
-                  <label>Class Start Date</label>
-                  <p>{selectedClass.completedDate}</p>
-                </div>
-                <div className={styles.modalItem}>
-                  <label>Day &amp; Time</label>
-                  <p>{selectedClass.day} at {selectedClass.time}</p>
-                </div>
-                <div className={styles.modalItem}>
-                  <label>Room</label>
-                  <p>{selectedClass.room}</p>
-                </div>
-                <div className={styles.modalItem}>
-                  <label>Instructor</label>
-                  <p>{selectedClass.instructor}</p>
-                </div>
-                <div className={styles.modalItem}>
-                  <label>Dog Name</label>
-                  <p>{selectedClass.dogName}</p>
-                </div>
-                <div className={styles.modalItem}>
-                  <label>Dog Breed</label>
-                  <p>{selectedClass.dogBreed}</p>
-                </div>
-                <div className={styles.modalItem}>
-                  <label>Dog Age</label>
-                  <p>{selectedClass.dogAge}</p>
-                </div>
-                <div className={styles.modalItem}>
-                  <label>Payment Method</label>
-                  <p>{selectedClass.paymentMethod}</p>
-                </div>
-                <div className={styles.modalItem}>
-                  <label>Payment Status</label>
+                  <label>Payment Info</label>
+                  <p>Method: {selectedClass.paymentMethod}</p>
                   <p className={selectedClass.paidStatus === 'Paid' ? styles.statusPaid : styles.statusUnpaid}>
-                    {selectedClass.paidStatus}
+                    Status: {selectedClass.paidStatus}
                   </p>
                 </div>
               </div>
