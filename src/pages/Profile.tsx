@@ -342,9 +342,7 @@ export default function Profile() {
               <div className={styles.modalGrid}>
                 <div className={styles.modalItem}>
                   <label>User Info</label>
-                  <p>{userData.userInfo?.name}</p>
-                  <p>{userData.userInfo?.email}</p>
-                  <p>{userData.userInfo?.phone}</p>
+                  <p>{userData.userInfo?.name} | {userData.userInfo?.email} | {userData.userInfo?.phone}</p>
                 </div>
                 <div className={styles.modalItem}>
                   <label>Class Date Info</label>
