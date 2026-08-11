@@ -359,7 +359,10 @@ export default function Profile() {
                   </div>
                   <button
                     className={styles.expandButton}
-                    onClick={() => setSelectedClass(cls)}
+                    onClick={() => {
+                      setSelectedClass(cls);
+                      navigate('/profile/' + cls.enrollmentId, { replace: true });
+                    }}
                   >
                     View Details
                   </button>
@@ -406,7 +409,9 @@ export default function Profile() {
                     </div>
                     {selectedClass.paidStatus !== 'Paid' && (
                       <div style={{ marginLeft: 'auto', minWidth: '300px', textAlign: 'right' }}>
-                        <PayPalSection price={selectedClass.cost} enrollmentId={selectedClass.enrollmentId} onSuccess={()=>{console.log("success")}} onError={()=>{console.log("error")}} />
+                        <PayPalSection price={selectedClass.cost} enrollmentId={selectedClass.enrollmentId} onSuccess={()=>{
+                          window.location.reload();
+                        }} onError={()=>{console.log("error")}} />
                       </div>
                     )}
                   </div>
