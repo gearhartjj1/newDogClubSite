@@ -29,10 +29,11 @@ export default function PayPalSection(payPaylButtonProps: PayPalButtonProps ) {
 // add logic to have an onComplete function where the database should update that the class is paid
 // add logic to make ui refresh after payment completes
 function PayPalButtonsUI({ price, enrollmentId, onSuccess, onError }: PayPalButtonProps) {
-    const [{ options, isPending }, dispatch] = usePayPalScriptReducer();
+    const [{ isPending }] = usePayPalScriptReducer();
 
     //should use the cost of the class based on if the user is a member or not
     const onCreateOrder = useCallback((data: any, actions: any) => {
+        console.log('order data:', data);
         return actions.order.create({
             purchase_units: [
                 {
@@ -46,6 +47,7 @@ function PayPalButtonsUI({ price, enrollmentId, onSuccess, onError }: PayPalButt
 
     //todo: this function is called when payment is completed by user. This is where we should update our database
     const onApproveOrder = useCallback((data: any, actions: any) => {
+        console.log('approve data:', data);
         return actions.order.capture().then((details: any) => {
             const name = details.payer.name.given_name;
             //TODO: add the enrollment id to this component
