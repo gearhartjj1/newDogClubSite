@@ -7,6 +7,13 @@ const fetchOptions: RequestInit = {
   credentials: 'include',
 };
 
+export interface ClassRate {
+  Id: number;
+  MemberRate: string;
+  NonMemberRate: string;
+  Name: string;
+}
+
 export interface DogClass {
   Class: string,
   ClassCode: string,
@@ -63,8 +70,44 @@ export const dogClassAPI = {
     const response = await fetch(`${API_URL}/dog-classes/session-status`, fetchOptions);
     if (!response.ok) throw new Error('Failed to fetch session status');
     return response.json();
+  },
+
+  getClassRates: async () => {
+    const response = await fetch(`${API_URL}/dog-classes/rates`, fetchOptions);
+    if (!response.ok) throw new Error('Failed to fetch class rates');
+    const data = await response.json();
+    const formattedData: ClassRate[] = data[0].map((rate: any) => ({
+      Id: rate.Id,
+      MemberRate: rate.Member,
+      NonMemberRate: rate['Non-Member'],
+      Name: rate.Name,
+    } as ClassRate));
+    return formattedData;
   }
 };
+
+export const paymentsAPI = {
+  getAll: async () => {
+    const response = await fetch(`${API_URL}/payments`, fetchOptions);
+    if (!response.ok) throw new Error('Failed to fetch payments');
+    return response.json();
+  },
+
+  getByUserId: async (userId: number) => {
+    const response = await fetch(`${API_URL}/payments/user/${userId}`, fetchOptions);
+    if (!response.ok) throw new Error('Failed to fetch payments for user');
+    return response.json();
+  },
+  create: async (paymentData: any) => {
+    const response = await fetch(`${API_URL}/payments`, {
+      ...fetchOptions,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(paymentData),
+    });
+    return response.json();
+  }
+}
 
 // Classes API
 export const classesAPI = {

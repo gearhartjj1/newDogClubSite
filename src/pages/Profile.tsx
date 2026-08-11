@@ -1,12 +1,14 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import styles from './Profile.module.css';
 import { useUserData, type Dog, type PastClass, type UserInfo } from '../context/UserDataContext';
-import { dogClassAPI, memberDogsAPI, signinAPI } from '../services/api';
+import { dogClassAPI, memberDogsAPI, signinAPI, type ClassRate } from '../services/api';
+import PayPalSection from '../components/PayPalButton';
 
 export default function Profile() {
+  const { classId } = useParams();
   const navigate = useNavigate();
-  const { userData, setUserData } = useUserData();
+  const { userData, isLoading, setUserData } = useUserData();
 
   const [showAddDog, setShowAddDog] = useState(false);
   const [newDogForm, setNewDogForm] = useState({
@@ -17,15 +19,42 @@ export default function Profile() {
 
   const [dogs, setDogs] = useState<Dog[]>([]);
   const [pastClasses, setPastClasses] = useState<PastClass[]>([]);
+  const [showUnpaidClasses, setShowUnpaidClasses] = useState(false);
   const [selectedClass, setSelectedClass] = useState<PastClass | null>(null);
+  const [classRates, setClassRates] = useState<ClassRate[]>([]);
 
-  // there is a bu here where on refresh the userData is not loaded causing this to go to the login page
+  useEffect(() => {
+    if (classId && pastClasses) {
+      const classIdNumber: number = Number(classId);
+      if (classIdNumber) {
+        const passedInSelectedClass = pastClasses.find((cls)=>{return cls.enrollmentId==classIdNumber});
+        if (passedInSelectedClass) {
+          setSelectedClass(passedInSelectedClass);
+        }
+      }
+    }
+  }, [classId, pastClasses]);
+
+  // Fetch class rates on component load
+  useEffect(() => {
+    const fetchClassRates = async () => {
+      try {
+        const rates = await dogClassAPI.getClassRates();
+        setClassRates(rates);
+      } catch (error) {
+        console.error('Error fetching class rates:', error);
+      }
+    };
+
+    fetchClassRates();
+  }, []);
+
   // Redirect to login if not authenticated
   useEffect(() => {
-    if (!userData) {
-      navigate('/login');
+    if (!isLoading && !userData) {
+      navigate('/login' + (classId ? '/' + classId : ''));
     }
-  }, [userData, navigate]);
+  }, [isLoading, classId, userData, navigate]);
 
   // Fetch user's dogs from database on component load
   useEffect(() => {
@@ -53,6 +82,8 @@ export default function Profile() {
 
   // Fetch user's enrolled classes on component load
   useEffect(() => {
+    if (!classRates.length) return; // Wait until class rates are fetched
+
     const fetchUserClasses = async () => {
       try {
         if (userData?.id) {
@@ -66,24 +97,32 @@ export default function Profile() {
             7: 'Waitlist',
           };
 
-          setPastClasses(response.map(cls => ({
-            id: cls.ID,
-            className: cls.Class,
-            instructor: cls.Instructors || 'N/A',
-            completedDate: cls.Start + ' ' + (cls.Session ? cls.Session.split('-')[0] : ''),
-            classDate: new Date(cls.Start + ' ' + (cls.Session ? cls.Session.split('-')[0] : '')),
-            dogName: cls.DogName || 'N/A',
-            enrollmentId: (cls as any).EnrollmentID,
-            sessionId: cls.ID,
-            paymentMethod: paymentMethodNames[(cls as any).PayMethod] || `Unknown (${(cls as any).PayMethod})`,
-            paidStatus: (cls as any).PaidYN === '1' || (cls as any).PaidYN === 'Y' ? 'Paid' : 'Unpaid',
-            dogBreed: (cls as any).DogBreed || 'N/A',
-            dogAge: (cls as any).DogAge != null ? String((cls as any).DogAge) : 'N/A',
-            session: cls.Session || 'N/A',
-            day: (cls as any).Day || 'N/A',
-            time: (cls as any).Time || 'N/A',
-            room: (cls as any).Room || 'N/A',
-          })).sort((a, b) => b.classDate.getTime() - a.classDate.getTime())); // Sort by most recent
+          const pastClasses = response.map((cls)=>{
+            const classRate = classRates.find(rate => rate.Id == cls.Rate);
+            const signedUpAsMember = (cls as any).MemberYN === '1' || (cls as any).MemberYN === 'Y';
+            const classPrice = classRate ? (signedUpAsMember ? classRate.MemberRate : classRate.NonMemberRate) : '100.00'; // Default to 100.00 if not found
+            //TODO: add more properties to the DogClass interface instead of hacking this with any types
+            return {
+              id: cls.ID,
+              className: cls.Class,
+              instructor: cls.Instructors || 'N/A',
+              completedDate: cls.Start + ' ' + (cls.Session ? cls.Session.split('-')[0] : ''),
+              classDate: new Date(cls.Start + ' ' + (cls.Session ? cls.Session.split('-')[0] : '')),
+              dogName: cls.DogName || 'N/A',
+              enrollmentId: (cls as any).EnrollmentID,
+              sessionId: cls.ID,
+              paymentMethod: paymentMethodNames[(cls as any).PayMethod] || `Unknown (${(cls as any).PayMethod})`,
+              paidStatus: (cls as any).PaidYN === '1' || (cls as any).PaidYN === 'Y' ? 'Paid' : 'Unpaid',
+              dogBreed: (cls as any).DogBreed || 'N/A',
+              dogAge: (cls as any).DogAge != null ? String((cls as any).DogAge) : 'N/A',
+              session: cls.Session || 'N/A',
+              day: (cls as any).Day || 'N/A',
+              time: (cls as any).Time || 'N/A',
+              room: (cls as any).Room || 'N/A',
+              cost: classPrice
+            }
+          }).sort((a, b) => b.classDate.getTime() - a.classDate.getTime()); // Sort by most recent
+          setPastClasses(pastClasses)
         }
       } catch (error) {
         console.error('Error fetching user classes:', error);
@@ -91,7 +130,7 @@ export default function Profile() {
     };
 
     fetchUserClasses();
-  }, [userData?.id]);
+  }, [userData?.id, classRates]);
 
   // Don't render profile content if not authenticated
   if (!userData) {
@@ -304,18 +343,19 @@ export default function Profile() {
 
         {/* Past Classes Section */}
         <section className={styles.section}>
-          <h2>Class History</h2>
+          <h2 style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>Class History <button style={{ fontSize: '0.5em', padding: '0.25em 0.5em' }} onClick={() => setShowUnpaidClasses(!showUnpaidClasses)}>{showUnpaidClasses ? 'Show All Classes' : 'Show Unpaid Classes'}</button></h2>
           <div className={styles.classList}>
             {pastClasses.length === 0 ? (
               <p className={styles.emptyState}>No classes completed yet.</p>
             ) : (
-              pastClasses.map((cls) => (
+              pastClasses.filter(cls => showUnpaidClasses ? cls.paidStatus !== 'Paid' : true).map((cls) => (
                 <div key={cls.enrollmentId} className={styles.classCard}>
                   <div className={styles.classInfo}>
                     <h3>📚 {cls.className}</h3>
                     <p><strong>Instructor:</strong> {cls.instructor}</p>
                     <p><strong>Class start date:</strong> {cls.completedDate}</p>
                     <p><strong>Dog name:</strong> {cls.dogName}</p>
+                    <p><strong>Payment status:</strong> <span style={{ color: cls.paidStatus === 'Paid' ? 'green' : 'red' }}>{cls.paidStatus} ${cls.cost}</span></p>
                   </div>
                   <button
                     className={styles.expandButton}
@@ -354,10 +394,22 @@ export default function Profile() {
                 </div>
                 <div className={styles.modalItem}>
                   <label>Payment Info</label>
-                  <p>Method: {selectedClass.paymentMethod}</p>
-                  <p className={selectedClass.paidStatus === 'Paid' ? styles.statusPaid : styles.statusUnpaid}>
-                    Status: {selectedClass.paidStatus}
-                  </p>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', width: '100%' }}>
+                    <div style={{ whiteSpace: 'nowrap' }}>
+                      <span>Method: {selectedClass.paymentMethod}</span>
+                      <span style={{ marginLeft: '1rem' }} className={selectedClass.paidStatus === 'Paid' ? styles.statusPaid : styles.statusUnpaid}>
+                        Status: {selectedClass.paidStatus}
+                      </span>
+                      <span style={{ marginLeft: '1rem' }} className={selectedClass.paidStatus === 'Paid' ? styles.statusPaid : styles.statusUnpaid}>
+                        Cost: ${selectedClass.cost}
+                      </span>
+                    </div>
+                    {selectedClass.paidStatus !== 'Paid' && (
+                      <div style={{ marginLeft: 'auto', minWidth: '300px', textAlign: 'right' }}>
+                        <PayPalSection price={selectedClass.cost} enrollmentId={selectedClass.enrollmentId} onSuccess={()=>{console.log("success")}} onError={()=>{console.log("error")}} />
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>

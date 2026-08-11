@@ -17,6 +17,7 @@ process.on('unhandledRejection', (reason, promise) => {
 
 // Import routes
 import dogClassesRouter from './routes/dogClasses.js';
+import paymentsRouter from './routes/payments.js';
 import classesRouter from './routes/classes.js';
 import signupsRouter from './routes/signups.js';
 import signinRouter from './routes/signin.js';
@@ -102,6 +103,7 @@ app.get('/api/health', (req, res) => {
 
 // API Routes
 app.use('/api/dog-classes', dogClassesRouter);
+app.use('/api/payments', paymentsRouter);
 app.use('/api/classes', classesRouter);
 app.use('/api/signups', signupsRouter);
 app.use('/api/signin', signinRouter);

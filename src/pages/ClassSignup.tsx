@@ -443,7 +443,7 @@ export default function ClassSignup() {
               required
             >
               {!isWaitlist && <option value="">- Choose a payment method -</option>}
-              {/* {!isWaitlist && <option value="PayPal">PayPal</option>} */}
+              {!isWaitlist && <option value="PayPal">PayPal</option>}
               {!isWaitlist && <option value="Cash">Cash</option>}
               {!isWaitlist && <option value="Check">Check</option>}
               {!isWaitlist && <option value="Instructor Perk">Instructor Perk</option>}

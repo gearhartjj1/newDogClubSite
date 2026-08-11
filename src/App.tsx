@@ -32,7 +32,9 @@ function App() {
               <Route path="/classes" element={<Classes />} />
               <Route path="/signup" element={<ClassSignup />} />
               <Route path="/login" element={<Login />} />
+              <Route path="/login/:classId" element={<Login />} />
               <Route path="/profile" element={<Profile />} />
+              <Route path="/profile/:classId" element={<Profile />} />
               <Route path="/building-usage" element={<BuildingUsage />} />
               <Route path="/class-prices" element={<ClassPrices />} />
               <Route path="/contact" element={<ContactUs />} />

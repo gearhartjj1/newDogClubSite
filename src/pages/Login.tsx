@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useState } from 'react';
 import styles from './Login.module.css';
 import { signinAPI } from '../services/api';
@@ -6,6 +6,7 @@ import { useUserData, type UserData } from '../context/UserDataContext';
 
 export default function Login() {
   const navigate = useNavigate();
+  const { classId } = useParams();
   const { setUserData } = useUserData();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -41,7 +42,7 @@ export default function Login() {
           }
         }
         setUserData(userData);
-        navigate('/profile');
+        navigate('/profile' + (classId ? '/' + classId : '')); // Redirect to profile or specific class if classId is present
       }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Sign in failed';

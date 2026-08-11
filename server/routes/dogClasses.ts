@@ -63,12 +63,24 @@ router.get('/session-status', async (req: Request, res: Response) => {
 router.get('/user/:userId', async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
-    const query = `SELECT c.*, e.DogName, e.ID AS EnrollmentID, e.PayMethod, e.PaidYN, e.DogBreed, e.DogAge FROM KCTCSession c INNER JOIN Enrollment e ON c.ID = e.SID WHERE e.PID = ? and e.paymethod != 7 and e.paymethod != 9`;
+    const query = `SELECT c.*, e.DogName, e.ID AS EnrollmentID, e.PayMethod, e.PaidYN, e.MemberYN, e.DogBreed, e.DogAge FROM KCTCSession c INNER JOIN Enrollment e ON c.ID = e.SID WHERE e.PID = ? and e.paymethod != 7 and e.paymethod != 9`;
     const dogClasses = await pool.query(query, [userId]);
     res.json(dogClasses);
   } catch (error) {
     console.error('Error fetching dog classes for user: ', error);
     res.status(500).json({ error: 'Failed to fetch dog classes for user' });
+  }
+});
+
+// Get class rate data
+router.get('/rates', async (req: Request, res: Response) => {
+  try {
+    const query = `SELECT * FROM rate`;
+    const classRates = await pool.query(query);
+    res.json(classRates);
+  } catch (error) {
+    console.error('Error fetching class rates: ', error);
+    res.status(500).json({ error: 'Failed to fetch class rates' });
   }
 });
 
@@ -146,10 +158,9 @@ router.post('/', async (req: Request, res: Response) => {
     const enrollmentDate = new Date().toISOString().slice(0, 19).replace('T', ' ');
 
     const effectivePaymentMethod = spotsOpen ? paymentMethod : 7;
-    //Todo: the memberYN value needs to be 1 if member and 0 if not, not Y or N
-    //Todo: the PaidYN needs to be updated to be 1 if paid and 0 if not, not Y or N
+    //Todo: the memberYN value needs to be 1 if member and 0 if not, not Y or N need to validate if someone is member
     //select t.FirstName, t.LastName, e.* from  enrollment e join teacher t on e.PID = t.family where e.HeardAboutFrom = "internet - new site"
-    const newQuery = 'INSERT INTO Enrollment VALUES (?, ?, ?, \'1\', \'Y\', ?, ?, ?, ?, \'Y\', \'None\', \'internet - new site\', ?)';
+    const newQuery = 'INSERT INTO Enrollment VALUES (?, ?, ?, \'1\', \'0\', ?, ?, ?, ?, \'Y\', \'None\', \'internet - new site\', ?)';
     const response = await pool.query(newQuery, [newIdValue, userId, classId, effectivePaymentMethod, dogName, parsedDogAge, dogBreed, enrollmentDate]);
 
     betaLog('ENROLLMENT_DB_INSERT', {
@@ -175,6 +186,9 @@ router.post('/', async (req: Request, res: Response) => {
     };
     const paymentMethodDisplay = paymentMethodNames[effectivePaymentMethod] || `Unknown (${effectivePaymentMethod})`;
 
+    const siteUrl = process.env.CORS_ORIGIN || (process.env.NODE_ENV === 'production' ? process.env.RAILWAY_PUBLIC_DOMAIN && `https://${process.env.RAILWAY_PUBLIC_DOMAIN}` : 'http://localhost:5173');
+    const paymentLink = `${siteUrl}/profile/${newIdValue}`;
+
     let emailHtml = "";
     if (spotsOpen) {
       emailHtml = `
@@ -185,7 +199,8 @@ router.post('/', async (req: Request, res: Response) => {
           <p>We have received your enrollment; the details are displayed below. Please review them.</p>
           <p>If any of this information is not correct, please reply to this message so that we can correct any problems.</p>
           <p>If we should find any issues with your enrollment, we will contact you. There is no need for you to contact us to confirm receipt of your enrollment.</p>
-          <p><strong>Unless you use PayPal, bring your payment (cash or check) to the first class and give it to your instructor.</strong></p>
+          ${effectivePaymentMethod !== 1 ? '<p><strong>Unless you use PayPal, bring your payment (cash or check) to the first class and give it to your instructor.</strong></p>' : ''}
+          ${effectivePaymentMethod == 1 ? `<p>To pay for the class through PayPal, please do so through your account: <a href="${paymentLink}" target="_blank">Pay now</a></p>` : ''}
           <p>Thank you for choosing Keystone Canine Training Club. We look forward to seeing you in class!</p>
           <p><em>If you are not a KCTC member, please bring a copy of your dog's up-to-date vaccine records and your signed Liability Waiver to your first class and give it to your instructor.</em></p>
           <hr style="border: 1px solid #3498db; margin: 20px 0;" />

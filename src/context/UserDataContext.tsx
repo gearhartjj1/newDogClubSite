@@ -24,6 +24,7 @@ export interface PastClass {
   day: string;
   time: string;
   room: string;
+  cost: string;
 }
 
 export interface UserInfo {
