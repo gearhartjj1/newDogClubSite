@@ -59,9 +59,13 @@ function PayPalButtonsUI({ price, enrollmentId, onSuccess, onError }: PayPalButt
             paymentsAPI.create(paymentInfo).then((response) => {
                 console.log('Payment record created:', response);
                 console.log(`Transaction completed by ${name}`);
-            });            
+                onSuccess(response);
+            }).catch((error) => {
+                console.error('Error creating payment record:', error);
+                onError(error);
+            });
         });
-    },[])
+    }, [onSuccess, onError, price, enrollmentId]);
 
     const showPaypal = false;
     return (

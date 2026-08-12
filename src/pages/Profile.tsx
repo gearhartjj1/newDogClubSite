@@ -379,7 +379,10 @@ export default function Profile() {
           <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
             <div className={styles.modalHeader}>
               <h2>📚 {selectedClass.className} | Invoice #: {selectedClass.enrollmentId} | Account # {userData.id}</h2>
-              <button className={styles.modalClose} onClick={() => setSelectedClass(null)}>✕</button>
+              <button className={styles.modalClose} onClick={() => {
+                  setSelectedClass(null);
+                  navigate('/profile', { replace: true });
+                }}>✕</button>
             </div>
             <div className={styles.modalBody}>
               <div className={styles.modalGrid}>
