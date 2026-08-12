@@ -449,6 +449,11 @@ export default function ClassSignup() {
               {!isWaitlist && <option value="Instructor Perk">Instructor Perk</option>}
               {isWaitlist && <option value="Waitlist">Waitlist</option>}
             </select>
+            {formData.paymentMethod === 'PayPal' && (
+              <p className={styles.paymentNote}>
+                PayPal payments can be made from the profile page. A link will be included on your confirmation email
+              </p>
+            )}
           </div>
         </div>
 
