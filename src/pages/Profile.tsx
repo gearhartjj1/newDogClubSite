@@ -210,6 +210,10 @@ export default function Profile() {
     }
   };
 
+  if (isLoading) {
+    return <p>Loading...</p>;
+  }
+
   return (
     <div className={styles.container}>
       <header className={styles.header}>
@@ -242,6 +246,10 @@ export default function Profile() {
             <div className={styles.infoItem}>
               <label>Member Since</label>
               <p>{userInfo.memberSince}</p>
+            </div>
+            <div className={styles.infoItem}>
+              <label>Active Member</label>
+              <p>{userData.isActiveMember ? 'Yes' : 'No'}</p>
             </div>
           </div>
         </section>

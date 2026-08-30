@@ -59,6 +59,7 @@ router.post('/', async (req: Request, res: Response) => {
     }
 
     // Query the database for the user
+    //TODO: this will fail if you have multiple users with the same last name
     const query = 'SELECT * FROM Teacher WHERE LastName = ? LIMIT 1';
     try {
       const [rows]: any = await pool.query(query, [username]);
@@ -81,12 +82,16 @@ router.post('/', async (req: Request, res: Response) => {
       }
 
       // Build session user data (only what the client needs)
+      const activeMember = user.CourseList ? (user.CourseList as string).includes('1') : false;
+      console.log("User's CourseList:", user.CourseList);
+      console.log('Active member status:', activeMember);
       const sessionUser = {
         id: user.Family,
         username: user.LastName,
         firstName: user.FirstName,
         email: user.Email || '',
         phone: user.Phone || '',
+        isActiveMember: activeMember || false,
       };
 
       // Store user in session
@@ -122,6 +127,7 @@ router.post('/', async (req: Request, res: Response) => {
 
 // Get current session user
 router.get('/me', (req: Request, res: Response) => {
+  console.log('Current session user:', req.session.user);
   if (req.session.user) {
     return res.status(200).json({
       success: true,

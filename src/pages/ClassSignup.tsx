@@ -89,6 +89,7 @@ export default function ClassSignup() {
     paymentMethod: isWaitlist ? 'Waitlist' : '',
     agreeTerms: false,
     prerequesitesMet: false,
+    isActiveMember: userData?.isActiveMember || false,
     userId: userData?.id || null,
   });
 
@@ -140,6 +141,7 @@ export default function ClassSignup() {
       userId: formData.userId,
       agreeTerms: formData.agreeTerms,
       prerequesitesMet: formData.prerequesitesMet,
+      isActiveMember: formData.isActiveMember,
     });
 
     if (!formData.agreeTerms) {
@@ -163,11 +165,14 @@ export default function ClassSignup() {
       'Waitlist': 7,
     };
 
+    // User is signing up as member, but is not validated by database data
+    const notValidatedMember = formData.isActiveMember && !userData?.isActiveMember;
     const submissionData = {
       ...formData,
       paymentMethod: paymentMethodMap[formData.paymentMethod] || 1,
       dogClassName: classes.find((cls) => cls.id === parseInt(formData.classId))?.name || '',
       dogClassCode: classes.find((cls) => cls.id === parseInt(formData.classId))?.code || '',
+      notValidatedMember: notValidatedMember
     };
 
     let apiResponse: any;
@@ -480,6 +485,19 @@ export default function ClassSignup() {
             />
             <label htmlFor="prerequesitesMet">
               Yes, I have completed KCTC Class Prerequisites OR My class choice has been approved by KCTC personnel
+            </label>
+          </div>
+          <div className={styles.checkboxGroup}>
+            <input
+              type="checkbox"
+              id="isActiveMember"
+              name="isActiveMember"
+              checked={formData.isActiveMember}
+              onChange={handleChange}
+              disabled={userData?.isActiveMember ?? false}
+            />
+            <label htmlFor="isActiveMember">
+              Yes, I am an active member of KCTC {!userData?.isActiveMember ? 'You are not marked as a member, sign up will be reviewed for member pricing before approval' : ''}
             </label>
           </div>
         </div>

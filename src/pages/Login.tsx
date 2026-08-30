@@ -39,8 +39,9 @@ export default function Login() {
             email: response.user.email,
             phone: response.user.phone,
             memberSince: "TBD"
-          }
-        }
+          },
+          isActiveMember: response.user.isActiveMember,
+        };
         setUserData(userData);
         navigate('/profile' + (classId ? '/' + classId : '')); // Redirect to profile or specific class if classId is present
       }

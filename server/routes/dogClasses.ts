@@ -22,7 +22,7 @@ const getCurrentSession = async (): Promise<{ session: string; code: string, sta
     const result = await pool.query('SELECT Session, Code, Class from kctcsession where id = 0');
     const row = (result[0] as any)[0];
     return { session: row.Session, code: row.Code, startDate: row.Class };
-  }  catch (error) {
+  } catch (error) {
     console.error('Error fetching current session: ', error);
     return { session: '', code: '', startDate: '' };
   }
@@ -84,6 +84,27 @@ router.get('/rates', async (req: Request, res: Response) => {
   }
 });
 
+//TODO:
+// Update PayPal to use account for club
+// Update signup system to properly record if someone is a member or not, riht now I am defaulting to yes
+//    If someone is an active member it is determined by checking the CourseList property on the teacher entry, if it contains 1 then they are a member
+//    New design - check if someone is a member based on the value, if it shows they are a member set that in the enrollment entry
+//    If it is a guest signup then create the generic non-member account if one does not exist and set enrollment as non-member
+//    On the UI indicate if they are going to be signing up as a member or not
+//    Add option to say I am am member during sign up. If this doesn't match the database trigger email to admin@keystonecanine.com to let an admin know that this is the case
+//    That way an admin will know if someone is either trying to sign up falsely or that the database needs fixed
+//      This is almost done. Just need to pass the checked value into the server during enrollment
+//      Should add in logic to email the admin email when someone not marked as member tries to sign up as a member
+//  
+// Update system to properly work for non-members
+//    The old site always creates a generic user non-member account to tie data to?
+//    This is necessary for things like payment and emails on classes, is there a better method?
+
+// TODO This weeken
+//    Configure signup method for non-members
+//    Hook up paypal integration with clubs paypal
+//    Email
+
 // Create enrollment
 router.post('/', async (req: Request, res: Response) => {
   const enrollStartTime = Date.now();
@@ -94,6 +115,8 @@ router.post('/', async (req: Request, res: Response) => {
     const paymentMethod = parseInt(req.body.paymentMethod, 10);
     const dogName = typeof req.body.dogName === 'string' ? req.body.dogName.trim() : '';
     const dogBreed = typeof req.body.dogBreed === 'string' ? req.body.dogBreed.trim() : '';
+    //TODO: configure this to send email to admin if this value is true... Maybe just store in database for review?
+    const isNotValidatedMember = req.body.notValidatedMember || false;
 
     betaLog('ENROLLMENT_REQUEST', {
       classId,
@@ -108,6 +131,7 @@ router.post('/', async (req: Request, res: Response) => {
       dogClassName: req.body.dogClassName,
       dogClassCode: req.body.dogClassCode,
       ip: req.ip,
+      isActiveMember: req.body.isActiveMember,
     });
 
     //this is the issue, if you don't sign in you won't have a user id and this fix returns an error
@@ -158,10 +182,8 @@ router.post('/', async (req: Request, res: Response) => {
     const enrollmentDate = new Date().toISOString().slice(0, 19).replace('T', ' ');
 
     const effectivePaymentMethod = spotsOpen ? paymentMethod : 7;
-    //Todo: the memberYN value needs to be 1 if member and 0 if not, not Y or N need to validate if someone is member
-    //select t.FirstName, t.LastName, e.* from  enrollment e join teacher t on e.PID = t.family where e.HeardAboutFrom = "internet - new site"
-    const newQuery = 'INSERT INTO Enrollment VALUES (?, ?, ?, \'1\', \'0\', ?, ?, ?, ?, \'Y\', \'None\', \'internet - new site\', ?)';
-    const response = await pool.query(newQuery, [newIdValue, userId, classId, effectivePaymentMethod, dogName, parsedDogAge, dogBreed, enrollmentDate]);
+    const newQuery = 'INSERT INTO Enrollment VALUES (?, ?, ?, ?, \'0\', ?, ?, ?, ?, \'Y\', \'None\', \'internet - new site\', ?)';
+    const response = await pool.query(newQuery, [newIdValue, userId, classId, req.body.isActiveMember ? 1 : 0, effectivePaymentMethod, dogName, parsedDogAge, dogBreed, enrollmentDate]);
 
     betaLog('ENROLLMENT_DB_INSERT', {
       enrollmentId: newIdValue,

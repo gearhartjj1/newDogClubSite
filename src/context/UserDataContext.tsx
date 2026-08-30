@@ -41,6 +41,7 @@ export interface UserData {
   userInfo?: UserInfo;
   dogs?: Dog[];
   pastClasses?: PastClass[];
+  isActiveMember?: boolean;
 }
 
 interface UserDataContextType {
@@ -63,8 +64,10 @@ export function UserDataProvider({ children }: UserDataProviderProps) {
 
   // On mount, check for an existing session via /api/me
   useEffect(() => {
+    console.log('Checking for existing session via /api/me');
     signinAPI.me()
       .then((user) => {
+        console.log('Response from /api/me:', user);
         if (user) {
           const restored: UserData = {
             id: user.id,
@@ -76,6 +79,7 @@ export function UserDataProvider({ children }: UserDataProviderProps) {
               phone: user.phone,
               memberSince: 'TBD',
             },
+            isActiveMember: user.isActiveMember,
           };
           setUserDataState(restored);
         }
