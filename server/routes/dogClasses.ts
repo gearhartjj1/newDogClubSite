@@ -1,6 +1,11 @@
 import express, { Request, Response } from 'express';
 import pool from '../config/database.js';
 import emailServiceResend from '../config/emailServiceResend.js';
+import crypto from 'crypto';
+
+function secureRandomString(length: number) {
+  return crypto.randomBytes(Math.ceil(length / 2)).toString('hex').slice(0, length);
+}
 
 const router = express.Router();
 
@@ -100,10 +105,10 @@ router.get('/rates', async (req: Request, res: Response) => {
 //    The old site always creates a generic user non-member account to tie data to?
 //    This is necessary for things like payment and emails on classes, is there a better method?
 
-// TODO This weeken
+// TODO This weekend
 //    Configure signup method for non-members
 //    Hook up paypal integration with clubs paypal
-//    Email
+//    Email club about planning next test session
 
 // Create enrollment
 router.post('/', async (req: Request, res: Response) => {
@@ -111,7 +116,7 @@ router.post('/', async (req: Request, res: Response) => {
   try {
     // --- Input validation ---
     const classId = parseInt(req.body.classId, 10);
-    const userId = parseInt(req.body.userId, 10);
+    let userId = parseInt(req.body.userId, 10);
     const paymentMethod = parseInt(req.body.paymentMethod, 10);
     const dogName = typeof req.body.dogName === 'string' ? req.body.dogName.trim() : '';
     const dogBreed = typeof req.body.dogBreed === 'string' ? req.body.dogBreed.trim() : '';
@@ -137,6 +142,43 @@ router.post('/', async (req: Request, res: Response) => {
     //this is the issue, if you don't sign in you won't have a user id and this fix returns an error
     //So the issue is that non-members have a generic entry created to track them even if they don't create an account
     //I really don't like that, but I probably need to do that because I assume that ties down with enrollment lists and payments
+    
+    //How to handle signing up without a logged in user...
+    // 1. Check if user is logged in - if so great
+    // 2. If the user is not logged in, check the system for a matching account based on the email provided
+    // 3. If not account for the email exists, create a new user account based on the provided data
+    // 4. Enroll user in the class with the new account
+    // 5. Send confirmation email but also include details on how to log into account to review enrollment and pay for class
+
+    // TODO: putting the code here for now but the logic to create a user should be moved elsewhere for account creation later
+    if (isNaN(userId)) {
+      // Check if a user with the provided email already exists
+      const checkUserQuery = 'SELECT Family FROM teacher WHERE Email = ? and LastName = ?';
+      const checkUserResult = await pool.query(checkUserQuery, [req.body.email, req.body.lastName]);
+      if ((checkUserResult[0] as any).length > 0) {
+        userId = (checkUserResult[0] as any)[0].Family;
+      }
+      console.log("what the id is now: ", userId);
+
+      // if no account is found, create one for the user
+      if (isNaN(userId)) {
+        const newUserIdQuery = "select max(Family) from Teacher";
+        const newUserIdResult = await pool.query(newUserIdQuery);
+        const newUserId = ((newUserIdResult[0] as any)[0]['max(Family)'] || 0) + 1;
+        userId = newUserId;
+        console.log("user token now again: ", userId);
+        const secureToken = secureRandomString(16);
+        const createUserQuery = 'INSERT INTO Teacher (Family, Email, FirstName, LastName, Phone, Comment1, Security, Password) VALUES (?, ?, ?, ?, ?, ?, 5, ?)';
+        //This works well, 
+        // TODO: I need to include details in the email in this scenario so the user knows how to access the account
+        await pool.query(createUserQuery, [newUserId, req.body.email, req.body.firstName, req.body.lastName, req.body.phone, req.body.dogName, secureToken]);
+      }
+
+      //Create user if non exists
+      //const createUserQuery = 'INSERT INTO Enrollment VALUES (?, ?, ?, ?, \'0\', ?, ?, ?, ?, \'Y\', \'None\', \'internet - new site\', ?)';
+      //const response = await pool.query(createUserQuery, [newIdValue, userId, classId, req.body.isActiveMember ? 1 : 0, effectivePaymentMethod, dogName, parsedDogAge, dogBreed, enrollmentDate]);
+    }
+
     if (isNaN(classId) || isNaN(userId) || isNaN(paymentMethod)) {
       betaLog('ENROLLMENT_VALIDATION_FAIL', { reason:  'invalid_numbers', classId: req.body.classId, userId: req.body.userId, paymentMethod: req.body.paymentMethod });
       res.status(400).json({ error: 'classId, userId, and paymentMethod must be valid numbers' });
