@@ -2,6 +2,7 @@ import express, { Request, Response } from 'express';
 import pool from '../config/database.js';
 import emailServiceResend from '../config/emailServiceResend.js';
 import crypto from 'crypto';
+import { getEnrollmentEmail } from '../config/utils.js';
 
 function secureRandomString(length: number) {
   return crypto.randomBytes(Math.ceil(length / 2)).toString('hex').slice(0, length);
@@ -106,7 +107,7 @@ router.get('/rates', async (req: Request, res: Response) => {
 //    This is necessary for things like payment and emails on classes, is there a better method?
 
 // TODO This weekend
-//    Configure signup method for non-members
+//    Configure signup method for non-members --- Done just need to finalize email notifications
 //    Hook up paypal integration with clubs paypal
 //    Email club about planning next test session
 
@@ -122,6 +123,8 @@ router.post('/', async (req: Request, res: Response) => {
     const dogBreed = typeof req.body.dogBreed === 'string' ? req.body.dogBreed.trim() : '';
     //TODO: configure this to send email to admin if this value is true... Maybe just store in database for review?
     const isNotValidatedMember = req.body.notValidatedMember || false;
+    let newUserCreated = false;
+    let newUserPassword = '';
 
     betaLog('ENROLLMENT_REQUEST', {
       classId,
@@ -166,12 +169,13 @@ router.post('/', async (req: Request, res: Response) => {
         const newUserIdResult = await pool.query(newUserIdQuery);
         const newUserId = ((newUserIdResult[0] as any)[0]['max(Family)'] || 0) + 1;
         userId = newUserId;
+        newUserCreated = true;
         console.log("user token now again: ", userId);
-        const secureToken = secureRandomString(16);
+        newUserPassword = secureRandomString(16);
         const createUserQuery = 'INSERT INTO Teacher (Family, Email, FirstName, LastName, Phone, Comment1, Security, Password) VALUES (?, ?, ?, ?, ?, ?, 5, ?)';
         //This works well, 
         // TODO: I need to include details in the email in this scenario so the user knows how to access the account
-        await pool.query(createUserQuery, [newUserId, req.body.email, req.body.firstName, req.body.lastName, req.body.phone, req.body.dogName, secureToken]);
+        await pool.query(createUserQuery, [newUserId, req.body.email, req.body.firstName, req.body.lastName, req.body.phone, req.body.dogName, newUserPassword]);
       }
 
       //Create user if non exists
@@ -240,106 +244,7 @@ router.post('/', async (req: Request, res: Response) => {
     });
 
     //if class is sign up succeeds then send confirmation email
-    //TODO: Should also figure out the email info for the club email or make a custom one
-    const paymentMethodNames: { [key: number]: string } = {
-      1: 'PayPal',
-      2: 'Cash',
-      3: 'Check',
-      4: 'Instructor Perk',
-      7: 'Waitlist',
-    };
-    const paymentMethodDisplay = paymentMethodNames[effectivePaymentMethod] || `Unknown (${effectivePaymentMethod})`;
-
-    const siteUrl = process.env.CORS_ORIGIN || (process.env.NODE_ENV === 'production' ? process.env.RAILWAY_PUBLIC_DOMAIN && `https://${process.env.RAILWAY_PUBLIC_DOMAIN}` : 'http://localhost:5173');
-    const paymentLink = `${siteUrl}/profile/${newIdValue}`;
-
-    let emailHtml = "";
-    if (spotsOpen) {
-      emailHtml = `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-          <h2 style="color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px;">
-            Keystone Canine Training Club - Enrollment Confirmation
-          </h2>
-          <p>We have received your enrollment; the details are displayed below. Please review them.</p>
-          <p>If any of this information is not correct, please reply to this message so that we can correct any problems.</p>
-          <p>If we should find any issues with your enrollment, we will contact you. There is no need for you to contact us to confirm receipt of your enrollment.</p>
-          ${effectivePaymentMethod !== 1 ? '<p><strong>Unless you use PayPal, bring your payment (cash or check) to the first class and give it to your instructor.</strong></p>' : ''}
-          ${effectivePaymentMethod == 1 ? `<p>To pay for the class through PayPal, please do so through your account: <a href="${paymentLink}" target="_blank">Pay now</a></p>` : ''}
-          <p>Thank you for choosing Keystone Canine Training Club. We look forward to seeing you in class!</p>
-          <p><em>If you are not a KCTC member, please bring a copy of your dog's up-to-date vaccine records and your signed Liability Waiver to your first class and give it to your instructor.</em></p>
-          <hr style="border: 1px solid #3498db; margin: 20px 0;" />
-          <h3 style="color: #2c3e50;">Enrollment Information</h3>
-          <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
-            <tr style="background-color: #f8f9fa;">
-              <td style="padding: 8px 12px; font-weight: bold; border: 1px solid #dee2e6;">Signup ID</td>
-              <td style="padding: 8px 12px; border: 1px solid #dee2e6;">${newIdValue}</td>
-            </tr>
-            <tr style="background-color: #f8f9fa;">
-              <td style="padding: 8px 12px; font-weight: bold; border: 1px solid #dee2e6;">Class Code</td>
-              <td style="padding: 8px 12px; border: 1px solid #dee2e6;">${req.body.dogClassCode}</td>
-            </tr>
-            <tr>
-              <td style="padding: 8px 12px; font-weight: bold; border: 1px solid #dee2e6;">Account holder name</td>
-              <td style="padding: 8px 12px; border: 1px solid #dee2e6;">${req.body.firstName} ${req.body.lastName}</td>
-            </tr>
-            <tr style="background-color: #f8f9fa;">
-              <td style="padding: 8px 12px; font-weight: bold; border: 1px solid #dee2e6;">Dog Name</td>
-              <td style="padding: 8px 12px; border: 1px solid #dee2e6;">${req.body.dogName}</td>
-            </tr>
-            <tr>
-              <td style="padding: 8px 12px; font-weight: bold; border: 1px solid #dee2e6;">Dog Breed</td>
-              <td style="padding: 8px 12px; border: 1px solid #dee2e6;">${req.body.dogBreed}</td>
-            </tr>
-            <tr style="background-color: #f8f9fa;">
-              <td style="padding: 8px 12px; font-weight: bold; border: 1px solid #dee2e6;">Dog Age</td>
-              <td style="padding: 8px 12px; border: 1px solid #dee2e6;">${req.body.dogAge}</td>
-            </tr>
-            <tr>
-              <td style="padding: 8px 12px; font-weight: bold; border: 1px solid #dee2e6;">Payment Method</td>
-              <td style="padding: 8px 12px; border: 1px solid #dee2e6;">${paymentMethodDisplay}</td>
-            </tr>
-            <tr style="background-color: #f8f9fa;">
-              <td style="padding: 8px 12px; font-weight: bold; border: 1px solid #dee2e6;">Class Name</td>
-              <td style="padding: 8px 12px; border: 1px solid #dee2e6;">${req.body.dogClassName}</td>
-            </tr>
-          </table>
-        </div>`;
-    } else {
-      emailHtml = `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-          <h2 style="color: #e74c3c;">Class Full - Waitlisted</h2>
-          <p>${!forcedWaitlist ? "We have received your request to be WAITLISTED for the class displayed below." : "***** Sorry, while you were enrolling, someone else completed their enrollment taking the last spot in the class displayed below.  *****"}</p>
-          <p>We will contact you if a spot becomes available.</p>
-          <hr style="border: 1px solid #e74c3c; margin: 20px 0;" />
-          <h3 style="color: #2c3e50;">Waitlist Details</h3>
-          <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
-            <tr style="background-color: #f8f9fa;">
-              <td style="padding: 8px 12px; font-weight: bold; border: 1px solid #dee2e6;">Signup ID</td>
-              <td style="padding: 8px 12px; border: 1px solid #dee2e6;">${newIdValue}</td>
-            </tr>
-            <tr style="background-color: #f8f9fa;">
-              <td style="padding: 8px 12px; font-weight: bold; border: 1px solid #dee2e6;">Class Code</td>
-              <td style="padding: 8px 12px; border: 1px solid #dee2e6;">${req.body.dogClassCode}</td>
-            </tr>
-            <tr>
-              <td style="padding: 8px 12px; font-weight: bold; border: 1px solid #dee2e6;">Class Name</td>
-              <td style="padding: 8px 12px; border: 1px solid #dee2e6;">${req.body.dogClassName}</td>
-            </tr>
-            <tr>
-              <td style="padding: 8px 12px; font-weight: bold; border: 1px solid #dee2e6;">Dog Name</td>
-              <td style="padding: 8px 12px; border: 1px solid #dee2e6;">${req.body.dogName}</td>
-            </tr>
-            <tr style="background-color: #f8f9fa;">
-              <td style="padding: 8px 12px; font-weight: bold; border: 1px solid #dee2e6;">Dog Breed</td>
-              <td style="padding: 8px 12px; border: 1px solid #dee2e6;">${req.body.dogBreed}</td>
-            </tr>
-            <tr>
-              <td style="padding: 8px 12px; font-weight: bold; border: 1px solid #dee2e6;">Dog Age</td>
-              <td style="padding: 8px 12px; border: 1px solid #dee2e6;">${req.body.dogAge}</td>
-            </tr>
-          </table>
-        </div>`;
-    }
+    let emailHtml = getEnrollmentEmail(spotsOpen, forcedWaitlist, paymentMethod, req, newIdValue, newUserCreated, newUserPassword);
     await emailServiceResend.sendEmail(req.body.email, 'KEYSTONE CANINE TRAINING CLUB CLASS ENROLLMENT', emailHtml);
     betaLog('ENROLLMENT_EMAIL_SENT', { email: req.body.email, spotsOpen, enrollmentId: newIdValue });
 
