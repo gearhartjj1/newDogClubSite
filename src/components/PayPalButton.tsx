@@ -67,7 +67,7 @@ function PayPalButtonsUI({ price, enrollmentId, onSuccess, onError }: PayPalButt
         });
     }, [onSuccess, onError, price, enrollmentId]);
 
-    const showPaypal = false;
+    const showPaypal = import.meta.env.VITE_PAYPAL_ENABLED == undefined ? false : import.meta.env.VITE_PAYPAL_ENABLED === 'true';
     return (
         <div>
         { isPending ? <div className="spinner" /> : 
