@@ -37,7 +37,7 @@ export default function Classes() {
 
   // Sort classes by date and separate into front and back sections
   const sortedClasses = [...dogClasses].sort((a, b) => {
-    return parseDate(a.Start).getTime() - parseDate(b.Start).getTime();
+    return parseDate(a.Start + " " + a.Time).getTime() - parseDate(b.Start + " " + b.Time).getTime();
   });
 
   const frontClasses = sortedClasses.filter(dogClass => 
