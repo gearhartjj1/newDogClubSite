@@ -60,7 +60,7 @@ router.post('/', async (req: Request, res: Response) => {
 
     // Query the database for the user
     //TODO: this will fail if you have multiple users with the same last name
-    const query = 'SELECT * FROM Teacher WHERE LastName = ? LIMIT 1';
+    const query = 'SELECT * FROM Teacher WHERE LastName = ?';
     try {
       const [rows]: any = await pool.query(query, [username]);
 
@@ -71,10 +71,11 @@ router.post('/', async (req: Request, res: Response) => {
         } as SignInResponse);
       }
 
-      const user = rows[0];
-
+      const potentialUsers: any[] = rows;
+      const user = potentialUsers.find(u => u.Password === password);
+      
       // Compare password (basic comparison - TODO: implement bcrypt hashing for production)
-      if (user.Password !== password) {
+      if (!user) {
         return res.status(401).json({
           success: false,
           error: 'Invalid username or password'
