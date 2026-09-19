@@ -8,6 +8,28 @@ function secureRandomString(length: number) {
   return crypto.randomBytes(Math.ceil(length / 2)).toString('hex').slice(0, length);
 }
 
+// Max lengths from the legacy Teacher/Enrollment column definitions
+const LIMITS = {
+  teacherName: 50,    // Teacher.FirstName / Teacher.LastName varchar(50)
+  teacherPhone: 50,   // Teacher.Phone varchar(50)
+  teacherEmail: 50,   // Teacher.Email varchar(50)
+  teacherComment: 50, // Teacher.Comment1 varchar(50)
+  dogName: 255,       // Enrollment.DogName varchar(255)
+  dogBreed: 30,       // Enrollment.DogBreed varchar(30)
+} as const;
+
+// Coerce to string, strip control characters, collapse whitespace, trim, and truncate
+const sanitizeString = (value: unknown, maxLength: number): string => {
+  if (typeof value !== 'string' && typeof value !== 'number') return '';
+  return String(value)
+    .replace(/[\x00-\x1F\x7F]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, maxLength);
+};
+
+const isValidEmail = (email: string): boolean => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
 const router = express.Router();
 
 // Beta testing logger – structured JSON for easy searching
@@ -69,7 +91,13 @@ router.get('/session-status', async (req: Request, res: Response) => {
 router.get('/user/:userId', async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
-    const query = `SELECT c.*, e.DogName, e.ID AS EnrollmentID, e.PayMethod, e.PaidYN, e.MemberYN, e.DogBreed, e.DogAge FROM KCTCSession c INNER JOIN Enrollment e ON c.ID = e.SID WHERE e.PID = ? and e.paymethod != 7 and e.paymethod != 9`;
+    const query = `SELECT c.*, e.DogName, e.ID AS EnrollmentID, e.PayMethod, e.PaidYN, e.MemberYN,
+        e.DogBreed, e.DogAge, SUM(p.AmtPaid) AS AmtPaid
+        FROM KCTCSession c
+        INNER JOIN Enrollment e ON c.ID = e.SID
+        LEFT JOIN Payment p ON p.FamilyId = e.ID
+        WHERE e.PID = ? AND e.PayMethod != 7 AND e.PayMethod != 9
+        GROUP BY e.ID`;
     const dogClasses = await pool.query(query, [userId]);
     res.json(dogClasses);
   } catch (error) {
@@ -92,22 +120,8 @@ router.get('/rates', async (req: Request, res: Response) => {
 
 //TODO:
 // Update PayPal to use account for club
-// Update signup system to properly record if someone is a member or not, riht now I am defaulting to yes
-//    If someone is an active member it is determined by checking the CourseList property on the teacher entry, if it contains 1 then they are a member
-//    New design - check if someone is a member based on the value, if it shows they are a member set that in the enrollment entry
-//    If it is a guest signup then create the generic non-member account if one does not exist and set enrollment as non-member
-//    On the UI indicate if they are going to be signing up as a member or not
-//    Add option to say I am am member during sign up. If this doesn't match the database trigger email to admin@keystonecanine.com to let an admin know that this is the case
-//    That way an admin will know if someone is either trying to sign up falsely or that the database needs fixed
-//      This is almost done. Just need to pass the checked value into the server during enrollment
-//      Should add in logic to email the admin email when someone not marked as member tries to sign up as a member
-//  
-// Update system to properly work for non-members
-//    The old site always creates a generic user non-member account to tie data to?
-//    This is necessary for things like payment and emails on classes, is there a better method?
 
 // TODO This weekend
-//    Configure signup method for non-members --- Done just need to finalize email notifications
 //    Hook up paypal integration with clubs paypal
 //    Email club about planning next test session
 
@@ -115,12 +129,24 @@ router.get('/rates', async (req: Request, res: Response) => {
 router.post('/', async (req: Request, res: Response) => {
   const enrollStartTime = Date.now();
   try {
-    // --- Input validation ---
+    // --- Input validation & sanitization ---
     const classId = parseInt(req.body.classId, 10);
     let userId = parseInt(req.body.userId, 10);
     const paymentMethod = parseInt(req.body.paymentMethod, 10);
-    const dogName = typeof req.body.dogName === 'string' ? req.body.dogName.trim() : '';
-    const dogBreed = typeof req.body.dogBreed === 'string' ? req.body.dogBreed.trim() : '';
+    const dogName = sanitizeString(req.body.dogName, LIMITS.dogName);
+    const dogBreed = sanitizeString(req.body.dogBreed, LIMITS.dogBreed);
+    const firstName = sanitizeString(req.body.firstName, LIMITS.teacherName);
+    const lastName = sanitizeString(req.body.lastName, LIMITS.teacherName);
+    const email = sanitizeString(req.body.email, LIMITS.teacherEmail);
+    const phone = sanitizeString(req.body.phone, LIMITS.teacherPhone);
+
+    // Write sanitized values back so downstream consumers (email template, logs) use clean data
+    req.body.dogName = dogName;
+    req.body.dogBreed = dogBreed;
+    req.body.firstName = firstName;
+    req.body.lastName = lastName;
+    req.body.email = email;
+    req.body.phone = phone;
     //TODO: configure this to send email to admin if this value is true... Maybe just store in database for review?
     const isNotValidatedMember = req.body.notValidatedMember || false;
     let newUserCreated = false;
@@ -133,35 +159,35 @@ router.post('/', async (req: Request, res: Response) => {
       dogName,
       dogBreed,
       dogAge: req.body.dogAge,
-      firstName: req.body.firstName,
-      lastName: req.body.lastName,
-      email: req.body.email,
+      firstName,
+      lastName,
+      email,
       dogClassName: req.body.dogClassName,
       dogClassCode: req.body.dogClassCode,
       ip: req.ip,
       isActiveMember: req.body.isActiveMember,
     });
 
-    //this is the issue, if you don't sign in you won't have a user id and this fix returns an error
-    //So the issue is that non-members have a generic entry created to track them even if they don't create an account
-    //I really don't like that, but I probably need to do that because I assume that ties down with enrollment lists and payments
-    
-    //How to handle signing up without a logged in user...
-    // 1. Check if user is logged in - if so great
-    // 2. If the user is not logged in, check the system for a matching account based on the email provided
-    // 3. If not account for the email exists, create a new user account based on the provided data
-    // 4. Enroll user in the class with the new account
-    // 5. Send confirmation email but also include details on how to log into account to review enrollment and pay for class
+    if (!email || !isValidEmail(email)) {
+      betaLog('ENROLLMENT_VALIDATION_FAIL', { reason: 'invalid_email', email });
+      res.status(400).json({ error: 'A valid email address is required' });
+      return;
+    }
 
     // TODO: putting the code here for now but the logic to create a user should be moved elsewhere for account creation later
     if (isNaN(userId)) {
+      if (!firstName || !lastName) {
+        betaLog('ENROLLMENT_VALIDATION_FAIL', { reason: 'missing_name', firstName, lastName });
+        res.status(400).json({ error: 'firstName and lastName are required' });
+        return;
+      }
+
       // Check if a user with the provided email already exists
       const checkUserQuery = 'SELECT Family FROM teacher WHERE Email = ? and LastName = ?';
-      const checkUserResult = await pool.query(checkUserQuery, [req.body.email, req.body.lastName]);
+      const checkUserResult = await pool.query(checkUserQuery, [email, lastName]);
       if ((checkUserResult[0] as any).length > 0) {
         userId = (checkUserResult[0] as any)[0].Family;
       }
-      console.log("what the id is now: ", userId);
 
       // if no account is found, create one for the user
       if (isNaN(userId)) {
@@ -170,17 +196,10 @@ router.post('/', async (req: Request, res: Response) => {
         const newUserId = ((newUserIdResult[0] as any)[0]['max(Family)'] || 0) + 1;
         userId = newUserId;
         newUserCreated = true;
-        console.log("user token now again: ", userId);
-        newUserPassword = secureRandomString(16);
+        newUserPassword = secureRandomString(16); // Teacher.Password is varchar(16)
         const createUserQuery = 'INSERT INTO Teacher (Family, Email, FirstName, LastName, Phone, Comment1, Security, Password) VALUES (?, ?, ?, ?, ?, ?, 5, ?)';
-        //This works well, 
-        // TODO: I need to include details in the email in this scenario so the user knows how to access the account
-        await pool.query(createUserQuery, [newUserId, req.body.email, req.body.firstName, req.body.lastName, req.body.phone, req.body.dogName, newUserPassword]);
+        await pool.query(createUserQuery, [newUserId, email, firstName, lastName, phone, dogName.slice(0, LIMITS.teacherComment), newUserPassword]);
       }
-
-      //Create user if non exists
-      //const createUserQuery = 'INSERT INTO Enrollment VALUES (?, ?, ?, ?, \'0\', ?, ?, ?, ?, \'Y\', \'None\', \'internet - new site\', ?)';
-      //const response = await pool.query(createUserQuery, [newIdValue, userId, classId, req.body.isActiveMember ? 1 : 0, effectivePaymentMethod, dogName, parsedDogAge, dogBreed, enrollmentDate]);
     }
 
     if (isNaN(classId) || isNaN(userId) || isNaN(paymentMethod)) {
@@ -219,6 +238,13 @@ router.post('/', async (req: Request, res: Response) => {
       const match = String(req.body.dogAge).match(/\d+(\.\d+)?/);
       parsedDogAge = match ? parseFloat(match[0]) : null;
     }
+    // Enrollment.DogAge is varchar(3): clamp so the stored value fits in 3 characters
+    if (parsedDogAge != null) {
+      parsedDogAge = Math.min(parsedDogAge, 999);
+      if (String(parsedDogAge).length > 3) {
+        parsedDogAge = Math.min(Math.round(parsedDogAge), 999);
+      }
+    }
 
     const maxIdResult = await pool.query('SELECT MAX(ID) AS maxId FROM Enrollment');
     const maxId = (maxIdResult[0] as any)[0].maxId;
@@ -245,8 +271,8 @@ router.post('/', async (req: Request, res: Response) => {
 
     //if class is sign up succeeds then send confirmation email
     let emailHtml = getEnrollmentEmail(spotsOpen, forcedWaitlist, paymentMethod, req, newIdValue, newUserCreated, newUserPassword);
-    await emailServiceResend.sendEmail(req.body.email, 'KEYSTONE CANINE TRAINING CLUB CLASS ENROLLMENT', emailHtml);
-    betaLog('ENROLLMENT_EMAIL_SENT', { email: req.body.email, spotsOpen, enrollmentId: newIdValue });
+    await emailServiceResend.sendEmail(email, 'KEYSTONE CANINE TRAINING CLUB CLASS ENROLLMENT', emailHtml);
+    betaLog('ENROLLMENT_EMAIL_SENT', { email, spotsOpen, enrollmentId: newIdValue });
 
     const durationMs = Date.now() - enrollStartTime;
     if (spotsOpen) {

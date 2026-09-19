@@ -112,7 +112,7 @@ export default function Profile() {
               enrollmentId: (cls as any).EnrollmentID,
               sessionId: cls.ID,
               paymentMethod: paymentMethodNames[(cls as any).PayMethod] || `Unknown (${(cls as any).PayMethod})`,
-              paidStatus: (cls as any).PaidYN === '1' || (cls as any).PaidYN === 'Y' ? 'Paid' : 'Unpaid',
+              paidStatus: (cls as any).PaidYN === '1' || (cls as any).PaidYN === 'Y' || (cls as any).AmtPaid > 0 ? 'Paid' : 'Unpaid',
               dogBreed: (cls as any).DogBreed || 'N/A',
               dogAge: (cls as any).DogAge != null ? String((cls as any).DogAge) : 'N/A',
               session: cls.Session || 'N/A',
