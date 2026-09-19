@@ -94,9 +94,9 @@ export default function Login() {
           </button>
         </form>
 
-        <div className={styles.footer}>
+        {/* <div className={styles.footer}>
           <p>Don't have an account? <a href="#signup">Sign up here</a></p>
-        </div>
+        </div> */}
       </div>
     </div>
   );
