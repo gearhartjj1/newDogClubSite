@@ -21,6 +21,7 @@ export default function Sidebar() {
     : { to: '/login', icon: '🔑', label: 'Sign In' };
 
   const sidebarLinks: SidebarLink[] = [
+    { to: '/getting-started', icon: '🚀', label: 'Getting Started' },
     profileButton,
     { to: '/', icon: '🏠', label: 'Home' },
     { to: '/building-usage', icon: '🏢', label: 'Building Usage' },

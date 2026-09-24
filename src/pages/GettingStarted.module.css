@@ -1,0 +1,93 @@
+.guides {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 40px 0;
+}
+
+.guide {
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.guideHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  width: 100%;
+  padding: 20px 30px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  transition: background-color 0.2s;
+}
+
+.guideHeader:hover {
+  background: #f0fdfa;
+}
+
+.guideHeaderText h2 {
+  margin: 0;
+  color: #0d9488;
+  font-size: 1.4rem;
+}
+
+.guideHeaderText p {
+  margin: 5px 0 0;
+  color: #555;
+  font-size: 0.95rem;
+}
+
+.chevron {
+  color: #0d9488;
+  font-size: 1rem;
+  flex-shrink: 0;
+  transition: transform 0.2s;
+}
+
+.chevronOpen {
+  transform: rotate(180deg);
+}
+
+.stepList {
+  margin: 0;
+  padding: 10px 30px 30px 55px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.step {
+  padding: 15px 0;
+  color: #555;
+}
+
+.step:not(:last-child) {
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.stepText {
+  margin: 0 0 12px;
+  line-height: 1.7;
+}
+
+.stepImage {
+  max-width: 100%;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+}
+
+@media (max-width: 600px) {
+  .guideHeader {
+    padding: 15px 20px;
+  }
+
+  .stepList {
+    padding: 10px 20px 20px 40px;
+  }
+}

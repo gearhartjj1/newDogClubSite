@@ -11,6 +11,7 @@ import ClassPrices from './pages/ClassPrices';
 import ContactUs from './pages/ContactUs';
 import Directions from './pages/Directions';
 import Forms from './pages/Forms';
+import GettingStarted from './pages/GettingStarted';
 import GiftCertificates from './pages/GiftCertificates';
 import History from './pages/History';
 import Membership from './pages/Membership';
@@ -40,6 +41,7 @@ function App() {
               <Route path="/contact" element={<ContactUs />} />
               <Route path="/directions" element={<Directions />} />
               <Route path="/forms" element={<Forms />} />
+              <Route path="/getting-started" element={<GettingStarted />} />
               <Route path="/gift-certificates" element={<GiftCertificates />} />
               <Route path="/history" element={<History />} />
               <Route path="/membership" element={<Membership />} />
