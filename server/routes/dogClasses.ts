@@ -254,7 +254,9 @@ router.post('/', async (req: Request, res: Response) => {
     const enrollmentDate = new Date().toISOString().slice(0, 19).replace('T', ' ');
 
     const effectivePaymentMethod = spotsOpen ? paymentMethod : 7;
-    const newQuery = 'INSERT INTO Enrollment VALUES (?, ?, ?, ?, \'0\', ?, ?, ?, ?, \'Y\', \'None\', \'internet - new site\', ?)';
+    //Todo: the "concerns" field is used to store the age string. For now I changed it to be hard coded to Years but this should probably
+    // be updated to use the rest of the text entered by the user. Eventually this should be imprved further
+    const newQuery = 'INSERT INTO Enrollment VALUES (?, ?, ?, ?, \'0\', ?, ?, ?, ?, \'Y\', \'Years\', \'internet - new site\', ?)';
     const response = await pool.query(newQuery, [newIdValue, userId, classId, req.body.isActiveMember ? 1 : 0, effectivePaymentMethod, dogName, parsedDogAge, dogBreed, enrollmentDate]);
 
     betaLog('ENROLLMENT_DB_INSERT', {
