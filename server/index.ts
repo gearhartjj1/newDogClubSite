@@ -22,6 +22,7 @@ import classesRouter from './routes/classes.js';
 import signupsRouter from './routes/signups.js';
 import signinRouter from './routes/signin.js';
 import memberDogsRouter from './routes/memberDogs.js';
+import userDataRouter from './routes/userData.js';
 import pool from './config/database.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -108,6 +109,7 @@ app.use('/api/classes', classesRouter);
 app.use('/api/signups', signupsRouter);
 app.use('/api/signin', signinRouter);
 app.use('/api/member-dogs', memberDogsRouter);
+app.use('/api/user-data', userDataRouter);
 
 // Error handling middleware
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {

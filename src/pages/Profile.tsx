@@ -2,7 +2,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import styles from './Profile.module.css';
 import { useUserData, type Dog, type PastClass, type UserInfo } from '../context/UserDataContext';
-import { dogClassAPI, memberDogsAPI, signinAPI, type ClassRate } from '../services/api';
+import { dogClassAPI, memberDogsAPI, signinAPI, userDataAPI, type ClassRate } from '../services/api';
 import PayPalSection from '../components/PayPalButton';
 
 export default function Profile() {
@@ -22,6 +22,15 @@ export default function Profile() {
   const [showUnpaidClasses, setShowUnpaidClasses] = useState(false);
   const [selectedClass, setSelectedClass] = useState<PastClass | null>(null);
   const [classRates, setClassRates] = useState<ClassRate[]>([]);
+
+  const [isEditingInfo, setIsEditingInfo] = useState(false);
+  const [isSavingInfo, setIsSavingInfo] = useState(false);
+  const [editInfoForm, setEditInfoForm] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+  });
 
   useEffect(() => {
     if (classId && pastClasses) {
@@ -210,6 +219,57 @@ export default function Profile() {
     }
   };
 
+  const handleStartEditInfo = () => {
+    setEditInfoForm({
+      firstName: userData?.firstName || '',
+      lastName: userData?.username || '',
+      email: userData?.email || '',
+      phone: userData?.userInfo?.phone || '',
+    });
+    setIsEditingInfo(true);
+  };
+
+  const handleSaveInfo = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editInfoForm.firstName.trim() || !editInfoForm.lastName.trim()) {
+      alert('Please enter your first and last name');
+      return;
+    }
+
+    setIsSavingInfo(true);
+    try {
+      const response = await userDataAPI.updateProfile({
+        firstName: editInfoForm.firstName.trim(),
+        lastName: editInfoForm.lastName.trim(),
+        email: editInfoForm.email.trim(),
+        phone: editInfoForm.phone.trim(),
+      });
+
+      if (response.success && userData) {
+        setUserData({
+          ...userData,
+          username: response.user.username,
+          firstName: response.user.firstName,
+          email: response.user.email,
+          userInfo: {
+            name: response.user.firstName + ' ' + response.user.username,
+            email: response.user.email,
+            phone: response.user.phone,
+            memberSince: userData.userInfo?.memberSince || 'TBD',
+          },
+        });
+        setIsEditingInfo(false);
+      } else {
+        alert('Failed to update profile: ' + (response.error || 'Unknown error'));
+      }
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      alert(error instanceof Error ? error.message : 'Failed to update profile');
+    } finally {
+      setIsSavingInfo(false);
+    }
+  };
+
   if (isLoading) {
     return <p>Loading...</p>;
   }
@@ -229,29 +289,108 @@ export default function Profile() {
       <div className={styles.content}>
         {/* Personal Information Section */}
         <section className={styles.section}>
-          <h2>Personal Information</h2>
-          <div className={styles.infoGrid}>
-            <div className={styles.infoItem}>
-              <label>Name</label>
-              <p>{userInfo.name}</p>
-            </div>
-            <div className={styles.infoItem}>
-              <label>Email</label>
-              <p>{userInfo.email}</p>
-            </div>
-            <div className={styles.infoItem}>
-              <label>Phone</label>
-              <p>{userInfo.phone}</p>
-            </div>
-            <div className={styles.infoItem}>
-              <label>Member Since</label>
-              <p>{userInfo.memberSince}</p>
-            </div>
-            <div className={styles.infoItem}>
-              <label>Active Member</label>
-              <p>{userData.isActiveMember ? 'Yes' : 'No'}</p>
-            </div>
+          <div className={styles.sectionHeader}>
+            <h2>Personal Information</h2>
+            {!isEditingInfo && (
+              <button onClick={handleStartEditInfo} className={styles.addButton}>
+                ✏️ Edit
+              </button>
+            )}
           </div>
+          {isEditingInfo ? (
+            <form onSubmit={handleSaveInfo} className={styles.form}>
+              <div className={styles.formRow}>
+                <div className={styles.formGroup}>
+                  <label htmlFor="firstName">First Name</label>
+                  <input
+                    type="text"
+                    id="firstName"
+                    value={editInfoForm.firstName}
+                    onChange={(e) =>
+                      setEditInfoForm({ ...editInfoForm, firstName: e.target.value })
+                    }
+                    placeholder="Enter first name"
+                    required
+                  />
+                </div>
+                <div className={styles.formGroup}>
+                  <label htmlFor="lastName">Last Name</label>
+                  <input
+                    type="text"
+                    id="lastName"
+                    value={editInfoForm.lastName}
+                    onChange={(e) =>
+                      setEditInfoForm({ ...editInfoForm, lastName: e.target.value })
+                    }
+                    placeholder="Enter last name"
+                    required
+                  />
+                </div>
+              </div>
+              <div className={styles.formRow}>
+                <div className={styles.formGroup}>
+                  <label htmlFor="email">Email</label>
+                  <input
+                    type="email"
+                    id="email"
+                    value={editInfoForm.email}
+                    onChange={(e) =>
+                      setEditInfoForm({ ...editInfoForm, email: e.target.value })
+                    }
+                    placeholder="Enter email"
+                  />
+                </div>
+                <div className={styles.formGroup}>
+                  <label htmlFor="phone">Phone</label>
+                  <input
+                    type="tel"
+                    id="phone"
+                    value={editInfoForm.phone}
+                    onChange={(e) =>
+                      setEditInfoForm({ ...editInfoForm, phone: e.target.value })
+                    }
+                    placeholder="Enter phone number"
+                  />
+                </div>
+              </div>
+              <div className={styles.formActions}>
+                <button type="submit" className={styles.submitButton} disabled={isSavingInfo}>
+                  {isSavingInfo ? 'Saving...' : 'Save'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsEditingInfo(false)}
+                  className={styles.cancelButton}
+                  disabled={isSavingInfo}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          ) : (
+            <div className={styles.infoGrid}>
+              <div className={styles.infoItem}>
+                <label>Name</label>
+                <p>{userInfo.name}</p>
+              </div>
+              <div className={styles.infoItem}>
+                <label>Email</label>
+                <p>{userInfo.email}</p>
+              </div>
+              <div className={styles.infoItem}>
+                <label>Phone</label>
+                <p>{userInfo.phone}</p>
+              </div>
+              <div className={styles.infoItem}>
+                <label>Member Since</label>
+                <p>{userInfo.memberSince}</p>
+              </div>
+              <div className={styles.infoItem}>
+                <label>Active Member</label>
+                <p>{userData.isActiveMember ? 'Yes' : 'No'}</p>
+              </div>
+            </div>
+          )}
         </section>
 
         {/* My Dogs Section */}

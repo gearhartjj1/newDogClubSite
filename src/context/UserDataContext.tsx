@@ -37,6 +37,7 @@ export interface UserInfo {
 export interface UserData {
   id?: number;
   username: string;
+  firstName?: string;
   email?: string;
   userInfo?: UserInfo;
   dogs?: Dog[];
@@ -72,6 +73,7 @@ export function UserDataProvider({ children }: UserDataProviderProps) {
           const restored: UserData = {
             id: user.id,
             username: user.username,
+            firstName: user.firstName,
             email: user.email,
             userInfo: {
               name: user.firstName + ' ' + user.username,

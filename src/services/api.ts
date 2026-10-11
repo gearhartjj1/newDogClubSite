@@ -205,6 +205,23 @@ export const signinAPI = {
   },
 };
 
+// User Data API
+export const userDataAPI = {
+  updateProfile: async (profile: { firstName: string; lastName: string; email: string; phone: string }) => {
+    const response = await fetch(`${API_URL}/user-data/profile`, {
+      ...fetchOptions,
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(profile),
+    });
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.error || 'Failed to update profile');
+    }
+    return data;
+  },
+};
+
 // Member Dogs API
 export const memberDogsAPI = {
   getByFamilyId: async (familyId: number) => {

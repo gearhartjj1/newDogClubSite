@@ -33,6 +33,7 @@ export default function Login() {
         const userData: UserData = {
           id: response.user.id,
           username: response.user.username,
+          firstName: response.user.firstName,
           email: response.user.email,
           userInfo: {
             name: response.user.firstName + ' ' + response.user.username,
