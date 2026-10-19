@@ -13,22 +13,22 @@ export default function OfficersAndBoard() {
         <div className={styles.card}>
           <h2>Officers and Board Members</h2>
 
-          <p><strong>President:</strong> Ted Nowlen</p>
-          <p><strong>Vice President:</strong> Clemence Cretaux</p>
+          <p><strong>President:</strong> Dan Goldberg</p>
+          <p><strong>Vice President:</strong> Katie Hinzman</p>
           <p><strong>Treasurer:</strong> Amy Sandhagen</p>
           <p><strong>Corresponding Secretary/Membership Chair:</strong> ClaraMarie Schmalz</p>
           <p><strong>Recording Secretary:</strong> Michelle Rengers</p>
           <p><strong>Ex-Officio:</strong> Dan Mullaney</p>
           <p><strong>Director at Large:</strong> Bill Tullock</p>
-          <p><strong>Director at Large:</strong> Amy Rusenko</p>
+          <p><strong>Director at Large:</strong> Chris Palamone</p>
           <p><strong>Enrollment Coordinator:</strong> Sharon Hareza</p>
           <p><strong>Training Director:</strong> Pam Lewis</p>
 
           <h3>Other</h3>
 
-          <p><strong>Webmaster:</strong> Joe Shields</p>
+          <p><strong>Webmaster:</strong> Jacob Gearhart</p>
           <p><strong>Website Editor:</strong> Cindy Sumner</p>
-          <p><strong>Newsletter Editor:</strong> Clemence Cretaux</p>
+          <p><strong>Newsletter Editor:</strong> Arlene Boehm</p>
         </div>
       </section>
 
