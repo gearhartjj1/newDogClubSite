@@ -118,13 +118,6 @@ router.get('/rates', async (req: Request, res: Response) => {
   }
 });
 
-//TODO:
-// Update PayPal to use account for club
-
-// TODO This weekend
-//    Hook up paypal integration with clubs paypal
-//    Email club about planning next test session
-
 // Create enrollment
 router.post('/', async (req: Request, res: Response) => {
   const enrollStartTime = Date.now();
@@ -292,6 +285,91 @@ router.post('/', async (req: Request, res: Response) => {
     betaLog('ENROLLMENT_ERROR', { error: String(error), body: req.body, durationMs });
     console.error('Error creating event: ', error);
     res.status(500).json({ error: 'Failed to create event' });
+  }
+});
+
+// Add a new class to the current session
+router.post('/classes', async (req: Request, res: Response) => {
+  try {
+    console.log('Adding a new class with body:', req.body);
+    betaLog('ADD_CLASS_START', { body: req.body });
+    const currentSession = await getCurrentSession();
+    const newClassIdQuery = "select max(ID) from KCTCSession";
+    const newClassIdResult = await pool.query(newClassIdQuery);
+    const newClassId = ((newClassIdResult[0] as any)[0]['max(ID)'] || 0) + 1;
+    console.log('New class ID:', newClassId);
+
+    // TODO: pull the needed fields from req.body and update the query/params
+    console.log('Current session:', currentSession);
+    const query = 'INSERT INTO KCTCSession VALUES (?, ?, ?, ?, ?, "", ?, ?, "", ?, ?, ?, ?, ?)';
+    //ToDo: there is something weird with how the instructorsIds value is used. I need to look into this further
+    //TODO: need to look into date conventsions
+    const params: unknown[] = [newClassId, req.body.session, req.body.room, req.body.code, req.body.className, req.body.prerequisites, req.body.maxDogs, req.body.startDate, req.body.day, req.body.time, req.body.instructors, req.body.rate];
+    const result = await pool.query(query, params)
+
+    betaLog('ADD_CLASS_COMPLETE', { classId: newClassId });
+    res.status(201).json({ message: 'Class created', classId: newClassId });
+  } catch (error) {
+    betaLog('ADD_CLASS_ERROR', { error: String(error), body: req.body });
+    console.error('Error adding class: ', error);
+    res.status(500).json({ error: 'Failed to add class' });
+  }
+});
+
+// Edit an existing class
+//todo: needs finished
+router.put('/classes/:classId', async (req: Request, res: Response) => {
+  try {
+    const classId = parseInt(req.params.classId, 10);
+    if (isNaN(classId)) {
+      return res.status(400).json({ error: 'Invalid class id' });
+    }
+    betaLog('EDIT_CLASS_START', { classId, body: req.body });
+
+    // TODO: pull the needed fields from req.body and update the query/params
+    const query = 'UPDATE KCTCSession SET Class = ? WHERE ID = ?';
+    const params: unknown[] = [req.body.className, classId];
+    const result = await pool.query(query, params);
+
+    if ((result[0] as any).affectedRows === 0) {
+      betaLog('EDIT_CLASS_NOT_FOUND', { classId });
+      return res.status(404).json({ error: 'Class not found' });
+    }
+
+    betaLog('EDIT_CLASS_COMPLETE', { classId });
+    res.json({ message: 'Class updated', classId });
+  } catch (error) {
+    betaLog('EDIT_CLASS_ERROR', { error: String(error), body: req.body });
+    console.error('Error updating class: ', error);
+    res.status(500).json({ error: 'Failed to update class' });
+  }
+});
+
+// Delete a class from the current session
+//todo needs finished
+router.delete('/classes/:classId', async (req: Request, res: Response) => {
+  try {
+    const classId = parseInt(req.params.classId, 10);
+    if (isNaN(classId)) {
+      return res.status(400).json({ error: 'Invalid class id' });
+    }
+    betaLog('DELETE_CLASS_START', { classId });
+
+    // TODO: update the query as needed (e.g. guard against deleting classes with enrollments)
+    const query = 'DELETE FROM KCTCSession WHERE ID = ?';
+    const result = await pool.query(query, [classId]);
+
+    if ((result[0] as any).affectedRows === 0) {
+      betaLog('DELETE_CLASS_NOT_FOUND', { classId });
+      return res.status(404).json({ error: 'Class not found' });
+    }
+
+    betaLog('DELETE_CLASS_COMPLETE', { classId });
+    res.json({ message: 'Class deleted', classId });
+  } catch (error) {
+    betaLog('DELETE_CLASS_ERROR', { error: String(error) });
+    console.error('Error deleting class: ', error);
+    res.status(500).json({ error: 'Failed to delete class' });
   }
 });
 

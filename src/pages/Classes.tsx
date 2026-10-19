@@ -3,6 +3,8 @@ import styles from './Classes.module.css';
 import { useEffect, useState } from 'react';
 import { dogClassAPI, type DogClass } from '../services/api';
 
+const classEditingEnabled = import.meta.env.VITE_PAYPAL_ENABLED === 'false';
+
 export default function Classes() {
   const [dogClasses, setDogClasses] = useState<DogClass[]>([]);
   const [sessionStatus, setSessionStatus] = useState<number | undefined>(undefined); // 0 = not started, 1 = open, 2 = closed
@@ -64,6 +66,7 @@ export default function Classes() {
               <th style={{width: '10%'}}>Time</th>
               <th style={{width: '9%'}}>Enrollment</th>
               {sessionStatus === 1 && <th>Action</th>}
+              {classEditingEnabled && <th>Edit</th>}
             </tr>
           </thead>
           <tbody>
@@ -115,6 +118,16 @@ export default function Classes() {
                   )}
                 </td>
                 )}
+                {classEditingEnabled && (
+                <td>
+                  <Link
+                    to={`/classes/edit/${dogClass.ID}`}
+                    className={styles.editButtonSmall}
+                  >
+                    Edit
+                  </Link>
+                </td>
+                )}
               </tr>
             ))}
           </tbody>
@@ -135,6 +148,11 @@ export default function Classes() {
           >
             {isRefreshing ? 'Refreshing...' : '↻ Refresh'}
           </button>
+          {classEditingEnabled && (
+            <Link to="/classes/add" className={styles.addClassButton}>
+              + Add Class
+            </Link>
+          )}
         </div>
         <p>
           {sessionStatus === 0 && <span className={styles.statusPending}>Enrollment opens on {new Date(sessionStartDate).toLocaleDateString('en-US', { timeZone: 'UTC' })} at 9:00 PM</span>}

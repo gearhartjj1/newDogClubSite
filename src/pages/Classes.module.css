@@ -61,6 +61,37 @@
   cursor: not-allowed;
 }
 
+.addClassButton {
+  padding: 6px 14px;
+  background-color: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background-color 0.2s;
+}
+
+.addClassButton:hover {
+  background-color: #1d4ed8;
+}
+
+.editButtonSmall {
+  display: inline-block;
+  padding: 4px 12px;
+  background-color: #2563eb;
+  color: white;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  text-decoration: none;
+  transition: background-color 0.2s;
+}
+
+.editButtonSmall:hover {
+  background-color: #1d4ed8;
+}
+
 .tableWrapper {
   background: white;
   border-radius: 8px;

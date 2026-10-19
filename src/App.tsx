@@ -3,6 +3,7 @@ import Navigation from './components/Navigation';
 import Sidebar from './components/Sidebar';
 import Home from './pages/Home';
 import Classes from './pages/Classes';
+import AddClass from './pages/AddClass';
 import ClassSignup from './pages/ClassSignup';
 import Login from './pages/Login';
 import Profile from './pages/Profile';
@@ -31,6 +32,8 @@ function App() {
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/classes" element={<Classes />} />
+              <Route path="/classes/add" element={<AddClass />} />
+              <Route path="/classes/edit/:classId" element={<AddClass />} />
               <Route path="/signup" element={<ClassSignup />} />
               <Route path="/login" element={<Login />} />
               <Route path="/login/:classId" element={<Login />} />

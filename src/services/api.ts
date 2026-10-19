@@ -59,6 +59,26 @@ export const dogClassAPI = {
     return response.json();
   },
 
+  createNewClass: async (classData: any) => {
+    const response = await fetch(`${API_URL}/dog-classes/classes`, {
+      ...fetchOptions,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(classData),
+    });
+    return response.json();
+  },
+
+  updateClass: async (classId: number, classData: any) => {
+    const response = await fetch(`${API_URL}/dog-classes/classes/${classId}`, {
+      ...fetchOptions,
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(classData),
+    });
+    return response.json();
+  },
+
   getByUserId: async (userId: number) => {
     const response = await fetch(`${API_URL}/dog-classes/user/${userId}`, fetchOptions);
     if (!response.ok) throw new Error('Failed to fetch user dog classes');
