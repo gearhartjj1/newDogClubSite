@@ -325,10 +325,14 @@ router.put('/classes/:classId', async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Invalid class id' });
     }
     betaLog('EDIT_CLASS_START', { classId, body: req.body });
-
+    
     // TODO: pull the needed fields from req.body and update the query/params
-    const query = 'UPDATE KCTCSession SET Class = ? WHERE ID = ?';
-    const params: unknown[] = [req.body.className, classId];
+    //const query = 'UPDATE KCTCSession SET Class = ? WHERE ID = ?';
+    const query = 'UPDATE KCTCSession KS SET ROOM = ?, KS.SESSION = ?, CODE = ?, CLASS = ?, PREREQUISITES = ?, MAXDOG = ?, CURDOG = ?, START = ?, KS.DAY = ?, KS.TIME = ?, INSTRUCTORS = ?, RATE = ? WHERE ID = ?';
+    console.log("the class name: ", req.body.className);
+    //TODO: need to see about the curDog value, currently setting it to 0
+    //Maybe just don't include it
+    const params: unknown[] = [req.body.room, req.body.session, req.body.code, req.body.className, req.body.prerequisites, req.body.maxDogs, 0,req.body.startDate, req.body.day, req.body.time, req.body.instructors, req.body.rate, classId];
     const result = await pool.query(query, params);
 
     if ((result[0] as any).affectedRows === 0) {
