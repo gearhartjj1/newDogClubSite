@@ -4,9 +4,14 @@ import styles from './ClassSignup.module.css';
 import { dogClassAPI } from '../services/api';
 
 // Convert legacy date strings to the yyyy-MM-dd format required by <input type="date">
+// DB dates have no year (e.g. "Oct 27"), so default to the current year instead of 2001
 const toDateInputValue = (dateString: string): string => {
-  const date = new Date(dateString);
-  return isNaN(date.getTime()) ? '' : date.toISOString().slice(0, 10);
+  if (!dateString) return '';
+  const hasYear = /\d{4}/.test(dateString);
+  const date = new Date(hasYear ? dateString : `${dateString} ${new Date().getFullYear()}`);
+  if (isNaN(date.getTime())) return '';
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
 };
 
 export default function AddClass() {
@@ -23,7 +28,6 @@ export default function AddClass() {
     prerequisites: '',
     maxDogs: '',
     startDate: '',
-    day: '',
     time: '',
     instructors: '',
     instructorIds: '',
@@ -49,7 +53,6 @@ export default function AddClass() {
           prerequisites: dogClass.Prerequisites ?? '',
           maxDogs: dogClass.MaxDog != null ? String(dogClass.MaxDog) : '',
           startDate: toDateInputValue(dogClass.Start),
-          day: dogClass.Day ?? '',
           time: dogClass.Time ?? '',
           instructors: dogClass.Instructors ?? '',
           instructorIds: '',
@@ -188,26 +191,6 @@ export default function AddClass() {
               onChange={handleChange}
               required
             />
-          </div>
-
-          <div className={styles.formGroup}>
-            <label htmlFor="day">Day *</label>
-            <select
-              id="day"
-              name="day"
-              value={formData.day}
-              onChange={handleChange}
-              required
-            >
-              <option value="">Select a day</option>
-              <option value="Mon">Monday</option>
-              <option value="Tue">Tuesday</option>
-              <option value="Wed">Wednesday</option>
-              <option value="Thu">Thursday</option>
-              <option value="Fri">Friday</option>
-              <option value="Sat">Saturday</option>
-              <option value="Sun">Sunday</option>
-            </select>
           </div>
 
           <div className={styles.formGroup}>

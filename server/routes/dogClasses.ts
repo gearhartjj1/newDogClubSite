@@ -43,16 +43,32 @@ const betaLog = (action: string, details?: Record<string, unknown>) => {
   console.log(`[BETA][dogClasses] ${action}`, JSON.stringify(entry));
 };
 
+// Parses "YYYY-MM-DD" or "M-D-YYYY" (with - or /) into [year, month, day], or null if invalid
+const parseDateParts = (dateInput: string): [number, number, number] | null => {
+  if (!dateInput) return null;
+  const parts = String(dateInput).trim().split(/[-/]/).map(Number);
+  if (parts.length !== 3 || parts.some(isNaN)) return null;
+  const [year, month, day] = parts[0] > 31 ? [parts[0], parts[1], parts[2]] : [parts[2], parts[0], parts[1]];
+  if (month < 1 || month > 12) return null;
+  return [year, month, day];
+};
+
 // Converts a date string (e.g. "10-27-2026", "2026-10-27") to "Mon D" format like "Oct 27"
 const formatStartDate = (dateInput: string): string => {
-  if (!dateInput) return '';
-  const parts = String(dateInput).trim().split(/[-/]/).map(Number);
-  if (parts.length !== 3 || parts.some(isNaN)) return String(dateInput);
-  // Support both YYYY-MM-DD and M-D-YYYY
-  const [month, day] = parts[0] > 31 ? [parts[1], parts[2]] : [parts[0], parts[1]];
+  const parsed = parseDateParts(dateInput);
+  if (!parsed) return String(dateInput ?? '');
+  const [, month, day] = parsed;
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  if (month < 1 || month > 12) return String(dateInput);
   return `${months[month - 1]} ${day}`;
+};
+
+// Derives the day-of-week abbreviation (e.g. "Mon") from a start date string
+const getDayFromStartDate = (dateInput: string): string => {
+  const parsed = parseDateParts(dateInput);
+  if (!parsed) return '';
+  const [year, month, day] = parsed;
+  const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  return days[new Date(year, month - 1, day).getDay()];
 };
 
 const getCurrentSession = async (): Promise<{ session: string; code: string, startDate: string }> => {
@@ -316,7 +332,7 @@ router.post('/classes', async (req: Request, res: Response) => {
     const query = 'INSERT INTO KCTCSession VALUES (?, ?, ?, ?, ?, "", ?, ?, "", ?, ?, ?, ?, ?)';
     //ToDo: there is something weird with how the instructorsIds value is used. I need to look into this further
     //TODO: need to look into date conventsions
-    const params: unknown[] = [newClassId, req.body.session, req.body.room, req.body.code, req.body.className, req.body.prerequisites, req.body.maxDogs, formatStartDate(req.body.startDate), req.body.day, req.body.time, req.body.instructors, req.body.rate];
+    const params: unknown[] = [newClassId, req.body.session, req.body.room, req.body.code, req.body.className, req.body.prerequisites, req.body.maxDogs, formatStartDate(req.body.startDate), getDayFromStartDate(req.body.startDate), req.body.time, req.body.instructors, req.body.rate];
     const result = await pool.query(query, params)
 
     betaLog('ADD_CLASS_COMPLETE', { classId: newClassId });
@@ -344,7 +360,7 @@ router.put('/classes/:classId', async (req: Request, res: Response) => {
     console.log("the class name: ", req.body.className);
     //TODO: need to see about the curDog value, currently setting it to 0
     //Maybe just don't include it
-    const params: unknown[] = [req.body.room, req.body.session, req.body.code, req.body.className, req.body.prerequisites, req.body.maxDogs, 0, formatStartDate(req.body.startDate), req.body.day, req.body.time, req.body.instructors, req.body.rate, classId];
+    const params: unknown[] = [req.body.room, req.body.session, req.body.code, req.body.className, req.body.prerequisites, req.body.maxDogs, 0, formatStartDate(req.body.startDate), getDayFromStartDate(req.body.startDate), req.body.time, req.body.instructors, req.body.rate, classId];
     const result = await pool.query(query, params);
 
     if ((result[0] as any).affectedRows === 0) {
