@@ -36,6 +36,14 @@ export interface DogClass {
 // Dog Classes API
 //TODO: clean up this to format data from database from json to list of objects
 export const dogClassAPI = {
+  remove: async (classId: number) => {
+    const response = await fetch(`${API_URL}/dog-classes/classes/${classId}`, {
+      ...fetchOptions,
+      method: 'DELETE',
+    });
+    return response.json();
+  },
+  
   getAll: async () => {
     const response = await fetch(`${API_URL}/dog-classes`, fetchOptions);
     if (!response.ok) throw new Error('Failed to fetch dog classes');

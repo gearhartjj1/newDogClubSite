@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import styles from './ClassSignup.module.css';
 import { dogClassAPI } from '../services/api';
@@ -42,6 +42,7 @@ export default function AddClass() {
   const { classId } = useParams();
   const isEditMode = classId != null;
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [confirmationModalOpen, setConfirmationModalOpen] = useState(false);
   const [error, setError] = useState('');
   const [formData, setFormData] = useState({
     session: '',
@@ -96,6 +97,7 @@ export default function AddClass() {
 
   //TODO: need to get the update query working
   const handleSubmit = async (e: React.FormEvent) => {
+    if (confirmationModalOpen) return;
     e.preventDefault();
     setIsSubmitting(true);
     setError('');
@@ -114,13 +116,23 @@ export default function AddClass() {
     }
   };
 
+  const openDeleteConfirmation = useCallback(() => {
+    setConfirmationModalOpen(true);
+  }, [classId]);
+
+  const confirmDelete = useCallback(async () => {
+    setConfirmationModalOpen(false);
+    if (!classId) throw new Error('Class ID is missing');
+    await dogClassAPI.remove(parseInt(classId, 10));
+    navigate('/classes');
+  }, [classId]);
+
   return (
     <div className={styles.container}>
       <header className={styles.header}>
         <h1>{isEditMode ? '✏️ Edit Class' : '➕ Add a New Class'}</h1>
         <p>{isEditMode ? 'Update the details for this class' : 'Enter the details for the new class'}</p>
       </header>
-
       <form onSubmit={handleSubmit} className={styles.form}>
         <div className={styles.section}>
           <h2>Class Information</h2>
@@ -279,8 +291,27 @@ export default function AddClass() {
           <button type="button" className={styles.cancelButton} onClick={() => navigate('/classes')}>
             Cancel
           </button>
+          {isEditMode &&
+            <button type="button" onClick={async () => {
+                openDeleteConfirmation();
+              }}>Delete Class
+            </button>
+          }
         </div>
       </form>
+      {confirmationModalOpen && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.confirmModal} onClick={(e) => e.stopPropagation()}>
+            <p className={styles.confirmText}>
+              Are you sure you want to delete this class?
+            </p>
+            <div className={styles.confirmActions}>
+              <button className={styles.confirmDeleteButton} onClick={confirmDelete}>Confirm Delete</button>
+              <button className={styles.confirmCancelButton} onClick={() => setConfirmationModalOpen(false)}>Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
