@@ -14,6 +14,29 @@ const toDateInputValue = (dateString: string): string => {
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
 };
 
+// Convert stored time strings (e.g. "7:00 PM", "7:00PM") to the HH:mm format required by <input type="time">
+const toTimeInputValue = (timeString: string): string => {
+  if (!timeString) return '';
+  const match = timeString.trim().match(/^(\d{1,2}):(\d{2})\s*(AM|PM)?$/i);
+  if (!match) return '';
+  let hours = parseInt(match[1], 10);
+  const minutes = match[2];
+  const meridiem = match[3]?.toUpperCase();
+  if (meridiem === 'PM' && hours !== 12) hours += 12;
+  if (meridiem === 'AM' && hours === 12) hours = 0;
+  return `${String(hours).padStart(2, '0')}:${minutes}`;
+};
+
+// Convert HH:mm from the time picker to "1:00 PM" format (always a space before AM/PM)
+const toDisplayTime = (inputValue: string): string => {
+  if (!inputValue) return '';
+  const [hourStr, minutes] = inputValue.split(':');
+  let hours = parseInt(hourStr, 10);
+  const meridiem = hours >= 12 ? 'PM' : 'AM';
+  hours = hours % 12 || 12;
+  return `${hours}:${minutes} ${meridiem}`;
+};
+
 export default function AddClass() {
   const navigate = useNavigate();
   const { classId } = useParams();
@@ -68,7 +91,7 @@ export default function AddClass() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData(prev => ({ ...prev, [name]: name === 'time' ? toDisplayTime(value) : value }));
   };
 
   //TODO: need to get the update query working
@@ -196,11 +219,10 @@ export default function AddClass() {
           <div className={styles.formGroup}>
             <label htmlFor="time">Time *</label>
             <input
-              type="text"
+              type="time"
               id="time"
               name="time"
-              placeholder="e.g. 7:00 PM"
-              value={formData.time}
+              value={toTimeInputValue(formData.time)}
               onChange={handleChange}
               required
             />
