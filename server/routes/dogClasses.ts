@@ -329,11 +329,11 @@ router.post('/classes', async (req: Request, res: Response) => {
 
     // TODO: pull the needed fields from req.body and update the query/params
     console.log('Current session:', currentSession);
-    const query = 'INSERT INTO KCTCSession VALUES (?, ?, ?, ?, ?, "", ?, ?, "", ?, ?, ?, ?, ?)';
+    const query = 'INSERT INTO KCTCSession VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
     //ToDo: there is something weird with how the instructorsIds value is used. I need to look into this further
     //TODO: need to look into date conventsions
     //TODO: the curdog needs to hold instructorIDs working in the edit function but the create new function sql needs udpated
-    const params: unknown[] = [newClassId, req.body.session, req.body.room, req.body.code, req.body.className, req.body.prerequisites, req.body.maxDogs, formatStartDate(req.body.startDate), getDayFromStartDate(req.body.startDate), req.body.time, req.body.instructors, req.body.rate];
+    const params: unknown[] = [newClassId, req.body.session, req.body.room, req.body.code, req.body.className, "", req.body.prerequisites, req.body.maxDogs, req.body.instructorIds, formatStartDate(req.body.startDate), getDayFromStartDate(req.body.startDate), req.body.time, req.body.instructors, req.body.rate];
     const result = await pool.query(query, params)
 
     betaLog('ADD_CLASS_COMPLETE', { classId: newClassId });
