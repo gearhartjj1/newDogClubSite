@@ -332,6 +332,7 @@ router.post('/classes', async (req: Request, res: Response) => {
     const query = 'INSERT INTO KCTCSession VALUES (?, ?, ?, ?, ?, "", ?, ?, "", ?, ?, ?, ?, ?)';
     //ToDo: there is something weird with how the instructorsIds value is used. I need to look into this further
     //TODO: need to look into date conventsions
+    //TODO: the curdog needs to hold instructorIDs working in the edit function but the create new function sql needs udpated
     const params: unknown[] = [newClassId, req.body.session, req.body.room, req.body.code, req.body.className, req.body.prerequisites, req.body.maxDogs, formatStartDate(req.body.startDate), getDayFromStartDate(req.body.startDate), req.body.time, req.body.instructors, req.body.rate];
     const result = await pool.query(query, params)
 
@@ -360,7 +361,7 @@ router.put('/classes/:classId', async (req: Request, res: Response) => {
     console.log("the class name: ", req.body.className);
     //TODO: need to see about the curDog value, currently setting it to 0
     //Maybe just don't include it
-    const params: unknown[] = [req.body.room, req.body.session, req.body.code, req.body.className, req.body.prerequisites, req.body.maxDogs, 0, formatStartDate(req.body.startDate), getDayFromStartDate(req.body.startDate), req.body.time, req.body.instructors, req.body.rate, classId];
+    const params: unknown[] = [req.body.room, req.body.session, req.body.code, req.body.className, req.body.prerequisites, req.body.maxDogs, req.body.instructorIds, formatStartDate(req.body.startDate), getDayFromStartDate(req.body.startDate), req.body.time, req.body.instructors, req.body.rate, classId];
     const result = await pool.query(query, params);
 
     if ((result[0] as any).affectedRows === 0) {

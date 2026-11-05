@@ -79,7 +79,7 @@ export default function AddClass() {
           startDate: toDateInputValue(dogClass.Start),
           time: dogClass.Time ?? '',
           instructors: dogClass.Instructors ?? '',
-          instructorIds: '',
+          instructorIds: dogClass.CurDog ?? '',
           rate: dogClass.Rate != null ? String(dogClass.Rate) : '',
         });
       } catch (err) {
