@@ -43,6 +43,7 @@ export interface UserData {
   dogs?: Dog[];
   pastClasses?: PastClass[];
   isActiveMember?: boolean;
+  isAdmin?: boolean;
 }
 
 interface UserDataContextType {
@@ -82,6 +83,7 @@ export function UserDataProvider({ children }: UserDataProviderProps) {
               memberSince: 'TBD',
             },
             isActiveMember: user.isActiveMember,
+            isAdmin: user.isAdmin,
           };
           setUserDataState(restored);
         }

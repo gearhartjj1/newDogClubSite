@@ -42,6 +42,7 @@ export default function Login() {
             memberSince: "TBD"
           },
           isActiveMember: response.user.isActiveMember,
+          isAdmin: response.user.isAdmin,
         };
         setUserData(userData);
         navigate('/profile' + (classId ? '/' + classId : '')); // Redirect to profile or specific class if classId is present

@@ -1,14 +1,19 @@
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import styles from './Profile.module.css';
 import { useUserData, type Dog, type PastClass, type UserInfo } from '../context/UserDataContext';
-import { dogClassAPI, memberDogsAPI, signinAPI, userDataAPI, type ClassRate } from '../services/api';
+import { dogClassAPI, memberDogsAPI, membersAPI, signinAPI, userDataAPI, type ClassRate, type Member } from '../services/api';
 import PayPalSection from '../components/PayPalButton';
 
 export default function Profile() {
-  const { classId } = useParams();
+  const { classId, userId } = useParams();
   const navigate = useNavigate();
   const { userData, isLoading, setUserData } = useUserData();
+
+  // Admin read-only view of another member's profile
+  const isAdminView = Boolean(userId);
+  const viewedUserId = isAdminView ? Number(userId) : userData?.id;
+  const [viewedMember, setViewedMember] = useState<Member | null>(null);
 
   const [showAddDog, setShowAddDog] = useState(false);
   const [newDogForm, setNewDogForm] = useState({
@@ -65,12 +70,27 @@ export default function Profile() {
     }
   }, [isLoading, classId, userData, navigate]);
 
+  // Only admins may view another member's profile
+  useEffect(() => {
+    if (!isLoading && userData && isAdminView && !userData.isAdmin) {
+      navigate('/profile', { replace: true });
+    }
+  }, [isLoading, userData, isAdminView, navigate]);
+
+  // Fetch the viewed member's info for the admin view
+  useEffect(() => {
+    if (!isAdminView || !userData?.isAdmin || !viewedUserId) return;
+    membersAPI.getById(viewedUserId)
+      .then(setViewedMember)
+      .catch((error) => console.error('Error fetching member info:', error));
+  }, [isAdminView, userData?.isAdmin, viewedUserId]);
+
   // Fetch user's dogs from database on component load
   useEffect(() => {
     const fetchUserDogs = async () => {
       try {
-        if (userData?.id) {
-          const response = await memberDogsAPI.getByFamilyId(userData.id);
+        if (viewedUserId && (!isAdminView || userData?.isAdmin)) {
+          const response = await memberDogsAPI.getByFamilyId(viewedUserId);
           if (response.success && response.data) {
             const formattedDogs: Dog[] = response.data.map((dog: any) => ({
               id: dog.id,
@@ -87,7 +107,7 @@ export default function Profile() {
     };
 
     fetchUserDogs();
-  }, [userData?.id]);
+  }, [viewedUserId, isAdminView, userData?.isAdmin]);
 
   // Fetch user's enrolled classes on component load
   useEffect(() => {
@@ -95,8 +115,8 @@ export default function Profile() {
 
     const fetchUserClasses = async () => {
       try {
-        if (userData?.id) {
-          const response = await dogClassAPI.getByUserId(userData.id);
+        if (viewedUserId && (!isAdminView || userData?.isAdmin)) {
+          const response = await dogClassAPI.getByUserId(viewedUserId);
 
           const paymentMethodNames: { [key: number]: string } = {
             1: 'PayPal',
@@ -139,7 +159,7 @@ export default function Profile() {
     };
 
     fetchUserClasses();
-  }, [userData?.id, classRates]);
+  }, [viewedUserId, isAdminView, userData?.isAdmin, classRates]);
 
   // Don't render profile content if not authenticated
   if (!userData) {
@@ -147,12 +167,20 @@ export default function Profile() {
   }
 
   // Use user data from context, with fallback values
-  const userInfo: UserInfo = {
-    name: userData.username || 'User',
-    email: userData.email || '',
-    phone: userData.userInfo?.phone || '',
-    memberSince: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long' }),
-  };
+  const userInfo: UserInfo = isAdminView
+    ? {
+        name: viewedMember ? `${viewedMember.firstName} ${viewedMember.lastName}` : 'Loading...',
+        email: viewedMember?.email || '',
+        phone: viewedMember?.phone || '',
+        memberSince: 'TBD',
+      }
+    : {
+        name: userData.username || 'User',
+        email: userData.email || '',
+        phone: userData.userInfo?.phone || '',
+        memberSince: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long' }),
+      };
+  const isActiveMemberShown = isAdminView ? viewedMember?.isActiveMember : userData.isActiveMember;
 
   const handleAddDog = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -278,20 +306,50 @@ export default function Profile() {
     <div className={styles.container}>
       <header className={styles.header}>
         <div className={styles.headerContent}>
-          <h1>👤 My Profile</h1>
-          <p>Welcome, {userData.userInfo?.name}!</p>
+          <h1>👤 {isAdminView ? 'Member Profile' : 'My Profile'}</h1>
+          {isAdminView ? (
+            <p className={styles.adminViewBanner}>
+              Admin view: viewing {userInfo.name}'s data (read only)
+            </p>
+          ) : (
+            <p>Welcome, {userData.userInfo?.name}!</p>
+          )}
         </div>
-        <button onClick={handleLogout} className={styles.logoutButton}>
-          Sign Out
-        </button>
+        {isAdminView ? (
+          <Link to="/admin/members" className={styles.backLink}>← Back to Member Management</Link>
+        ) : (
+          <button onClick={handleLogout} className={styles.logoutButton}>
+            Sign Out
+          </button>
+        )}
       </header>
 
       <div className={styles.content}>
+        {/* Admin Section */}
+        {userData.isAdmin && !isAdminView && (
+          <section className={styles.section}>
+            <div className={styles.sectionHeader}>
+              <h2>🔧 Admin Tools</h2>
+            </div>
+            <div className={styles.adminLinks}>
+              <Link to="/admin/members" className={styles.adminLinkCard}>
+                <h3>👥 Member Management</h3>
+                <p>Search members, view the full member list, or add a new member.</p>
+              </Link>
+              <Link to="/classes/add" className={styles.adminLinkCard}>
+                <h3>📚 Add a Class</h3>
+                <p>Create a new class offering.</p>
+              </Link>
+              {/* TODO: additional admin pages (class signups, payment reports, etc.) */}
+            </div>
+          </section>
+        )}
+
         {/* Personal Information Section */}
         <section className={styles.section}>
           <div className={styles.sectionHeader}>
             <h2>Personal Information</h2>
-            {!isEditingInfo && (
+            {!isEditingInfo && !isAdminView && (
               <button onClick={handleStartEditInfo} className={styles.addButton}>
                 ✏️ Edit
               </button>
@@ -387,7 +445,7 @@ export default function Profile() {
               </div>
               <div className={styles.infoItem}>
                 <label>Active Member</label>
-                <p>{userData.isActiveMember ? 'Yes' : 'No'}</p>
+                <p>{isActiveMemberShown ? 'Yes' : 'No'}</p>
               </div>
             </div>
           )}
@@ -396,13 +454,15 @@ export default function Profile() {
         {/* My Dogs Section */}
         <section className={styles.section}>
           <div className={styles.sectionHeader}>
-            <h2>My Dogs</h2>
-            <button
-              onClick={() => setShowAddDog(!showAddDog)}
-              className={styles.addButton}
-            >
-              {showAddDog ? '✕' : '+ Add Dog'}
-            </button>
+            <h2>{isAdminView ? 'Dogs' : 'My Dogs'}</h2>
+            {!isAdminView && (
+              <button
+                onClick={() => setShowAddDog(!showAddDog)}
+                className={styles.addButton}
+              >
+                {showAddDog ? '✕' : '+ Add Dog'}
+              </button>
+            )}
           </div>
 
           {showAddDog && (
@@ -476,12 +536,14 @@ export default function Profile() {
                     <p><strong>Breed:</strong> {dog.breed}</p>
                     <p><strong>Age:</strong> {dog.age}</p>
                   </div>
-                  <button
-                    onClick={() => handleRemoveDog(dog.id)}
-                    className={styles.removeButton}
-                  >
-                    Remove
-                  </button>
+                  {!isAdminView && (
+                    <button
+                      onClick={() => handleRemoveDog(dog.id)}
+                      className={styles.removeButton}
+                    >
+                      Remove
+                    </button>
+                  )}
                 </div>
               ))
             )}
@@ -508,7 +570,9 @@ export default function Profile() {
                     className={styles.expandButton}
                     onClick={() => {
                       setSelectedClass(cls);
-                      navigate('/profile/' + cls.enrollmentId, { replace: true });
+                      if (!isAdminView) {
+                        navigate('/profile/' + cls.enrollmentId, { replace: true });
+                      }
                     }}
                   >
                     View Details
@@ -525,17 +589,19 @@ export default function Profile() {
         <div className={styles.modalOverlay} onClick={() => setSelectedClass(null)}>
           <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
             <div className={styles.modalHeader}>
-              <h2>📚 {selectedClass.className} | Invoice #: {selectedClass.enrollmentId} | Account # {userData.id}</h2>
+              <h2>📚 {selectedClass.className} | Invoice #: {selectedClass.enrollmentId} | Account # {viewedUserId}</h2>
               <button className={styles.modalClose} onClick={() => {
                   setSelectedClass(null);
-                  navigate('/profile', { replace: true });
+                  if (!isAdminView) {
+                    navigate('/profile', { replace: true });
+                  }
                 }}>✕</button>
             </div>
             <div className={styles.modalBody}>
               <div className={styles.modalGrid}>
                 <div className={styles.modalItem}>
                   <label>User Info</label>
-                  <p>{userData.userInfo?.name} | {userData.userInfo?.email} | {userData.userInfo?.phone}</p>
+                  <p>{userInfo.name} | {userInfo.email} | {userInfo.phone}</p>
                 </div>
                 <div className={styles.modalItem}>
                   <label>Class Date Info</label>
@@ -557,7 +623,7 @@ export default function Profile() {
                         Cost: ${selectedClass.cost}
                       </span>
                     </div>
-                    {selectedClass.paidStatus !== 'Paid' && (
+                    {selectedClass.paidStatus !== 'Paid' && !isAdminView && (
                       <div style={{ marginLeft: 'auto', minWidth: '300px', textAlign: 'right' }}>
                         <PayPalSection price={selectedClass.cost} enrollmentId={selectedClass.enrollmentId} onSuccess={()=>{
                           window.location.reload();

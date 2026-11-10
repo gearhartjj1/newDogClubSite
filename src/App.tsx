@@ -18,6 +18,7 @@ import History from './pages/History';
 import Membership from './pages/Membership';
 import MembersOnly from './pages/MembersOnly';
 import OfficersAndBoard from './pages/OfficersAndBoard';
+import MemberManagement from './pages/MemberManagement';
 import { UserDataProvider } from './context/UserDataContext';
 import './App.css';
 
@@ -38,6 +39,7 @@ function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/login/:classId" element={<Login />} />
               <Route path="/profile" element={<Profile />} />
+              <Route path="/profile/user/:userId" element={<Profile />} />
               <Route path="/profile/:classId" element={<Profile />} />
               <Route path="/building-usage" element={<BuildingUsage />} />
               <Route path="/class-prices" element={<ClassPrices />} />
@@ -50,6 +52,7 @@ function App() {
               <Route path="/membership" element={<Membership />} />
               <Route path="/members-only" element={<MembersOnly />} />
               <Route path="/officers-and-board" element={<OfficersAndBoard />} />
+              <Route path="/admin/members" element={<MemberManagement />} />
             </Routes>
           </main>
         </div>

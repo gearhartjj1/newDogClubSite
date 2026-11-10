@@ -280,4 +280,50 @@ export const memberDogsAPI = {
   },
 };
 
+export interface Member {
+  id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  security?: number;
+  isActiveMember?: boolean;
+}
+
+// Members API (admin only)
+export const membersAPI = {
+  getAll: async () => {
+    const response = await fetch(`${API_URL}/members`, fetchOptions);
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'Failed to fetch members');
+    return data.data as Member[];
+  },
+
+  getById: async (memberId: number) => {
+    const response = await fetch(`${API_URL}/members/${memberId}`, fetchOptions);
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'Failed to fetch member');
+    return data.data as Member;
+  },
+
+  searchByLastName: async (lastName: string) => {
+    const response = await fetch(`${API_URL}/members/search?lastName=${encodeURIComponent(lastName)}`, fetchOptions);
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'Failed to search members');
+    return data.data as Member[];
+  },
+
+  add: async (member: { firstName: string; lastName: string; email: string; phone: string }) => {
+    const response = await fetch(`${API_URL}/members`, {
+      ...fetchOptions,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(member),
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'Failed to add member');
+    return data;
+  },
+};
+
 export default { dogClassAPI, classesAPI, signupsAPI, memberDogsAPI };

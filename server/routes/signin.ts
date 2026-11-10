@@ -23,9 +23,17 @@ declare module 'express-session' {
       firstName: string;
       email: string;
       phone: string;
+      isAdmin?: boolean;
     };
   }
 }
+
+const isUserAdmin = (_user: any): boolean => {
+  console.log('Checking if user is admin:', _user);
+  const courseList = _user.CourseList ? (_user.CourseList as string) : "";
+  const roles = courseList.split(',');
+  return roles.includes('2');
+};
 
 interface SignInRequest {
   username: string;
@@ -125,6 +133,7 @@ router.post('/', async (req: Request, res: Response) => {
         email: user.Email || '',
         phone: user.Phone || '',
         isActiveMember: activeMember || false,
+        isAdmin: isUserAdmin(user),
       };
 
       // Store user in session

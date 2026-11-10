@@ -2,8 +2,7 @@ import { Link } from 'react-router-dom';
 import styles from './Classes.module.css';
 import { useEffect, useState } from 'react';
 import { dogClassAPI, type DogClass } from '../services/api';
-
-const classEditingEnabled = import.meta.env.VITE_PAYPAL_ENABLED === 'false';
+import { useUserData } from '../context/UserDataContext';
 
 export default function Classes() {
   const [dogClasses, setDogClasses] = useState<DogClass[]>([]);
@@ -11,6 +10,7 @@ export default function Classes() {
   const [sessionStartDate, setSessionStartDate] = useState<string>('');
   const [sessionName, setSessionName] = useState<string>('');
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const userIsAdmin = useUserData()?.userData?.isAdmin;
 
   const fetchDogClasses = async () => {
     setIsRefreshing(true);
@@ -66,7 +66,7 @@ export default function Classes() {
               <th style={{width: '10%'}}>Time</th>
               <th style={{width: '9%'}}>Enrollment</th>
               {sessionStatus === 1 && <th>Action</th>}
-              {classEditingEnabled && <th>Edit</th>}
+              {userIsAdmin && <th>Edit</th>}
             </tr>
           </thead>
           <tbody>
@@ -118,7 +118,7 @@ export default function Classes() {
                   )}
                 </td>
                 )}
-                {classEditingEnabled && (
+                {userIsAdmin && (
                 <td>
                   <Link
                     to={`/classes/edit/${dogClass.ID}`}
@@ -148,7 +148,7 @@ export default function Classes() {
           >
             {isRefreshing ? 'Refreshing...' : '↻ Refresh'}
           </button>
-          {classEditingEnabled && (
+          {userIsAdmin && (
             <Link to="/classes/add" className={styles.addClassButton}>
               + Add Class
             </Link>
