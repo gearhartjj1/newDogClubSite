@@ -33,6 +33,7 @@ function App() {
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/classes" element={<Classes />} />
+              <Route path="/classes/edit" element={<Classes editMode={true} />} />
               <Route path="/classes/add" element={<AddClass />} />
               <Route path="/classes/edit/:classId" element={<AddClass />} />
               <Route path="/signup" element={<ClassSignup />} />

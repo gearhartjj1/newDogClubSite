@@ -336,9 +336,9 @@ export default function Profile() {
                 <h3>👥 Member Management</h3>
                 <p>Search members, view the full member list, or add a new member.</p>
               </Link>
-              <Link to="/classes/add" className={styles.adminLinkCard}>
-                <h3>📚 Add a Class</h3>
-                <p>Create a new class offering.</p>
+              <Link to="/classes/edit" className={styles.adminLinkCard}>
+                <h3>📚 Edit session classes</h3>
+                <p>Edit existing class offerings or create a new one.</p>
               </Link>
               {/* TODO: additional admin pages (class signups, payment reports, etc.) */}
             </div>

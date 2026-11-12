@@ -107,7 +107,7 @@ export default function AddClass() {
       } else {
         await dogClassAPI.createNewClass(formData);
       }
-      navigate('/classes');
+      navigate('/classes/edit');
     } catch (err) {
       console.error('Error saving class: ', err);
       setError(`Failed to ${isEditMode ? 'update' : 'create'} class. Please try again.`);
@@ -124,7 +124,7 @@ export default function AddClass() {
     setConfirmationModalOpen(false);
     if (!classId) throw new Error('Class ID is missing');
     await dogClassAPI.remove(parseInt(classId, 10));
-    navigate('/classes');
+    navigate('/classes/edit');
   }, [classId]);
 
   return (
@@ -288,7 +288,7 @@ export default function AddClass() {
           <button type="submit" className={styles.submitButton} disabled={isSubmitting}>
             {isSubmitting ? 'Saving...' : (isEditMode ? 'Save Changes' : 'Add Class')}
           </button>
-          <button type="button" className={styles.cancelButton} onClick={() => navigate('/classes')}>
+          <button type="button" className={styles.cancelButton} onClick={() => navigate('/classes/edit')}>
             Cancel
           </button>
           {isEditMode &&

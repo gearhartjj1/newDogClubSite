@@ -4,13 +4,14 @@ import { useEffect, useState } from 'react';
 import { dogClassAPI, type DogClass } from '../services/api';
 import { useUserData } from '../context/UserDataContext';
 
-export default function Classes() {
+export default function Classes({ editMode }: { editMode?: boolean }) {
   const [dogClasses, setDogClasses] = useState<DogClass[]>([]);
   const [sessionStatus, setSessionStatus] = useState<number | undefined>(undefined); // 0 = not started, 1 = open, 2 = closed
   const [sessionStartDate, setSessionStartDate] = useState<string>('');
   const [sessionName, setSessionName] = useState<string>('');
   const [isRefreshing, setIsRefreshing] = useState(false);
   const userIsAdmin = useUserData()?.userData?.isAdmin;
+  const isEditMode = userIsAdmin && (editMode ?? false);
 
   const fetchDogClasses = async () => {
     setIsRefreshing(true);
@@ -65,8 +66,8 @@ export default function Classes() {
               <th style={{width: '5%'}}>Day</th>
               <th style={{width: '10%'}}>Time</th>
               <th style={{width: '9%'}}>Enrollment</th>
-              {sessionStatus === 1 && <th>Action</th>}
-              {userIsAdmin && <th>Edit</th>}
+              {(sessionStatus === 1 && !isEditMode) && <th>Action</th>}
+              {isEditMode && <th>Edit</th>}
             </tr>
           </thead>
           <tbody>
@@ -99,7 +100,7 @@ export default function Classes() {
                     </div>
                   </div>
                 </td>
-                {sessionStatus === 1 && (
+                {(sessionStatus === 1 && !isEditMode) && (
                 <td>
                   {dogClass.DogsInClass < dogClass.MaxDog ? (
                     <Link
@@ -118,7 +119,7 @@ export default function Classes() {
                   )}
                 </td>
                 )}
-                {userIsAdmin && (
+                {isEditMode && (
                 <td>
                   <Link
                     to={`/classes/edit/${dogClass.ID}`}
@@ -148,7 +149,7 @@ export default function Classes() {
           >
             {isRefreshing ? 'Refreshing...' : '↻ Refresh'}
           </button>
-          {userIsAdmin && (
+          {isEditMode && (
             <Link to="/classes/add" className={styles.addClassButton}>
               + Add Class
             </Link>
