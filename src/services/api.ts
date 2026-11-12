@@ -313,7 +313,18 @@ export const membersAPI = {
     return data.data as Member[];
   },
 
-  add: async (member: { firstName: string; lastName: string; email: string; phone: string }) => {
+  add: async (member: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    homePhone: string;
+    workPhone: string;
+    cellPhone: string;
+    address: string;
+    cityStZip: string;
+    comment1: string;
+    comment2: string;
+  }) => {
     const response = await fetch(`${API_URL}/members`, {
       ...fetchOptions,
       method: 'POST',

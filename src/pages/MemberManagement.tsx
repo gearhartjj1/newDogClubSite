@@ -16,12 +16,19 @@ export default function MemberManagement() {
 
   const [showAddMember, setShowAddMember] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [newMemberForm, setNewMemberForm] = useState({
+  const emptyMemberForm = {
     firstName: '',
     lastName: '',
     email: '',
-    phone: '',
-  });
+    homePhone: '',
+    workPhone: '',
+    cellPhone: '',
+    address: '',
+    cityStZip: '',
+    comment1: '',
+    comment2: '',
+  };
+  const [newMemberForm, setNewMemberForm] = useState(emptyMemberForm);
 
   // Redirect non-admins away from this page
   useEffect(() => {
@@ -75,12 +82,18 @@ export default function MemberManagement() {
         firstName: newMemberForm.firstName.trim(),
         lastName: newMemberForm.lastName.trim(),
         email: newMemberForm.email.trim(),
-        phone: newMemberForm.phone.trim(),
+        homePhone: newMemberForm.homePhone.trim(),
+        workPhone: newMemberForm.workPhone.trim(),
+        cellPhone: newMemberForm.cellPhone.trim(),
+        address: newMemberForm.address.trim(),
+        cityStZip: newMemberForm.cityStZip.trim(),
+        comment1: newMemberForm.comment1.trim(),
+        comment2: newMemberForm.comment2.trim(),
       });
 
       if (response.success) {
         setMembers([...members, response.data]);
-        setNewMemberForm({ firstName: '', lastName: '', email: '', phone: '' });
+        setNewMemberForm(emptyMemberForm);
         setShowAddMember(false);
       } else {
         alert('Failed to add member: ' + (response.error || 'Unknown error'));
@@ -162,15 +175,93 @@ export default function MemberManagement() {
                 />
               </div>
               <div className={styles.formGroup}>
-                <label htmlFor="newPhone">Phone</label>
+                <label htmlFor="newHomePhone">Home Phone</label>
                 <input
                   type="tel"
-                  id="newPhone"
-                  value={newMemberForm.phone}
+                  id="newHomePhone"
+                  value={newMemberForm.homePhone}
                   onChange={(e) =>
-                    setNewMemberForm({ ...newMemberForm, phone: e.target.value })
+                    setNewMemberForm({ ...newMemberForm, homePhone: e.target.value })
                   }
-                  placeholder="Enter phone number"
+                  placeholder="Enter home phone number"
+                />
+              </div>
+            </div>
+            <div className={styles.formRow}>
+              <div className={styles.formGroup}>
+                <label htmlFor="newWorkPhone">Work Phone</label>
+                <input
+                  type="tel"
+                  id="newWorkPhone"
+                  value={newMemberForm.workPhone}
+                  onChange={(e) =>
+                    setNewMemberForm({ ...newMemberForm, workPhone: e.target.value })
+                  }
+                  placeholder="Enter work phone number"
+                />
+              </div>
+              <div className={styles.formGroup}>
+                <label htmlFor="newCellPhone">Cell Phone</label>
+                <input
+                  type="tel"
+                  id="newCellPhone"
+                  value={newMemberForm.cellPhone}
+                  onChange={(e) =>
+                    setNewMemberForm({ ...newMemberForm, cellPhone: e.target.value })
+                  }
+                  placeholder="Enter cell phone number"
+                />
+              </div>
+            </div>
+            <div className={styles.formRow}>
+              <div className={styles.formGroup}>
+                <label htmlFor="newAddress">Address</label>
+                <input
+                  type="text"
+                  id="newAddress"
+                  value={newMemberForm.address}
+                  onChange={(e) =>
+                    setNewMemberForm({ ...newMemberForm, address: e.target.value })
+                  }
+                  placeholder="Enter street address"
+                />
+              </div>
+              <div className={styles.formGroup}>
+                <label htmlFor="newCityStZip">City/St/Zip</label>
+                <input
+                  type="text"
+                  id="newCityStZip"
+                  value={newMemberForm.cityStZip}
+                  onChange={(e) =>
+                    setNewMemberForm({ ...newMemberForm, cityStZip: e.target.value })
+                  }
+                  placeholder="e.g. Pittsburgh, PA 15102"
+                />
+              </div>
+            </div>
+            <div className={styles.formRow}>
+              <div className={styles.formGroup}>
+                <label htmlFor="newComment1">Comment 1</label>
+                <input
+                  type="text"
+                  id="newComment1"
+                  value={newMemberForm.comment1}
+                  onChange={(e) =>
+                    setNewMemberForm({ ...newMemberForm, comment1: e.target.value })
+                  }
+                  placeholder="Enter comment"
+                />
+              </div>
+              <div className={styles.formGroup}>
+                <label htmlFor="newComment2">Comment 2</label>
+                <input
+                  type="text"
+                  id="newComment2"
+                  value={newMemberForm.comment2}
+                  onChange={(e) =>
+                    setNewMemberForm({ ...newMemberForm, comment2: e.target.value })
+                  }
+                  placeholder="Enter comment"
                 />
               </div>
             </div>

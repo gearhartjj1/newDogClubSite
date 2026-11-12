@@ -13,6 +13,9 @@ const LIMITS = {
   teacherName: 50,
   teacherPhone: 50,
   teacherEmail: 50,
+  teacherAddress: 50,
+  teacherCityStZip: 50,
+  teacherComment: 50,
 } as const;
 
 // Require a logged-in admin for all member management endpoints
@@ -98,11 +101,17 @@ router.get('/:id', async (req: Request, res: Response) => {
 // Add a new member
 router.post('/', async (req: Request, res: Response) => {
   try {
-    const { firstName, lastName, email, phone } = req.body as {
+    const { firstName, lastName, email, homePhone, workPhone, cellPhone, address, cityStZip, comment1, comment2 } = req.body as {
       firstName?: string;
       lastName?: string;
       email?: string;
-      phone?: string;
+      homePhone?: string;
+      workPhone?: string;
+      cellPhone?: string;
+      address?: string;
+      cityStZip?: string;
+      comment1?: string;
+      comment2?: string;
     };
 
     if (!firstName?.trim() || !lastName?.trim()) {
@@ -116,7 +125,13 @@ router.post('/', async (req: Request, res: Response) => {
     const trimmedFirst = firstName.trim().slice(0, LIMITS.teacherName);
     const trimmedLast = lastName.trim().slice(0, LIMITS.teacherName);
     const trimmedEmail = (email || '').trim().slice(0, LIMITS.teacherEmail);
-    const trimmedPhone = (phone || '').trim().slice(0, LIMITS.teacherPhone);
+    const trimmedHomePhone = (homePhone || '').trim().slice(0, LIMITS.teacherPhone);
+    const trimmedWorkPhone = (workPhone || '').trim().slice(0, LIMITS.teacherPhone);
+    const trimmedCellPhone = (cellPhone || '').trim().slice(0, LIMITS.teacherPhone);
+    const trimmedAddress = (address || '').trim().slice(0, LIMITS.teacherAddress);
+    const trimmedCityStZip = (cityStZip || '').trim().slice(0, LIMITS.teacherCityStZip);
+    const trimmedComment1 = (comment1 || '').trim().slice(0, LIMITS.teacherComment);
+    const trimmedComment2 = (comment2 || '').trim().slice(0, LIMITS.teacherComment);
 
     // Legacy schema has no auto-increment on Teacher.Family
     const [maxRows]: any = await pool.query('SELECT max(Family) as maxId FROM Teacher');
@@ -124,8 +139,8 @@ router.post('/', async (req: Request, res: Response) => {
     const password = secureRandomString(16); // Teacher.Password is varchar(16)
 
     await pool.query(
-      'INSERT INTO Teacher (Family, Email, FirstName, LastName, Phone, Security, Password) VALUES (?, ?, ?, ?, ?, 5, ?)',
-      [newId, trimmedEmail, trimmedFirst, trimmedLast, trimmedPhone, password]
+      'INSERT INTO Teacher (Family, Email, FirstName, LastName, Phone, WorkPhone, CellPhone, Addr1, CitySTZip, Comment1, Comment2, Seq, Birthdate, Security, Password) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, CURDATE(), 5, ?)',
+      [newId, trimmedEmail, trimmedFirst, trimmedLast, trimmedHomePhone, trimmedWorkPhone, trimmedCellPhone, trimmedAddress, trimmedCityStZip, trimmedComment1, trimmedComment2, password]
     );
 
     res.status(201).json({
@@ -136,7 +151,7 @@ router.post('/', async (req: Request, res: Response) => {
         firstName: trimmedFirst,
         lastName: trimmedLast,
         email: trimmedEmail,
-        phone: trimmedPhone,
+        phone: trimmedHomePhone,
       },
     });
   } catch (error) {
