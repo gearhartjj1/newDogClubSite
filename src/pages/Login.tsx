@@ -39,7 +39,6 @@ export default function Login() {
             name: response.user.firstName + ' ' + response.user.username,
             email: response.user.email,
             phone: response.user.phone,
-            memberSince: "TBD"
           },
           isActiveMember: response.user.isActiveMember,
           isAdmin: response.user.isAdmin,

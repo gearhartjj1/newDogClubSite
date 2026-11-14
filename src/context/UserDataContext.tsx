@@ -31,7 +31,6 @@ export interface UserInfo {
   name: string;
   email: string;
   phone: string;
-  memberSince: string;
 }
 
 export interface UserData {
@@ -80,7 +79,6 @@ export function UserDataProvider({ children }: UserDataProviderProps) {
               name: user.firstName + ' ' + user.username,
               email: user.email,
               phone: user.phone,
-              memberSince: 'TBD',
             },
             isActiveMember: user.isActiveMember,
             isAdmin: user.isAdmin,

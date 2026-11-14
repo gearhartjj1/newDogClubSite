@@ -172,13 +172,11 @@ export default function Profile() {
         name: viewedMember ? `${viewedMember.firstName} ${viewedMember.lastName}` : 'Loading...',
         email: viewedMember?.email || '',
         phone: viewedMember?.phone || '',
-        memberSince: 'TBD',
       }
     : {
         name: userData.username || 'User',
         email: userData.email || '',
         phone: userData.userInfo?.phone || '',
-        memberSince: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long' }),
       };
   const isActiveMemberShown = isAdminView ? viewedMember?.isActiveMember : userData.isActiveMember;
 
@@ -283,7 +281,6 @@ export default function Profile() {
             name: response.user.firstName + ' ' + response.user.username,
             email: response.user.email,
             phone: response.user.phone,
-            memberSince: userData.userInfo?.memberSince || 'TBD',
           },
         });
         setIsEditingInfo(false);
@@ -438,10 +435,6 @@ export default function Profile() {
               <div className={styles.infoItem}>
                 <label>Phone</label>
                 <p>{userInfo.phone}</p>
-              </div>
-              <div className={styles.infoItem}>
-                <label>Member Since</label>
-                <p>{userInfo.memberSince}</p>
               </div>
               <div className={styles.infoItem}>
                 <label>Active Member</label>
