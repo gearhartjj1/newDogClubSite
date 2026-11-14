@@ -19,6 +19,7 @@ import Membership from './pages/Membership';
 import MembersOnly from './pages/MembersOnly';
 import OfficersAndBoard from './pages/OfficersAndBoard';
 import MemberManagement from './pages/MemberManagement';
+import PaymentManagement from './pages/PaymentManagement';
 import { UserDataProvider } from './context/UserDataContext';
 import './App.css';
 
@@ -54,6 +55,7 @@ function App() {
               <Route path="/members-only" element={<MembersOnly />} />
               <Route path="/officers-and-board" element={<OfficersAndBoard />} />
               <Route path="/admin/members" element={<MemberManagement />} />
+              <Route path="/admin/payments" element={<PaymentManagement />} />
             </Routes>
           </main>
         </div>

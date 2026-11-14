@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import styles from './Profile.module.css';
 import { useUserData, type Dog, type PastClass, type UserInfo } from '../context/UserDataContext';
 import { dogClassAPI, memberDogsAPI, membersAPI, signinAPI, userDataAPI, type ClassRate, type Member } from '../services/api';
-import PayPalSection from '../components/PayPalButton';
+import ClassDetailsModal from '../components/ClassDetailsModal';
 
 export default function Profile() {
   const { classId, userId } = useParams();
@@ -337,7 +337,11 @@ export default function Profile() {
                 <h3>📚 Edit session classes</h3>
                 <p>Edit existing class offerings or create a new one.</p>
               </Link>
-              {/* TODO: additional admin pages (class signups, payment reports, etc.) */}
+              <Link to="/admin/payments" className={styles.adminLinkCard}>
+                <h3>💳 Manage Payments</h3>
+                <p>Look up enrollments by invoice number and review session enrollment and payment status.</p>
+              </Link>
+              {/* TODO: additional admin pages (class signups, etc.) */}
             </div>
           </section>
         )}
@@ -579,56 +583,18 @@ export default function Profile() {
 
       {/* Class Details Modal */}
       {selectedClass && (
-        <div className={styles.modalOverlay} onClick={() => setSelectedClass(null)}>
-          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-            <div className={styles.modalHeader}>
-              <h2>📚 {selectedClass.className} | Invoice #: {selectedClass.enrollmentId} | Account # {viewedUserId}</h2>
-              <button className={styles.modalClose} onClick={() => {
-                  setSelectedClass(null);
-                  if (!isAdminView) {
-                    navigate('/profile', { replace: true });
-                  }
-                }}>✕</button>
-            </div>
-            <div className={styles.modalBody}>
-              <div className={styles.modalGrid}>
-                <div className={styles.modalItem}>
-                  <label>User Info</label>
-                  <p>{userInfo.name} | {userInfo.email} | {userInfo.phone}</p>
-                </div>
-                <div className={styles.modalItem}>
-                  <label>Class Date Info</label>
-                  <p>{selectedClass.session} | {selectedClass.room} | classCode | {selectedClass.className} | {selectedClass.completedDate} | {selectedClass.time} | {selectedClass.instructor}</p>
-                </div>
-                <div className={styles.modalItem}>
-                  <label>Dog Info</label>
-                  <p>Dog Name: {selectedClass.dogName} | Age: {selectedClass.dogAge} | Breed: {selectedClass.dogBreed}</p>
-                </div>
-                <div className={styles.modalItem}>
-                  <label>Payment Info</label>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', width: '100%' }}>
-                    <div style={{ whiteSpace: 'nowrap' }}>
-                      <span>Method: {selectedClass.paymentMethod}</span>
-                      <span style={{ marginLeft: '1rem' }} className={selectedClass.paidStatus === 'Paid' ? styles.statusPaid : styles.statusUnpaid}>
-                        Status: {selectedClass.paidStatus}
-                      </span>
-                      <span style={{ marginLeft: '1rem' }} className={selectedClass.paidStatus === 'Paid' ? styles.statusPaid : styles.statusUnpaid}>
-                        Cost: ${selectedClass.cost}
-                      </span>
-                    </div>
-                    {selectedClass.paidStatus !== 'Paid' && !isAdminView && (
-                      <div style={{ marginLeft: 'auto', minWidth: '300px', textAlign: 'right' }}>
-                        <PayPalSection price={selectedClass.cost} enrollmentId={selectedClass.enrollmentId} onSuccess={()=>{
-                          window.location.reload();
-                        }} onError={()=>{console.log("error")}} />
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <ClassDetailsModal
+          selectedClass={selectedClass}
+          userInfo={userInfo}
+          accountId={viewedUserId}
+          showPayPal={!isAdminView}
+          onClose={() => {
+            setSelectedClass(null);
+            if (!isAdminView) {
+              navigate('/profile', { replace: true });
+            }
+          }}
+        />
       )}
     </div>
   );

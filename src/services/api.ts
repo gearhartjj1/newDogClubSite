@@ -134,7 +134,49 @@ export const paymentsAPI = {
       body: JSON.stringify(paymentData),
     });
     return response.json();
-  }
+  },
+
+  // Admin: fetch full enrollment details by enrollment ID
+  adminGetEnrollment: async (enrollmentId: number) => {
+    const response = await fetch(`${API_URL}/payments/admin/enrollment/${enrollmentId}`, fetchOptions);
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'Failed to fetch enrollment');
+    return data.data;
+  },
+
+  // Admin: list all distinct class sessions
+  adminGetSessions: async () => {
+    const response = await fetch(`${API_URL}/payments/admin/sessions`, fetchOptions);
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'Failed to fetch sessions');
+    return data.data as string[];
+  },
+
+  // Admin: all enrollment data for a given session
+  adminGetSessionEnrollments: async (session: string) => {
+    const response = await fetch(`${API_URL}/payments/admin/session-enrollments?session=${encodeURIComponent(session)}`, fetchOptions);
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'Failed to fetch session enrollments');
+    return data.data as SessionEnrollment[];
+  },
+}
+
+export interface SessionEnrollment {
+  EnrollmentID: number;
+  PID: number;
+  PayMethod: number | string;
+  PaidYN: string;
+  MemberYN: string;
+  DogName: string;
+  FirstName: string | null;
+  LastName: string | null;
+  Email: string | null;
+  Class: string;
+  Day: string;
+  Time: string;
+  Instructors: string;
+  Rate: number;
+  AmtPaid: number | null;
 }
 
 // Classes API
