@@ -5,6 +5,14 @@ import { useUserData, type PastClass, type UserInfo } from '../context/UserDataC
 import { dogClassAPI, paymentsAPI, type ClassRate, type SessionEnrollment } from '../services/api';
 import ClassDetailsModal from '../components/ClassDetailsModal';
 
+/**
+ * TODO:
+ * Update grid to have data on the existing site
+ * Look into number discrpenancy from existing site
+ * Have email section be a link that will go to the email communication section (once I build it...)
+ */
+
+
 const paymentMethodNames: { [key: number]: string } = {
   1: 'PayPal',
   2: 'Cash',
@@ -209,20 +217,30 @@ export default function PaymentManagement() {
                 <table className={styles.enrollmentTable}>
                   <thead>
                     <tr>
-                      <th>Enrollment ID</th>
+                      <th>Amt Paid</th>
+                      <th>Check No</th>
+                      <th>Account ID</th>
                       <th>Member</th>
                       <th>Email</th>
-                      <th>Class</th>
-                      <th>Day / Time</th>
+                      <th>Phone</th>
+                      <th>Enrollment ID</th>
                       <th>Dog</th>
                       <th>Pay Method</th>
-                      <th>Paid</th>
-                      <th>Amt Paid</th>
+                      <th>Class</th>
+                      <th>Code</th>
                     </tr>
                   </thead>
                   <tbody>
                     {enrollments.map((enrollment) => (
                       <tr key={enrollment.EnrollmentID}>
+                        <td className={isPaid(enrollment) ? styles.paid : styles.unpaid}>
+                          {enrollment.AmtPaid != null ? `$${Number(enrollment.AmtPaid).toFixed(2)}` : '—'}
+                        </td>
+                        <td>{enrollment.CheckNo || '—'}</td>
+                        <td>{enrollment.PID || 'N/A'}</td>
+                        <td>{`${enrollment.FirstName || ''} ${enrollment.LastName || ''}`.trim() || 'N/A'}</td>
+                        <td>{enrollment.Email || ''}</td>
+                        <td>{enrollment.Phone || ''}</td>
                         <td>
                           <button
                             type="button"
@@ -244,16 +262,10 @@ export default function PaymentManagement() {
                             {enrollment.EnrollmentID}
                           </button>
                         </td>
-                        <td>{`${enrollment.FirstName || ''} ${enrollment.LastName || ''}`.trim() || 'N/A'}</td>
-                        <td>{enrollment.Email || ''}</td>
-                        <td>{enrollment.Class}</td>
-                        <td>{enrollment.Day} {enrollment.Time}</td>
                         <td>{enrollment.DogName || 'N/A'}</td>
                         <td>{paymentMethodNames[Number(enrollment.PayMethod)] || `Unknown (${enrollment.PayMethod})`}</td>
-                        <td className={isPaid(enrollment) ? styles.paid : styles.unpaid}>
-                          {isPaid(enrollment) ? 'Paid' : 'Unpaid'}
-                        </td>
-                        <td>{enrollment.AmtPaid != null ? `$${Number(enrollment.AmtPaid).toFixed(2)}` : '—'}</td>
+                        <td>{enrollment.Class}</td>
+                        <td>{enrollment.Code || '—'}</td>
                       </tr>
                     ))}
                   </tbody>

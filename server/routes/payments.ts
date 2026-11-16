@@ -64,16 +64,16 @@ router.get('/admin/session-enrollments', requireAdmin, async (req: Request, res:
     }
 
     const query = `SELECT e.ID AS EnrollmentID, e.PID, e.PayMethod, e.PaidYN, e.MemberYN, e.DogName,
-        t.FirstName, t.LastName, t.Email,
-        c.Class, c.Day, c.Time, c.Instructors, c.Rate,
-        SUM(p.AmtPaid) AS AmtPaid
+        t.FirstName, t.LastName, t.Email, t.Phone,
+        c.Class, c.Code, c.Day, c.Time, c.Instructors, c.Rate,
+        SUM(p.AmtPaid) AS AmtPaid, p.CheckNo
         FROM Enrollment e
         INNER JOIN KCTCSession c ON c.ID = e.SID
         LEFT JOIN Teacher t ON t.Family = e.PID
         LEFT JOIN Payment p ON p.FamilyId = e.ID
         WHERE c.Session = ?
         GROUP BY e.ID
-        ORDER BY c.Class, t.LastName, t.FirstName`;
+        ORDER BY e.PID, e.ID`;
     const [rows]: any = await pool.query(query, [session]);
     res.json({ success: true, data: rows || [] });
   } catch (error) {

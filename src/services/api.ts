@@ -171,12 +171,15 @@ export interface SessionEnrollment {
   FirstName: string | null;
   LastName: string | null;
   Email: string | null;
+  Phone: string | null;
   Class: string;
+  Code: string | null;
   Day: string;
   Time: string;
   Instructors: string;
   Rate: number;
   AmtPaid: number | null;
+  CheckNo: string | null;
 }
 
 // Classes API
