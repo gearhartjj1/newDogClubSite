@@ -7,9 +7,10 @@ import ClassDetailsModal from '../components/ClassDetailsModal';
 
 /**
  * TODO:
- * Update grid to have data on the existing site
+ * Update grid to have data on the existing site -- Done
  * Look into number discrpenancy from existing site
  * Have email section be a link that will go to the email communication section (once I build it...)
+ * Have member name be a link that will go to the admin read only version of the user's data
  */
 
 
@@ -45,6 +46,7 @@ export default function PaymentManagement() {
   const [isLoadingEnrollments, setIsLoadingEnrollments] = useState(false);
   const [sessionError, setSessionError] = useState('');
   const [hasLoadedEnrollments, setHasLoadedEnrollments] = useState(false);
+  const [enrollmentFilter, setEnrollmentFilter] = useState<'all' | 'paid' | 'waitlisted'>('all');
 
   // Redirect non-admins away from this page
   useEffect(() => {
@@ -119,6 +121,7 @@ export default function PaymentManagement() {
     setEnrollments([]);
     setSessionError('');
     setHasLoadedEnrollments(false);
+    setEnrollmentFilter('all');
     if (!session) return;
 
     setIsLoadingEnrollments(true);
@@ -144,6 +147,12 @@ export default function PaymentManagement() {
 
   const waitlistedCount = enrollments.filter((e) => Number(e.PayMethod) === 7).length;
   const registeredCount = enrollments.filter((e) => Number(e.PayMethod) !== 7 && Number(e.PayMethod) !== 9).length;
+
+  const filteredEnrollments = enrollments.filter((enrollment) => {
+    if (enrollmentFilter === 'paid') return Number(enrollment.PayMethod) !== 7 && isPaid(enrollment);
+    if (enrollmentFilter === 'waitlisted') return Number(enrollment.PayMethod) === 7;
+    return true;
+  });
 
   return (
     <div className={styles.container}>
@@ -210,8 +219,35 @@ export default function PaymentManagement() {
                 <span className={styles.statLabel}>Waitlisted Enrollments</span>
               </div>
             </div>
-            {enrollments.length === 0 ? (
-              <p className={styles.emptyState}>No enrollments found for this session.</p>
+            <div className={styles.filterRow}>
+              <button
+                type="button"
+                className={`${styles.filterButton} ${enrollmentFilter === 'all' ? styles.filterButtonActive : ''}`}
+                onClick={() => setEnrollmentFilter('all')}
+              >
+                All
+              </button>
+              <button
+                type="button"
+                className={`${styles.filterButton} ${enrollmentFilter === 'paid' ? styles.filterButtonActive : ''}`}
+                onClick={() => setEnrollmentFilter('paid')}
+              >
+                Paid Only
+              </button>
+              <button
+                type="button"
+                className={`${styles.filterButton} ${enrollmentFilter === 'waitlisted' ? styles.filterButtonActive : ''}`}
+                onClick={() => setEnrollmentFilter('waitlisted')}
+              >
+                Waitlisted Only
+              </button>
+            </div>
+            {filteredEnrollments.length === 0 ? (
+              <p className={styles.emptyState}>
+                {enrollments.length === 0
+                  ? 'No enrollments found for this session.'
+                  : `No ${enrollmentFilter} enrollments found for this session.`}
+              </p>
             ) : (
               <div className={styles.tableWrapper}>
                 <table className={styles.enrollmentTable}>
@@ -231,7 +267,7 @@ export default function PaymentManagement() {
                     </tr>
                   </thead>
                   <tbody>
-                    {enrollments.map((enrollment) => (
+                    {filteredEnrollments.map((enrollment) => (
                       <tr key={enrollment.EnrollmentID}>
                         <td className={isPaid(enrollment) ? styles.paid : styles.unpaid}>
                           {enrollment.AmtPaid != null ? `$${Number(enrollment.AmtPaid).toFixed(2)}` : '—'}

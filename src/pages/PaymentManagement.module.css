@@ -161,6 +161,37 @@
   font-weight: 600;
 }
 
+.filterRow {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+}
+
+.filterButton {
+  padding: 8px 16px;
+  background-color: white;
+  color: #0d9488;
+  border: 2px solid #0d9488;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.filterButton:hover {
+  background-color: #f0fdfa;
+}
+
+.filterButtonActive {
+  background-color: #0d9488;
+  color: white;
+}
+
+.filterButtonActive:hover {
+  background-color: #0f766e;
+}
+
 .tableWrapper {
   overflow-x: auto;
 }
