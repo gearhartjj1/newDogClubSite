@@ -10,7 +10,7 @@ import ClassDetailsModal from '../components/ClassDetailsModal';
  * Update grid to have data on the existing site -- Done
  * Look into number discrpenancy from existing site
  * Have email section be a link that will go to the email communication section (once I build it...)
- * Have member name be a link that will go to the admin read only version of the user's data
+ * Have member name be a link that will go to the admin read only version of the user's data -- Done
  */
 
 
@@ -218,6 +218,10 @@ export default function PaymentManagement() {
                 <span className={styles.statValue}>{waitlistedCount}</span>
                 <span className={styles.statLabel}>Waitlisted Enrollments</span>
               </div>
+              <div className={styles.statCard}>
+                <span className={styles.statValue}>{enrollments.length}</span>
+                <span className={styles.statLabel}>Total Enrollments</span>
+              </div>
             </div>
             <div className={styles.filterRow}>
               <button
@@ -256,14 +260,15 @@ export default function PaymentManagement() {
                       <th>Amt Paid</th>
                       <th>Check No</th>
                       <th>Account ID</th>
-                      <th>Member</th>
+                      <th>Name</th>
+                      <th>Is Member</th>
                       <th>Email</th>
-                      <th>Phone</th>
-                      <th>Enrollment ID</th>
+                      <th className={styles.phoneCol}>Phone</th>
+                      <th>Invoice No.</th>
                       <th>Dog</th>
                       <th>Pay Method</th>
                       <th>Class</th>
-                      <th>Code</th>
+                      <th className={styles.codeCol}>Code</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -274,9 +279,18 @@ export default function PaymentManagement() {
                         </td>
                         <td>{enrollment.CheckNo || '—'}</td>
                         <td>{enrollment.PID || 'N/A'}</td>
-                        <td>{`${enrollment.FirstName || ''} ${enrollment.LastName || ''}`.trim() || 'N/A'}</td>
+                        <td>
+                          {enrollment.PID ? (
+                            <Link to={`/profile/user/${enrollment.PID}`} className={styles.idLink}>
+                              {`${enrollment.FirstName || ''} ${enrollment.LastName || ''}`.trim() || 'N/A'}
+                            </Link>
+                          ) : (
+                            `${enrollment.FirstName || ''} ${enrollment.LastName || ''}`.trim() || 'N/A'
+                          )}
+                        </td>
+                        <td>{enrollment.MemberYN ? 'Yes' : 'No'}</td>
                         <td>{enrollment.Email || ''}</td>
-                        <td>{enrollment.Phone || ''}</td>
+                        <td className={styles.phoneCol}>{enrollment.Phone || ''}</td>
                         <td>
                           <button
                             type="button"
@@ -301,7 +315,7 @@ export default function PaymentManagement() {
                         <td>{enrollment.DogName || 'N/A'}</td>
                         <td>{paymentMethodNames[Number(enrollment.PayMethod)] || `Unknown (${enrollment.PayMethod})`}</td>
                         <td>{enrollment.Class}</td>
-                        <td>{enrollment.Code || '—'}</td>
+                        <td className={styles.codeCol}>{enrollment.Code || '—'}</td>
                       </tr>
                     ))}
                   </tbody>

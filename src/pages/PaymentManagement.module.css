@@ -220,6 +220,16 @@
   background-color: #f9f9f9;
 }
 
+.phoneCol {
+  min-width: 130px;
+  white-space: nowrap;
+}
+
+.codeCol {
+  min-width: 120px;
+  white-space: nowrap;
+}
+
 .idLink {
   background: none;
   border: none;
